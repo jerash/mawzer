@@ -1,0 +1,513 @@
+A51 MACRO ASSEMBLER  DSCR_MAWZER                                                          02/19/2007 12:06:39 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.00
+OBJECT MODULE PLACED IN dscr_mawzer.OBJ
+ASSEMBLER INVOKED BY: C:\Keil\C51\BIN\A51.EXE dscr_mawzer.a51 INCDIR(..\..\Common_Ez_Z8) SET(SMALL) EP
+
+LOC  OBJ            LINE     SOURCE
+
+                       1     ;;-----------------------------------------------------------------------------
+                       2     ;;   File:      dscr.a51
+                       3     ;;   Contents:  This file contains descriptor data tables.
+                       4     ;;
+                       5     ;; $Archive: /USB/Examples/Fx2lp/bulkloop/dscr.a51 $
+                       6     ;; $Date: 9/01/03 8:51p $
+                       7     ;; $Revision: 3 $
+                       8     ;;
+                       9     ;;
+                      10     ;;-----------------------------------------------------------------------------
+                      11     ;; Copyright 2003, Cypress Semiconductor Corporation
+                      12     ;;-----------------------------------------------------------------------------;;----------
+                             -------------------------------------------------------------------
+                      13     ; USB MIDI DESCRIPTORS
+                      14     ;#include "usb_defs.h"
+                +1    15     
+                +1    16     
+                +1    17     
+                +1    18     
+                +1    19     
+                +1    20     
+                +1    21     
+                +1    22     
+                +1    23     
+                +1    24     
+                +1    25     
+                +1    26     
+                +1    27     
+                +1    28     
+                +1    29     
+                +1    30     
+                +1    31     
+                +1    32     
+                +1    33     
+                +1    34     
+                +1    35     
+                +1    36     
+                +1    37     
+                +1    38     
+                +1    39     
+                +1    40     
+                +1    41     
+                +1    42     
+                +1    43     
+                +1    44     
+                +1    45     
+                +1    46     
+                +1    47     
+                +1    48     
+                +1    49     
+                +1    50     
+                +1    51     
+                +1    52     
+                +1    53     
+                +1    54     
+                +1    55     
+                +1    56     
+                +1    57     
+A51 MACRO ASSEMBLER  DSCR_MAWZER                                                          02/19/2007 12:06:39 PAGE     2
+
+                +1    58     
+                +1    59     
+                +1    60     
+                +1    61     
+                +1    62     
+                +1    63     
+                      64     
+                      65        
+  0001                66     DSCR_DEVICE   equ   1   ;; Descriptor type: Device
+  0002                67     DSCR_CONFIG   equ   2   ;; Descriptor type: Configuration
+  0003                68     DSCR_STRING   equ   3   ;; Descriptor type: String
+  0004                69     DSCR_INTRFC   equ   4   ;; Descriptor type: Interface
+  0005                70     DSCR_ENDPNT   equ   5   ;; Descriptor type: Endpoint
+  0006                71     DSCR_DEVQUAL  equ   6   ;; Descriptor type: Device Qualifier
+                      72     
+  0012                73     DSCR_DEVICE_LEN   equ   18
+  0009                74     DSCR_CONFIG_LEN   equ    9
+  0009                75     DSCR_INTRFC_LEN   equ    9
+  0007                76     DSCR_ENDPNT_LEN   equ    7
+  000A                77     DSCR_DEVQUAL_LEN  equ   10
+                      78     
+  0000                79     ET_CONTROL   equ   0   ;; Endpoint type: Control
+  0001                80     ET_ISO       equ   1   ;; Endpoint type: Isochronous
+  0002                81     ET_BULK      equ   2   ;; Endpoint type: Bulk
+  0003                82     ET_INT       equ   3   ;; Endpoint type: Interrupt
+                      83     
+  0024                84     CS_INTERFACE      equ   0x24    ;; CS_INTERFACE descriptor.
+  0025                85     CS_ENDPOINT       equ   0x25    ;; Descriptor type: CS_ENDPOINT
+                      86     
+                      87     ; ENDPOINT ADDRESSES: EPIN/OUT are named from the host point of view
+                      88     ;                     MIDI/AUDIO/IN/OUT are named from the device point of view
+  0002                89     EPOUT_ADDR_MIDI_IN        equ 0x02 ;; Receives the MIDI data sent by the USB host
+  0084                90     EPIN_ADDR_MIDI_OUT        equ 0x84 ;; Sends MIDI data to the USB host
+                      91     
+                      92     
+                      93     public      DeviceDscr, DeviceQualDscr, HighSpeedConfigDscr, FullSpeedConfigDscr, StringDsc
+                             r, UserDscr
+                      94     
+                      95     DSCR   SEGMENT   CODE PAGE
+                      96     
+                      97     ;;-----------------------------------------------------------------------------
+                      98     ;; Global Variables
+                      99     ;;-----------------------------------------------------------------------------
+----                 100           rseg DSCR      ;; locate the descriptor table in on-part memory.
+                     101     
+                     102     ;;CSEG AT 100H
+                     103     
+0000                 104     DeviceDscr:   
+0000 12              105           db   DSCR_DEVICE_LEN      ;; Descriptor length
+0001 01              106           db   DSCR_DEVICE   ;; Decriptor type
+0002 0002            107           dw   0002H      ;; Specification Version (BCD)
+0004 00              108           db   00H        ;; Device class
+0005 00              109           db   00H         ;; Device sub-class
+0006 00              110           db   00H         ;; Device sub-sub-class
+0007 40              111           db   64         ;; Maximum packet size
+                     112                     
+0008 2301            113                     db      0x23, 0x01      ;; Vendor ID
+000A 0100            114                     db      0x01, 0x00      ;; Product ID
+000C 0000            115                     db      0x00, 0x00      ;; Product version ID
+000E 01              116           db   1         ;; Manufacturer string index
+000F 02              117           db   2         ;; Product string index
+0010 00              118           db   0         ;; Serial number string index
+0011 01              119           db   1         ;; Number of configurations
+                     120     
+0012                 121     DeviceQualDscr:
+0012 0A              122           db   DSCR_DEVQUAL_LEN   ;; Descriptor length
+A51 MACRO ASSEMBLER  DSCR_MAWZER                                                          02/19/2007 12:06:39 PAGE     3
+
+0013 06              123           db   DSCR_DEVQUAL   ;; Decriptor type
+0014 0002            124           dw   0002H      ;; Specification Version (BCD)
+0016 00              125           db   00H        ;; Device class
+0017 00              126           db   00H         ;; Device sub-class
+0018 00              127           db   00H         ;; Device sub-sub-class
+0019 40              128           db   64         ;; Maximum packet size
+001A 01              129           db   1         ;; Number of configurations
+001B 00              130           db   0         ;; Reserved
+                     131     
+                     132     ;;org (($ / 2) +1) * 2
+                     133     
+001C                 134     HighSpeedConfigDscr:   
+001C 09              135           db   DSCR_CONFIG_LEN               ;; Descriptor length
+001D 02              136           db   DSCR_CONFIG                  ;; Descriptor type
+001E 65              137           db   (HighSpeedConfigDscrEnd-HighSpeedConfigDscr) mod 256 ;; Total Length (LSB)
+001F 00              138           db   (HighSpeedConfigDscrEnd-HighSpeedConfigDscr)  /  256 ;; Total Length (MSB)
+0020 02              139             db   2      ;; Number of interfaces
+0021 01              140           db   1      ;; Configuration number
+0022 00              141           db   0      ;; Configuration string
+0023 C0              142             db   11000000b   ;; Attributes (b7 - buspwr, b6 - selfpwr, b5 - rwu)
+0024 19              143           db   25      ;; Power requirement (div 2 ma)
+                     144     
+                     145     ;; Interface Descriptor
+0025 09              146                     db      DSCR_INTRFC_LEN ;; Descriptor length
+0026 04              147                     db      DSCR_INTRFC     ;; Descriptor type
+0027 00              148                     db      0               ;; Zero-based index of this interface
+0028 00              149                     db      0               ;; index of this setting
+0029 00              150                     db      0               ;; Number of end points
+002A 01              151                     db      1               ;; Interface class  (AUDIO)
+002B 01              152                     db      1               ;; Interface sub class  (AC:audio control)
+002C 00              153                     db      0               ;; Interface sub sub class
+002D 00              154                     db      0               ;; Interface descriptor string index
+                     155     
+                     156     ;; Interface Descriptor
+002E 09              157                     db      DSCR_INTRFC_LEN         ;; Descriptor length
+002F 24              158                     db      CS_INTERFACE            ;; Descriptor type
+0030 01              159                     db      1                                       ;; descriptor sub-type
+0031 0001            160                     db      0x00, 0x01      ;; revision of this class specification
+0033 0900            161                     db      0x09, 0x00      ;; Total size of class-specific descriptors
+0035 01              162                     db      1               ;; number of streaming interface
+0036 01              163                     db      1               ;; midi streaming interf 1 belongs to this audiocon
+                             trol interf                     ???
+                     164     
+                     165     ;; Interface Descriptor
+0037 09              166                     db      DSCR_INTRFC_LEN ;; Descriptor length
+0038 04              167                     db      DSCR_INTRFC     ;; Descriptor type
+0039 01              168                     db      1               ;; Zero-based index of this interface
+003A 00              169                     db      0               ;; index of this Alternate setting
+003B 02              170                     db      2               ;; Number of end points 
+003C 01              171                     db      1               ;; Interface class  (AUDIO)
+003D 03              172                     db      3               ;; Interface sub class  (MIDISTREAMING)
+003E 00              173                     db      0               ;; Interface sub sub class
+003F 00              174                     db      0               ;; Interface descriptor string index
+                     175     
+                     176     ;; Interface Descriptor
+0040                 177     HighSpeedMSCIntrfcDscr:
+0040 07              178                     db      7               ;; Descriptor length
+0041 24              179                     db      CS_INTERFACE            ;; Descriptor type
+0042 01              180                     db      1               ;; Zero-based index of this interface
+0043 0001            181                     db      0x00, 0x01      ;; revision of this class specification
+0045 41              182                     db      LOW(HS_CS_MS_IF_DSCR_TOTAL_SIZE);; Total size of class-specific des
+                             criptors                ???
+0046 00              183                     db      HIGH(HS_CS_MS_IF_DSCR_TOTAL_SIZE)               ;;                 
+                                                                                             ???
+                     184     
+                     185     ;; Endpoint Descriptor MIDI IN EMBEDDED
+A51 MACRO ASSEMBLER  DSCR_MAWZER                                                          02/19/2007 12:06:39 PAGE     4
+
+0047 06              186                     db      6               ;; Descriptor length
+0048 24              187                     db      CS_INTERFACE            ;; Descriptor type (CS_INTERFACE)
+0049 02              188                     db      0x02            ;; MIDI_IN_JACK subtype
+004A 01              189                     db      0x01            ;; EMBEDDED
+004B 01              190                     db      0x01            ;; ID of this jack
+004C 00              191                     db      0               ;; unused
+                     192     
+                     193     ;; Endpoint Descriptor MIDI IN EXTERNAL
+004D 06              194                     db      6               ;; Descriptor length
+004E 24              195                     db      CS_INTERFACE            ;; Descriptor type (CS_INTERFACE)
+004F 02              196                     db      0x02            ;; MIDI_IN_JACK subtype
+0050 02              197                     db      0x02            ;; EXTERNAL
+0051 02              198                     db      0x02            ;; ID of this jack
+0052 00              199                     db      0               ;; unused
+                     200     
+                     201     ;; Endpoint Descriptor MIDI OUT EMBEDDED
+0053 09              202                     db      9               ;; Descriptor length
+0054 24              203                     db      CS_INTERFACE            ;; Descriptor type (CS_INTERFACE)
+0055 03              204                     db      0x03            ;; MIDI_OUT_JACK subtype
+0056 01              205                     db      0x01            ;; EMBEDDED
+0057 03              206                     db      0x03            ;; ID of this jack
+0058 01              207                     db      0x01            ;; number of input pins of this jack
+0059 02              208                     db      0x02            ;; ID of the entity to which this pin is connected
+005A 01              209                     db      0x01            ;; Output Pin number of the entity to which this in
+                             put pin is connected
+005B 00              210                     db      0               ;; unused
+                     211     
+                     212     ;; Endpoint Descriptor MIDI OUT EXTERNAL
+005C 09              213                     db      9               ;; Descriptor length
+005D 24              214                     db      CS_INTERFACE            ;; Descriptor type (CS_INTERFACE)
+005E 03              215                     db      0x03            ;; MIDI_OUT_JACK subtype
+005F 02              216                     db      0x02            ;; EXTERNAL
+0060 04              217                     db      0x04            ;; ID of this jack
+0061 01              218                     db      0x01            ;; number of input pins of this jack
+0062 01              219                     db      0x01            ;; ID of the entity to which this pin is connected
+0063 01              220                     db      0x01            ;; Output Pin number of the entity to which this in
+                             put pin is connected
+0064 00              221                     db      0               ;; unused
+                     222     
+                     223     ;; Endpoint Descriptor BULK OUT
+0065 09              224                     db      9       ;; Descriptor length
+0066 05              225                     db      DSCR_ENDPNT     ;; Descriptor type
+0067 02              226                     db      EPOUT_ADDR_MIDI_IN              ;; Out Endpoint 4 
+0068 02              227                     db      0x02            ;; Bulk, not shared
+0069 4000            228                     db      64, 0x00        ;; 64 bytes per packet
+006B 00              229                     db      0x00            ;; ignore for bulk
+006C 00              230                     db      0x00            ;; unused
+006D 00              231                     db      0x00            ;; unused
+                     232     
+                     233     ;; Endpoint Descriptor BULK OUT CLASS SPECIFIC
+006E 05              234                     db      5       ;; Descriptor length
+006F 25              235                     db      CS_ENDPOINT             ;; Descriptor type (CS_ENDPOINT)
+0070 01              236                     db      0x01            ;; MS_GENERAL
+0071 01              237                     db      0x01            ;; number of embedded MIDI IN Jacks (???)
+0072 01              238                     db      0x01            ;; ID of embedded MIDI In Jack
+                     239     
+                     240     ;; Endpoint Descriptor BULK IN
+0073 09              241                     db      9       ;; Descriptor length
+0074 05              242                     db      DSCR_ENDPNT     ;; Descriptor type
+0075 84              243                     db      EPIN_ADDR_MIDI_OUT              ;; In Endpoint 4 (see usb_defs.h)
+0076 02              244                     db      0x02            ;; Bulk, not shared
+0077 4000            245                     db      64, 0x00        ;; 64 bytes per packet
+0079 00              246                     db      0x00            ;; ignore for bulk
+007A 00              247                     db      0x00            ;; unused
+007B 00              248                     db      0x00            ;; unused
+                     249     
+A51 MACRO ASSEMBLER  DSCR_MAWZER                                                          02/19/2007 12:06:39 PAGE     5
+
+                     250     ;; Endpoint Descriptor BULK IN CLASS SPECIFIC
+007C 05              251                     db      5       ;; Descriptor length
+007D 25              252                     db      CS_ENDPOINT             ;; Descriptor type (CS_ENDPOINT)
+007E 01              253                     db      0x01            ;; MS_GENERAL
+007F 01              254                     db      0x01            ;; number of embedded MIDI Out Jacks
+0080 03              255                     db      0x03            ;; ID of embedded MIDI Out Jack
+                     256     
+0081                 257     HighSpeedConfigDscrEnd:   
+                     258     
+  0041               259     HS_CS_MS_IF_DSCR_TOTAL_SIZE    EQU    $-HighSpeedMSCIntrfcDscr
+                     260     
+                     261     
+                     262     
+                     263     
+                     264     ;;org (($ / 2) +1) * 2
+                     265     
+0081                 266     FullSpeedConfigDscr:   
+0081 09              267           db   DSCR_CONFIG_LEN               ;; Descriptor length
+0082 02              268           db   DSCR_CONFIG                  ;; Descriptor type
+0083 65              269           db   (FullSpeedConfigDscrEnd-FullSpeedConfigDscr) mod 256 ;; Total Length (LSB)
+0084 00              270           db   (FullSpeedConfigDscrEnd-FullSpeedConfigDscr)  /  256 ;; Total Length (MSB)
+0085 02              271             db   2      ;; Number of interfaces
+0086 01              272           db   1      ;; Configuration number
+0087 00              273           db   0      ;; Configuration string
+0088 C0              274             db   11000000b   ;; Attributes (b7 - buspwr, b6 - selfpwr, b5 - rwu)
+0089 19              275           db   25      ;; Power requirement (div 2 ma)
+                     276     
+                     277     ;; Interface Descriptor
+008A 09              278                     db      DSCR_INTRFC_LEN ;; Descriptor length
+008B 04              279                     db      DSCR_INTRFC     ;; Descriptor type
+008C 00              280                     db      0               ;; Zero-based index of this interface
+008D 00              281                     db      0               ;; index of this setting
+008E 00              282                     db      0               ;; Number of end points
+008F 01              283                     db      1               ;; Interface class  (AUDIO)
+0090 01              284                     db      1               ;; Interface sub class  (AC:audio control)
+0091 00              285                     db      0               ;; Interface sub sub class
+0092 00              286                     db      0               ;; Interface descriptor string index
+                     287     
+                     288     ;; Interface Descriptor
+0093 09              289                     db      DSCR_INTRFC_LEN         ;; Descriptor length
+0094 24              290                     db      CS_INTERFACE            ;; Descriptor type
+0095 01              291                     db      1                                       ;; descriptor sub-type
+0096 0001            292                     db      0x00, 0x01      ;; revision of this class specification
+0098 0900            293                     db      0x09, 0x00      ;; Total size of class-specific descriptors
+009A 01              294                     db      1               ;; number of streaming interface
+009B 01              295                     db      1               ;; midi streaming interf 1 belongs to this audiocon
+                             trol interf                     ???
+                     296     
+                     297     ;; Interface Descriptor
+009C 09              298                     db      DSCR_INTRFC_LEN ;; Descriptor length
+009D 04              299                     db      DSCR_INTRFC     ;; Descriptor type
+009E 01              300                     db      1               ;; Zero-based index of this interface
+009F 00              301                     db      0               ;; index of this Alternate setting
+00A0 02              302                     db      2               ;; Number of end points 
+00A1 01              303                     db      1               ;; Interface class  (AUDIO)
+00A2 03              304                     db      3               ;; Interface sub class  (MIDISTREAMING)
+00A3 00              305                     db      0               ;; Interface sub sub class
+00A4 00              306                     db      0               ;; Interface descriptor string index
+                     307     
+                     308     ;; Interface Descriptor
+00A5                 309     FullSpeedMSCIntrfcDscr:
+00A5 07              310                     db      7               ;; Descriptor length
+00A6 24              311                     db      CS_INTERFACE            ;; Descriptor type
+00A7 01              312                     db      1               ;; Zero-based index of this interface
+00A8 0001            313                     db      0x00, 0x01      ;; revision of this class specification
+00AA 41              314                     db      LOW(FS_CS_MS_IF_DSCR_TOTAL_SIZE);; Total size of class-specific des
+A51 MACRO ASSEMBLER  DSCR_MAWZER                                                          02/19/2007 12:06:39 PAGE     6
+
+                             criptors                ???
+00AB 00              315                     db      HIGH(FS_CS_MS_IF_DSCR_TOTAL_SIZE)                                  
+                                  ;;                                                         ???
+                     316     
+                     317     ;; Endpoint Descriptor MIDI IN EMBEDDED
+00AC 06              318                     db      6               ;; Descriptor length
+00AD 24              319                     db      CS_INTERFACE            ;; Descriptor type (CS_INTERFACE)
+00AE 02              320                     db      0x02            ;; MIDI_IN_JACK subtype
+00AF 01              321                     db      0x01            ;; EMBEDDED
+00B0 01              322                     db      0x01            ;; ID of this jack
+00B1 00              323                     db      0               ;; unused
+                     324     
+                     325     ;; Endpoint Descriptor MIDI IN EXTERNAL
+00B2 06              326                     db      6               ;; Descriptor length
+00B3 24              327                     db      CS_INTERFACE            ;; Descriptor type (CS_INTERFACE)
+00B4 02              328                     db      0x02            ;; MIDI_IN_JACK subtype
+00B5 02              329                     db      0x02            ;; EXTERNAL
+00B6 02              330                     db      0x02            ;; ID of this jack
+00B7 00              331                     db      0               ;; unused
+                     332     
+                     333     ;; Endpoint Descriptor MIDI OUT EMBEDDED
+00B8 09              334                     db      9               ;; Descriptor length
+00B9 24              335                     db      CS_INTERFACE            ;; Descriptor type (CS_INTERFACE)
+00BA 03              336                     db      0x03            ;; MIDI_OUT_JACK subtype
+00BB 01              337                     db      0x01            ;; EMBEDDED
+00BC 03              338                     db      0x03            ;; ID of this jack
+00BD 01              339                     db      0x01            ;; number of input pins of this jack
+00BE 02              340                     db      0x02            ;; ID of the entity to which this pin is connected
+00BF 01              341                     db      0x01            ;; Output Pin number of the entity to which this in
+                             put pin is connected
+00C0 00              342                     db      0               ;; unused
+                     343     
+                     344     ;; Endpoint Descriptor MIDI OUT EXTERNAL
+00C1 09              345                     db      9               ;; Descriptor length
+00C2 24              346                     db      CS_INTERFACE            ;; Descriptor type (CS_INTERFACE)
+00C3 03              347                     db      0x03            ;; MIDI_OUT_JACK subtype
+00C4 02              348                     db      0x02            ;; EXTERNAL
+00C5 04              349                     db      0x04            ;; ID of this jack
+00C6 01              350                     db      0x01            ;; number of input pins of this jack
+00C7 01              351                     db      0x01            ;; ID of the entity to which this pin is connected
+00C8 01              352                     db      0x01            ;; Output Pin number of the entity to which this in
+                             put pin is connected
+00C9 00              353                     db      0               ;; unused
+                     354     
+                     355     ;; Endpoint Descriptor BULK OUT
+00CA 09              356                     db      9       ;; Descriptor length
+00CB 05              357                     db      DSCR_ENDPNT     ;; Descriptor type
+00CC 02              358                     db      EPOUT_ADDR_MIDI_IN              ;; Out Endpoint 4 
+00CD 02              359                     db      0x02            ;; Bulk, not shared
+00CE 4000            360                     db      64, 0x00        ;; 64 bytes per packet
+00D0 00              361                     db      0x00            ;; ignore for bulk
+00D1 00              362                     db      0x00            ;; unused
+00D2 00              363                     db      0x00            ;; unused
+                     364     
+                     365     ;; Endpoint Descriptor BULK OUT CLASS SPECIFIC
+00D3 05              366                     db      5       ;; Descriptor length
+00D4 25              367                     db      CS_ENDPOINT             ;; Descriptor type (CS_ENDPOINT)
+00D5 01              368                     db      0x01            ;; MS_GENERAL
+00D6 01              369                     db      0x01            ;; number of embedded MIDI IN Jacks (???)
+00D7 01              370                     db      0x01            ;; ID of embedded MIDI In Jack
+                     371     
+                     372     ;; Endpoint Descriptor BULK IN
+00D8 09              373                     db      9       ;; Descriptor length
+00D9 05              374                     db      DSCR_ENDPNT     ;; Descriptor type
+00DA 84              375                     db      EPIN_ADDR_MIDI_OUT              ;; In Endpoint 4 (see usb_defs.h)
+00DB 02              376                     db      0x02            ;; Bulk, not shared
+A51 MACRO ASSEMBLER  DSCR_MAWZER                                                          02/19/2007 12:06:39 PAGE     7
+
+00DC 4000            377                     db      64, 0x00        ;; 64 bytes per packet
+00DE 00              378                     db      0x00            ;; ignore for bulk
+00DF 00              379                     db      0x00            ;; unused
+00E0 00              380                     db      0x00            ;; unused
+                     381     
+                     382     ;; Endpoint Descriptor BULK IN CLASS SPECIFIC
+00E1 05              383                     db      5       ;; Descriptor length
+00E2 25              384                     db      CS_ENDPOINT             ;; Descriptor type (CS_ENDPOINT)
+00E3 01              385                     db      0x01            ;; MS_GENERAL
+00E4 01              386                     db      0x01            ;; number of embedded MIDI Out Jacks
+00E5 03              387                     db      0x03            ;; ID of embedded MIDI Out Jack
+00E6                 388     FullSpeedConfigDscrEnd:   
+                     389     
+  0041               390     FS_CS_MS_IF_DSCR_TOTAL_SIZE    EQU    $-FullSpeedMSCIntrfcDscr
+                     391     
+                     392     ;;org (($ / 2) +1) * 2
+                     393     
+00E6                 394     StringDscr:
+                     395     
+00E6                 396     StringDscr0:   
+00E6 04              397           db   StringDscr0End-StringDscr0      ;; String descriptor length
+00E7 03              398           db   DSCR_STRING
+00E8 0904            399           db   09H,04H
+00EA                 400     StringDscr0End:
+                     401     
+00EA                 402     StringDscr1:   
+00EA 10              403           db   StringDscr1End-StringDscr1      ;; String descriptor length
+00EB 03              404           db   DSCR_STRING
+00EC 4A00            405           db   'J',00
+00EE 6500            406           db   'e',00
+00F0 7200            407           db   'r',00
+00F2 6100            408           db   'a',00
+00F4 7300            409           db   's',00
+00F6 6800            410           db   'h',00
+00F8 4C00            411           db   'L',00
+00FA                 412     StringDscr1End:
+                     413     
+00FA                 414     StringDscr2:   
+00FA 0E              415           db   StringDscr2End-StringDscr2      ;; Descriptor length
+00FB 03              416           db   DSCR_STRING
+00FC 4D00            417           db   'M',00
+00FE 6100            418           db   'a',00
+0100 7700            419           db   'w',00
+0102 7A00            420           db   'z',00
+0104 6500            421           db   'e',00
+0106 7200            422           db   'r',00
+0108                 423     StringDscr2End:
+                     424     
+0108                 425     UserDscr:      
+0108 0000            426           dw   0000H
+                     427           end
+                                   
+A51 MACRO ASSEMBLER  DSCR_MAWZER                                                          02/19/2007 12:06:39 PAGE     8
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E                      T Y P E  V A L U E   ATTRIBUTES
+
+CS_ENDPOINT . . . . . . . .  N NUMB   0025H   A   
+CS_INTERFACE. . . . . . . .  N NUMB   0024H   A   
+DEVICEDSCR. . . . . . . . .  C ADDR   0000H   R   SEG=DSCR
+DEVICEQUALDSCR. . . . . . .  C ADDR   0012H   R   SEG=DSCR
+DSCR. . . . . . . . . . . .  C SEG    010AH       REL=PAGE
+DSCR_CONFIG . . . . . . . .  N NUMB   0002H   A   
+DSCR_CONFIG_LEN . . . . . .  N NUMB   0009H   A   
+DSCR_DEVICE . . . . . . . .  N NUMB   0001H   A   
+DSCR_DEVICE_LEN . . . . . .  N NUMB   0012H   A   
+DSCR_DEVQUAL. . . . . . . .  N NUMB   0006H   A   
+DSCR_DEVQUAL_LEN. . . . . .  N NUMB   000AH   A   
+DSCR_ENDPNT . . . . . . . .  N NUMB   0005H   A   
+DSCR_ENDPNT_LEN . . . . . .  N NUMB   0007H   A   
+DSCR_INTRFC . . . . . . . .  N NUMB   0004H   A   
+DSCR_INTRFC_LEN . . . . . .  N NUMB   0009H   A   
+DSCR_STRING . . . . . . . .  N NUMB   0003H   A   
+EPIN_ADDR_MIDI_OUT. . . . .  N NUMB   0084H   A   
+EPOUT_ADDR_MIDI_IN. . . . .  N NUMB   0002H   A   
+ET_BULK . . . . . . . . . .  N NUMB   0002H   A   
+ET_CONTROL. . . . . . . . .  N NUMB   0000H   A   
+ET_INT. . . . . . . . . . .  N NUMB   0003H   A   
+ET_ISO. . . . . . . . . . .  N NUMB   0001H   A   
+FS_CS_MS_IF_DSCR_TOTAL_SIZE  N NUMB   0041H   A   
+FULLSPEEDCONFIGDSCR . . . .  C ADDR   0081H   R   SEG=DSCR
+FULLSPEEDCONFIGDSCREND. . .  C ADDR   00E6H   R   SEG=DSCR
+FULLSPEEDMSCINTRFCDSCR. . .  C ADDR   00A5H   R   SEG=DSCR
+HIGHSPEEDCONFIGDSCR . . . .  C ADDR   001CH   R   SEG=DSCR
+HIGHSPEEDCONFIGDSCREND. . .  C ADDR   0081H   R   SEG=DSCR
+HIGHSPEEDMSCINTRFCDSCR. . .  C ADDR   0040H   R   SEG=DSCR
+HS_CS_MS_IF_DSCR_TOTAL_SIZE  N NUMB   0041H   A   
+STRINGDSCR. . . . . . . . .  C ADDR   00E6H   R   SEG=DSCR
+STRINGDSCR0 . . . . . . . .  C ADDR   00E6H   R   SEG=DSCR
+STRINGDSCR0END. . . . . . .  C ADDR   00EAH   R   SEG=DSCR
+STRINGDSCR1 . . . . . . . .  C ADDR   00EAH   R   SEG=DSCR
+STRINGDSCR1END. . . . . . .  C ADDR   00FAH   R   SEG=DSCR
+STRINGDSCR2 . . . . . . . .  C ADDR   00FAH   R   SEG=DSCR
+STRINGDSCR2END. . . . . . .  C ADDR   0108H   R   SEG=DSCR
+USERDSCR. . . . . . . . . .  C ADDR   0108H   R   SEG=DSCR
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

@@ -1,0 +1,2542 @@
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 1   
+
+
+C51 COMPILER V8.02, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE main.c OPTIMIZE(9,SIZE) INCDIR(..\..\Common_Ez_Z8) DEFINE(EZ_COMPIL) CODE L
+                    -ISTINCLUDE SYMBOLS PREPRINT
+
+line level    source
+
+   1          // ==========================================================================
+   2          // Copyright (C) MAWZER - Jerash Labs 2006
+   3          // ==========================================================================
+   4          
+   5          //#pragma NOIV  // Do not generate interrupt vectors 
+   6          
+   7          #include "fx2.h"
+   1      =1  //-----------------------------------------------------------------------------
+   2      =1  //   File:      FX2.h
+   3      =1  //   Contents:  EZ-USB FX2/FX2LP/FX1 constants, macros, datatypes, globals, and library
+   4      =1  //              function prototypes.
+   5      =1  //
+   6      =1  // $Archive: /USB/Target/Inc/Fx2.h $
+   7      =1  // $Date: 3/23/05 2:30p $
+   8      =1  // $Revision: 16 $
+   9      =1  //
+  10      =1  //   Copyright (c) 2005 Cypress Semiconductor, All rights reserved
+  11      =1  //-----------------------------------------------------------------------------
+  12      =1  #ifndef FX2_H     //Header sentry
+  13      =1  #define FX2_H
+  14      =1  
+  15      =1  #define INTERNAL_DSCR_ADDR 0x0080   // Relocate Descriptors to 0x80
+  16      =1  #define bmSTRETCH 0x07
+  17      =1  #define FW_STRETCH_VALUE 0x0      // Set stretch to 0 in frameworks
+  18      =1  
+  19      =1  //-----------------------------------------------------------------------------
+  20      =1  // Constants
+  21      =1  //-----------------------------------------------------------------------------
+  22      =1  #define   TRUE    1
+  23      =1  #define FALSE   0
+  24      =1  
+  25      =1  #define bmBIT0   0x01
+  26      =1  #define bmBIT1   0x02
+  27      =1  #define bmBIT2   0x04
+  28      =1  #define bmBIT3   0x08
+  29      =1  #define bmBIT4   0x10
+  30      =1  #define bmBIT5   0x20
+  31      =1  #define bmBIT6   0x40
+  32      =1  #define bmBIT7   0x80
+  33      =1  
+  34      =1  #define DEVICE_DSCR      0x01      // Descriptor type: Device
+  35      =1  #define CONFIG_DSCR      0x02      // Descriptor type: Configuration
+  36      =1  #define STRING_DSCR      0x03      // Descriptor type: String
+  37      =1  #define INTRFC_DSCR      0x04      // Descriptor type: Interface
+  38      =1  #define ENDPNT_DSCR      0x05      // Descriptor type: End Point
+  39      =1  #define DEVQUAL_DSCR     0x06      // Descriptor type: Device Qualifier
+  40      =1  #define OTHERSPEED_DSCR  0x07      // Descriptor type: Other Speed Configuration
+  41      =1  
+  42      =1  #define bmBUSPWR  bmBIT7         // Config. attribute: Bus powered
+  43      =1  #define bmSELFPWR bmBIT6         // Config. attribute: Self powered
+  44      =1  #define bmRWU     bmBIT5         // Config. attribute: Remote Wakeup
+  45      =1  
+  46      =1  #define bmEPOUT   bmBIT7
+  47      =1  #define bmEPIN    0x00
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 2   
+
+  48      =1  
+  49      =1  #define EP_CONTROL   0x00        // End Point type: Control
+  50      =1  #define EP_ISO       0x01        // End Point type: Isochronous
+  51      =1  #define EP_BULK      0x02        // End Point type: Bulk
+  52      =1  #define EP_INT       0x03        // End Point type: Interrupt
+  53      =1  
+  54      =1  #define SUD_SIZE            8      // Setup data packet size
+  55      =1  
+  56      =1  //////////////////////////////////////////////////////////////////////////////
+  57      =1  //Added for HID
+  58      =1  
+  59      =1  #define SETUP_MASK                              0x60    //Used to mask off request type
+  60      =1  #define SETUP_STANDARD_REQUEST  0               //Standard Request
+  61      =1  #define SETUP_CLASS_REQUEST             0x20    //Class Request
+  62      =1  #define SETUP_VENDOR_REQUEST    0x40    //Vendor Request
+  63      =1  #define SETUP_RESERVED_REQUEST  0x60    //Reserved or illegal request
+  64      =1  
+  65      =1  //////////////////////////////////////////////////////////////////////////////
+  66      =1  
+  67      =1  
+  68      =1  #define SC_GET_STATUS         0x00   // Setup command: Get Status
+  69      =1  #define SC_CLEAR_FEATURE      0x01   // Setup command: Clear Feature
+  70      =1  #define SC_RESERVED            0x02   // Setup command: Reserved
+  71      =1  #define SC_SET_FEATURE         0x03   // Setup command: Set Feature
+  72      =1  #define SC_SET_ADDRESS         0x05   // Setup command: Set Address
+  73      =1  #define SC_GET_DESCRIPTOR      0x06   // Setup command: Get Descriptor
+  74      =1  #define SC_SET_DESCRIPTOR      0x07   // Setup command: Set Descriptor
+  75      =1  #define SC_GET_CONFIGURATION   0x08   // Setup command: Get Configuration
+  76      =1  #define SC_SET_CONFIGURATION   0x09   // Setup command: Set Configuration
+  77      =1  #define SC_GET_INTERFACE      0x0a   // Setup command: Get Interface
+  78      =1  #define SC_SET_INTERFACE      0x0b   // Setup command: Set Interface
+  79      =1  #define SC_SYNC_FRAME         0x0c   // Setup command: Sync Frame
+  80      =1  #define SC_ANCHOR_LOAD         0xa0   // Setup command: Anchor load
+  81      =1     
+  82      =1  #define GD_DEVICE          0x01  // Get descriptor: Device
+  83      =1  #define GD_CONFIGURATION   0x02  // Get descriptor: Configuration
+  84      =1  #define GD_STRING          0x03  // Get descriptor: String
+  85      =1  #define GD_INTERFACE       0x04  // Get descriptor: Interface
+  86      =1  #define GD_ENDPOINT        0x05  // Get descriptor: Endpoint
+  87      =1  #define GD_DEVICE_QUALIFIER 0x06  // Get descriptor: Device Qualifier
+  88      =1  #define GD_OTHER_SPEED_CONFIGURATION 0x07  // Get descriptor: Other Configuration
+  89      =1  #define GD_INTERFACE_POWER 0x08  // Get descriptor: Interface Power
+  90      =1  #define GD_HID              0x21        // Get descriptor: HID
+  91      =1  #define GD_REPORT                0x22   // Get descriptor: Report
+  92      =1  
+  93      =1  #define GS_DEVICE          0x80  // Get Status: Device
+  94      =1  #define GS_INTERFACE       0x81  // Get Status: Interface
+  95      =1  #define GS_ENDPOINT        0x82  // Get Status: End Point
+  96      =1  
+  97      =1  #define FT_DEVICE          0x00  // Feature: Device
+  98      =1  #define FT_ENDPOINT        0x02  // Feature: End Point
+  99      =1  
+ 100      =1  #define I2C_IDLE              0     // I2C Status: Idle mode
+ 101      =1  #define I2C_SENDING           1     // I2C Status: I2C is sending data
+ 102      =1  #define I2C_RECEIVING         2     // I2C Status: I2C is receiving data
+ 103      =1  #define I2C_PRIME             3     // I2C Status: I2C is receiving the first byte of a string
+ 104      =1  #define I2C_STOP              5     // I2C Status: I2C waiting for stop completion
+ 105      =1  #define I2C_BERROR            6     // I2C Status: I2C error; Bit Error
+ 106      =1  #define I2C_NACK              7     // I2C Status: I2C error; No Acknowledge
+ 107      =1  #define I2C_OK                8     // I2C positive return code
+ 108      =1  #define I2C_WAITSTOP          9     // I2C Status: Wait for STOP complete
+ 109      =1  
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 3   
+
+ 110      =1  /*-----------------------------------------------------------------------------
+ 111      =1     Macros
+ 112      =1  -----------------------------------------------------------------------------*/
+ 113      =1  
+ 114      =1  #define MSB(word)      (BYTE)(((WORD)(word) >> 8) & 0xff)
+ 115      =1  #define LSB(word)      (BYTE)((WORD)(word) & 0xff)
+ 116      =1  
+ 117      =1  #define SWAP_ENDIAN(word)   ((BYTE*)&word)[0] ^= ((BYTE*)&word)[1];\
+ 118      =1                       ((BYTE*)&word)[1] ^= ((BYTE*)&word)[0];\
+ 119      =1                       ((BYTE*)&word)[0] ^= ((BYTE*)&word)[1]
+ 120      =1  
+ 121      =1  #define EZUSB_IRQ_ENABLE()   EUSB = 1
+ 122      =1  #define EZUSB_IRQ_DISABLE()   EUSB = 0
+ 123      =1  #define EZUSB_IRQ_CLEAR()   EXIF &= ~0x10      // IE2_
+ 124      =1  
+ 125      =1  #define EZUSB_STALL_EP0()            EP0CS |= bmEPSTALL
+ 126      =1  
+ 127      =1  // WRITEDELAY() has been replaced by SYNCDELAY; macro in fx2sdly.h
+ 128      =1  // ...it is here for backwards compatibility...
+ 129      =1  
+ 130      =1  // the WRITEDELAY macro compiles to the time equivalent of 3 NOPs.
+ 131      =1  // It is used in the frameworks to allow for write recovery time
+ 132      =1  // requirements of certain registers.  This is only necessary for
+ 133      =1  // EZ-USB FX parts.  See the EZ-USB FX TRM for
+ 134      =1  // more information on write recovery time issues.
+ 135      =1  #define WRITEDELAY() {char writedelaydummy = 0;}
+ 136      =1  // if this firmware will never run on an EZ-USB FX part replace
+ 137      =1  // with:
+ 138      =1  // #define WRITEDELAY()
+ 139      =1  
+ 140      =1  // macro to reset and endpoint data toggle
+ 141      =1  #define EZUSB_RESET_DATA_TOGGLE(ep)     TOGCTL = (((ep & 0x80) >> 3) + (ep & 0x0F));\
+ 142      =1                                          TOGCTL |= bmRESETTOGGLE
+ 143      =1  
+ 144      =1  
+ 145      =1  #define EZUSB_ENABLE_RSMIRQ()      (EICON |= 0x20)      // Enable Resume Interrupt (EPFI_)
+ 146      =1  #define EZUSB_DISABLE_RSMIRQ()      (EICON &= ~0x20)   // Disable Resume Interrupt (EPFI_)
+ 147      =1  #define EZUSB_CLEAR_RSMIRQ()      (EICON &= ~0x10)   // Clear Resume Interrupt Flag (PFI_)
+ 148      =1  
+ 149      =1  #define EZUSB_GETI2CSTATUS()      (I2CPckt.status)
+ 150      =1  #define EZUSB_CLEARI2CSTATUS()      if((I2CPckt.status == I2C_BERROR) || (I2CPckt.status == I2C_NACK))\
+ 151      =1                                I2CPckt.status = I2C_IDLE;
+ 152      =1  
+ 153      =1  #define EZUSB_ENABLEBP()         (BREAKPT |= bmBPEN)
+ 154      =1  #define EZUSB_DISABLEBP()         (BREAKPT &= ~bmBPEN)
+ 155      =1  #define EZUSB_CLEARBP()            (BREAKPT |= bmBREAK)
+ 156      =1  #define EZUSB_BP(addr)            BPADDRH = (BYTE)(((WORD)addr >> 8) & 0xff);\      
+ 157      =1                                    BPADDRL = (BYTE)addr
+ 158      =1  
+ 159      =1  #define EZUSB_EXTWAKEUP()      (((WAKEUPCS & bmWU2) && (WAKEUPCS & bmWU2EN)) ||\
+ 160      =1                                  ((WAKEUPCS & bmWU) &&  (WAKEUPCS & bmWUEN)))
+ 161      =1  
+ 162      =1  #define EZUSB_HIGHSPEED()      (USBCS & bmHSM)
+ 163      =1  
+ 164      =1  //-----------------------------------------------------------------------------
+ 165      =1  // Datatypes
+ 166      =1  //-----------------------------------------------------------------------------
+ 167      =1  typedef unsigned char   BYTE;
+ 168      =1  typedef unsigned short   WORD;
+ 169      =1  typedef unsigned long   DWORD;
+ 170      =1  typedef bit            BOOL;
+ 171      =1  
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 4   
+
+ 172      =1  #define  INT0_VECT   0
+ 173      =1  #define  TMR0_VECT   1
+ 174      =1  #define  INT1_VECT   2
+ 175      =1  #define  TMR1_VECT   3
+ 176      =1  #define  COM0_VECT   4
+ 177      =1  #define  TMR2_VECT   5
+ 178      =1  #define  WKUP_VECT   6
+ 179      =1  #define  COM1_VECT   7
+ 180      =1  #define  USB_VECT    8
+ 181      =1  #define  I2C_VECT    9
+ 182      =1  #define  INT4_VECT   10
+ 183      =1  #define  INT5_VECT   11
+ 184      =1  #define  INT6_VECT   12
+ 185      =1  
+ 186      =1  
+ 187      =1  typedef struct
+ 188      =1  {
+ 189      =1     BYTE   length;
+ 190      =1     BYTE   type;
+ 191      =1  }DSCR;
+ 192      =1  
+ 193      =1  typedef struct            // Device Descriptor
+ 194      =1  {
+ 195      =1     BYTE   length;         // Descriptor length ( = sizeof(DEVICEDSCR) )
+ 196      =1     BYTE   type;         // Decriptor type (Device = 1)
+ 197      =1     BYTE   spec_ver_minor;   // Specification Version (BCD) minor
+ 198      =1     BYTE   spec_ver_major;   // Specification Version (BCD) major
+ 199      =1     BYTE   dev_class;      // Device class
+ 200      =1     BYTE   sub_class;      // Device sub-class
+ 201      =1     BYTE   protocol;      // Device sub-sub-class
+ 202      =1     BYTE   max_packet;      // Maximum packet size
+ 203      =1     WORD   vendor_id;      // Vendor ID
+ 204      =1     WORD   product_id;      // Product ID
+ 205      =1     WORD   version_id;      // Product version ID
+ 206      =1     BYTE   mfg_str;      // Manufacturer string index
+ 207      =1     BYTE   prod_str;      // Product string index
+ 208      =1     BYTE   serialnum_str;   // Serial number string index
+ 209      =1     BYTE   configs;      // Number of configurations
+ 210      =1  }DEVICEDSCR;
+ 211      =1  
+ 212      =1  typedef struct            // Device Qualifier Descriptor
+ 213      =1  {
+ 214      =1     BYTE   length;         // Descriptor length ( = sizeof(DEVICEQUALDSCR) )
+ 215      =1     BYTE   type;         // Decriptor type (Device Qualifier = 6)
+ 216      =1     BYTE   spec_ver_minor;   // Specification Version (BCD) minor
+ 217      =1     BYTE   spec_ver_major;   // Specification Version (BCD) major
+ 218      =1     BYTE   dev_class;      // Device class
+ 219      =1     BYTE   sub_class;      // Device sub-class
+ 220      =1     BYTE   protocol;      // Device sub-sub-class
+ 221      =1     BYTE   max_packet;      // Maximum packet size
+ 222      =1     BYTE   configs;      // Number of configurations
+ 223      =1     BYTE  reserved0;
+ 224      =1  }DEVICEQUALDSCR;
+ 225      =1  
+ 226      =1  typedef struct
+ 227      =1  {
+ 228      =1     BYTE   length;         // Configuration length ( = sizeof(CONFIGDSCR) )
+ 229      =1     BYTE   type;         // Descriptor type (Configuration = 2)
+ 230      =1     WORD   config_len;      // Configuration + End Points length
+ 231      =1     BYTE   interfaces;      // Number of interfaces
+ 232      =1     BYTE   index;         // Configuration number
+ 233      =1     BYTE   config_str;      // Configuration string
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 5   
+
+ 234      =1     BYTE   attrib;         // Attributes (b7 - buspwr, b6 - selfpwr, b5 - rwu
+ 235      =1     BYTE   power;         // Power requirement (div 2 ma)
+ 236      =1  }CONFIGDSCR;
+ 237      =1  
+ 238      =1  typedef struct
+ 239      =1  {
+ 240      =1     BYTE   length;         // Interface descriptor length ( - sizeof(INTRFCDSCR) )
+ 241      =1     BYTE   type;         // Descriptor type (Interface = 4)
+ 242      =1     BYTE   index;         // Zero-based index of this interface
+ 243      =1     BYTE   alt_setting;   // Alternate setting
+ 244      =1     BYTE   ep_cnt;         // Number of end points 
+ 245      =1     BYTE   class;         // Interface class
+ 246      =1     BYTE   sub_class;      // Interface sub class
+ 247      =1     BYTE   protocol;      // Interface sub sub class
+ 248      =1     BYTE   interface_str;   // Interface descriptor string index
+ 249      =1  }INTRFCDSCR;
+ 250      =1  
+ 251      =1  typedef struct
+ 252      =1  {
+ 253      =1     BYTE   length;         // End point descriptor length ( = sizeof(ENDPNTDSCR) )
+ 254      =1     BYTE   type;         // Descriptor type (End point = 5)
+ 255      =1     BYTE   addr;         // End point address
+ 256      =1     BYTE   ep_type;      // End point type
+ 257      =1     BYTE   mp_L;         // Maximum packet size
+ 258      =1     BYTE   mp_H;
+ 259      =1     BYTE   interval;      // Interrupt polling interval
+ 260      =1  }ENDPNTDSCR;
+ 261      =1  
+ 262      =1  typedef struct
+ 263      =1  {
+ 264      =1     BYTE   length;         // String descriptor length
+ 265      =1     BYTE   type;         // Descriptor type
+ 266      =1  }STRINGDSCR;
+ 267      =1  
+ 268      =1  typedef struct
+ 269      =1  {
+ 270      =1     BYTE   cntrl;         // End point control register
+ 271      =1     BYTE   bytes;         // End point buffer byte count
+ 272      =1  }EPIOC;
+ 273      =1  
+ 274      =1  typedef struct 
+ 275      =1  {
+ 276      =1     BYTE   length;
+ 277      =1     BYTE   *dat;
+ 278      =1     BYTE   count;
+ 279      =1     BYTE   status;
+ 280      =1  }I2CPCKT;
+ 281      =1  
+ 282      =1  //-----------------------------------------------------------------------------
+ 283      =1  // Globals
+ 284      =1  //-----------------------------------------------------------------------------
+ 285      =1  extern code BYTE   USB_AutoVector;
+ 286      =1  
+ 287      =1  extern WORD   pDeviceDscr;
+ 288      =1  extern WORD   pDeviceQualDscr;
+ 289      =1  extern WORD       pHighSpeedConfigDscr;
+ 290      =1  extern WORD       pFullSpeedConfigDscr; 
+ 291      =1  extern WORD   pConfigDscr;
+ 292      =1  extern WORD   pOtherConfigDscr;
+ 293      =1  extern WORD   pStringDscr;
+ 294      =1  
+ 295      =1  extern code DEVICEDSCR        DeviceDscr;
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 6   
+
+ 296      =1  extern code DEVICEQUALDSCR    DeviceQualDscr;
+ 297      =1  extern code CONFIGDSCR        HighSpeedConfigDscr;
+ 298      =1  extern code CONFIGDSCR        FullSpeedConfigDscr;
+ 299      =1  extern code STRINGDSCR        StringDscr;
+ 300      =1  extern code DSCR              UserDscr;
+ 301      =1  
+ 302      =1  extern I2CPCKT   I2CPckt;
+ 303      =1  
+ 304      =1  //-----------------------------------------------------------------------------
+ 305      =1  // Function Prototypes
+ 306      =1  //-----------------------------------------------------------------------------
+ 307      =1  
+ 308      =1  extern void EZUSB_Renum(void);
+ 309      =1  extern void EZUSB_Discon(BOOL renum);
+ 310      =1  
+ 311      =1  extern void EZUSB_Susp(void);
+ 312      =1  extern void EZUSB_Resume(void);
+ 313      =1  
+ 314      =1  extern void EZUSB_Delay1ms(void);
+ 315      =1  extern void EZUSB_Delay(WORD ms);
+ 316      =1  
+ 317      =1  extern CONFIGDSCR xdata*   EZUSB_GetConfigDscr(BYTE ConfigIdx);
+ 318      =1  extern INTRFCDSCR xdata*   EZUSB_GetIntrfcDscr(BYTE ConfigIdx, BYTE IntrfcIdx, BYTE AltSetting);
+ 319      =1  extern STRINGDSCR xdata*   EZUSB_GetStringDscr(BYTE StrIdx);
+ 320      =1  extern DSCR xdata*      EZUSB_GetDscr(BYTE index, DSCR* dscr, BYTE type);
+ 321      =1  
+ 322      =1  extern void EZUSB_InitI2C(void);
+ 323      =1  extern BOOL EZUSB_WriteI2C_(BYTE addr, BYTE length, BYTE xdata *dat);
+ 324      =1  extern BOOL EZUSB_ReadI2C_(BYTE addr, BYTE length, BYTE xdata *dat);
+ 325      =1  extern BOOL EZUSB_WriteI2C(BYTE addr, BYTE length, BYTE xdata *dat);
+ 326      =1  extern BOOL EZUSB_ReadI2C(BYTE addr, BYTE length, BYTE xdata *dat);
+ 327      =1  extern void EZUSB_WaitForEEPROMWrite(BYTE addr);
+ 328      =1  
+ 329      =1  extern void modify_endpoint_stall(BYTE epid, BYTE stall);
+ 330      =1  
+ 331      =1  #endif   // FX2_H
+   8          #include "fx2regs.h"
+   1      =1  //-----------------------------------------------------------------------------
+   2      =1  //   File:      FX2regs.h
+   3      =1  //   Contents:   EZ-USB FX2/FX2LP/FX1 register declarations and bit mask definitions.
+   4      =1  //
+   5      =1  // $Archive: /USB/Target/Inc/fx2regs.h $
+   6      =1  // $Date: 4/13/05 4:29p $
+   7      =1  // $Revision: 42 $
+   8      =1  //
+   9      =1  //
+  10      =1  //   Copyright (c) 2005 Cypress Semiconductor, All rights reserved
+  11      =1  //-----------------------------------------------------------------------------
+  12      =1  
+  13      =1  #ifndef FX2REGS_H   /* Header Sentry */
+  14      =1  #define FX2REGS_H
+  15      =1  
+  16      =1  //-----------------------------------------------------------------------------
+  17      =1  // FX2/FX2LP/FX1 Related Register Assignments
+  18      =1  //-----------------------------------------------------------------------------
+  19      =1  
+  20      =1  // The Ez-USB FX2/FX2LP/FX1 registers are defined here. We use fx2regs.h for register 
+  21      =1  // address allocation by using "#define ALLOCATE_EXTERN". 
+  22      =1  // When using "#define ALLOCATE_EXTERN", you get (for instance): 
+  23      =1  // xdata volatile BYTE OUT7BUF[64]   _at_   0x7B40;
+  24      =1  // Such lines are created from FX2.h by using the preprocessor. 
+  25      =1  // Incidently, these lines will not generate any space in the resulting hex 
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 7   
+
+  26      =1  // file; they just bind the symbols to the addresses for compilation. 
+  27      =1  // You just need to put "#define ALLOCATE_EXTERN" in your main program file; 
+  28      =1  // i.e. fw.c or a stand-alone C source file. 
+  29      =1  // Without "#define ALLOCATE_EXTERN", you just get the external reference: 
+  30      =1  // extern xdata volatile BYTE OUT7BUF[64]   ;//   0x7B40;
+  31      =1  // This uses the concatenation operator "##" to insert a comment "//" 
+  32      =1  // to cut off the end of the line, "_at_   0x7B40;", which is not wanted.
+  33      =1  
+  34      =1  #ifdef ALLOCATE_EXTERN
+           =1 #define EXTERN
+           =1 #define _AT_ _at_
+           =1 #else
+  38      =1  #define EXTERN extern
+  39      =1  #define _AT_ ;/ ## /
+  40      =1  #endif
+  41      =1  
+  42      =1  EXTERN xdata volatile BYTE GPIF_WAVE_DATA    _AT_ 0xE400;
+  43      =1  EXTERN xdata volatile BYTE RES_WAVEDATA_END  _AT_ 0xE480;
+  44      =1  
+  45      =1  // General Configuration
+  46      =1  
+  47      =1  EXTERN xdata volatile BYTE CPUCS             _AT_ 0xE600;  // Control & Status
+  48      =1  EXTERN xdata volatile BYTE IFCONFIG          _AT_ 0xE601;  // Interface Configuration
+  49      =1  EXTERN xdata volatile BYTE PINFLAGSAB        _AT_ 0xE602;  // FIFO FLAGA and FLAGB Assignments
+  50      =1  EXTERN xdata volatile BYTE PINFLAGSCD        _AT_ 0xE603;  // FIFO FLAGC and FLAGD Assignments
+  51      =1  EXTERN xdata volatile BYTE FIFORESET         _AT_ 0xE604;  // Restore FIFOS to default state
+  52      =1  EXTERN xdata volatile BYTE BREAKPT           _AT_ 0xE605;  // Breakpoint
+  53      =1  EXTERN xdata volatile BYTE BPADDRH           _AT_ 0xE606;  // Breakpoint Address H
+  54      =1  EXTERN xdata volatile BYTE BPADDRL           _AT_ 0xE607;  // Breakpoint Address L
+  55      =1  EXTERN xdata volatile BYTE UART230           _AT_ 0xE608;  // 230 Kbaud clock for T0,T1,T2
+  56      =1  EXTERN xdata volatile BYTE FIFOPINPOLAR      _AT_ 0xE609;  // FIFO polarities
+  57      =1  EXTERN xdata volatile BYTE REVID             _AT_ 0xE60A;  // Chip Revision
+  58      =1  EXTERN xdata volatile BYTE REVCTL            _AT_ 0xE60B;  // Chip Revision Control
+  59      =1  
+  60      =1  // Endpoint Configuration
+  61      =1  
+  62      =1  EXTERN xdata volatile BYTE EP1OUTCFG         _AT_ 0xE610;  // Endpoint 1-OUT Configuration
+  63      =1  EXTERN xdata volatile BYTE EP1INCFG          _AT_ 0xE611;  // Endpoint 1-IN Configuration
+  64      =1  EXTERN xdata volatile BYTE EP2CFG            _AT_ 0xE612;  // Endpoint 2 Configuration
+  65      =1  EXTERN xdata volatile BYTE EP4CFG            _AT_ 0xE613;  // Endpoint 4 Configuration
+  66      =1  EXTERN xdata volatile BYTE EP6CFG            _AT_ 0xE614;  // Endpoint 6 Configuration
+  67      =1  EXTERN xdata volatile BYTE EP8CFG            _AT_ 0xE615;  // Endpoint 8 Configuration
+  68      =1  EXTERN xdata volatile BYTE EP2FIFOCFG        _AT_ 0xE618;  // Endpoint 2 FIFO configuration
+  69      =1  EXTERN xdata volatile BYTE EP4FIFOCFG        _AT_ 0xE619;  // Endpoint 4 FIFO configuration
+  70      =1  EXTERN xdata volatile BYTE EP6FIFOCFG        _AT_ 0xE61A;  // Endpoint 6 FIFO configuration
+  71      =1  EXTERN xdata volatile BYTE EP8FIFOCFG        _AT_ 0xE61B;  // Endpoint 8 FIFO configuration
+  72      =1  EXTERN xdata volatile BYTE EP2AUTOINLENH     _AT_ 0xE620;  // Endpoint 2 Packet Length H (IN only)
+  73      =1  EXTERN xdata volatile BYTE EP2AUTOINLENL     _AT_ 0xE621;  // Endpoint 2 Packet Length L (IN only)
+  74      =1  EXTERN xdata volatile BYTE EP4AUTOINLENH     _AT_ 0xE622;  // Endpoint 4 Packet Length H (IN only)
+  75      =1  EXTERN xdata volatile BYTE EP4AUTOINLENL     _AT_ 0xE623;  // Endpoint 4 Packet Length L (IN only)
+  76      =1  EXTERN xdata volatile BYTE EP6AUTOINLENH     _AT_ 0xE624;  // Endpoint 6 Packet Length H (IN only)
+  77      =1  EXTERN xdata volatile BYTE EP6AUTOINLENL     _AT_ 0xE625;  // Endpoint 6 Packet Length L (IN only)
+  78      =1  EXTERN xdata volatile BYTE EP8AUTOINLENH     _AT_ 0xE626;  // Endpoint 8 Packet Length H (IN only)
+  79      =1  EXTERN xdata volatile BYTE EP8AUTOINLENL     _AT_ 0xE627;  // Endpoint 8 Packet Length L (IN only)
+  80      =1  EXTERN xdata volatile BYTE EP2FIFOPFH        _AT_ 0xE630;  // EP2 Programmable Flag trigger H
+  81      =1  EXTERN xdata volatile BYTE EP2FIFOPFL        _AT_ 0xE631;  // EP2 Programmable Flag trigger L
+  82      =1  EXTERN xdata volatile BYTE EP4FIFOPFH        _AT_ 0xE632;  // EP4 Programmable Flag trigger H
+  83      =1  EXTERN xdata volatile BYTE EP4FIFOPFL        _AT_ 0xE633;  // EP4 Programmable Flag trigger L
+  84      =1  EXTERN xdata volatile BYTE EP6FIFOPFH        _AT_ 0xE634;  // EP6 Programmable Flag trigger H
+  85      =1  EXTERN xdata volatile BYTE EP6FIFOPFL        _AT_ 0xE635;  // EP6 Programmable Flag trigger L
+  86      =1  EXTERN xdata volatile BYTE EP8FIFOPFH        _AT_ 0xE636;  // EP8 Programmable Flag trigger H
+  87      =1  EXTERN xdata volatile BYTE EP8FIFOPFL        _AT_ 0xE637;  // EP8 Programmable Flag trigger L
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 8   
+
+  88      =1  EXTERN xdata volatile BYTE EP2ISOINPKTS      _AT_ 0xE640;  // EP2 (if ISO) IN Packets per frame (1-3)
+  89      =1  EXTERN xdata volatile BYTE EP4ISOINPKTS      _AT_ 0xE641;  // EP4 (if ISO) IN Packets per frame (1-3)
+  90      =1  EXTERN xdata volatile BYTE EP6ISOINPKTS      _AT_ 0xE642;  // EP6 (if ISO) IN Packets per frame (1-3)
+  91      =1  EXTERN xdata volatile BYTE EP8ISOINPKTS      _AT_ 0xE643;  // EP8 (if ISO) IN Packets per frame (1-3)
+  92      =1  EXTERN xdata volatile BYTE INPKTEND          _AT_ 0xE648;  // Force IN Packet End
+  93      =1  EXTERN xdata volatile BYTE OUTPKTEND         _AT_ 0xE649;  // Force OUT Packet End
+  94      =1  
+  95      =1  // Interrupts
+  96      =1  
+  97      =1  EXTERN xdata volatile BYTE EP2FIFOIE         _AT_ 0xE650;  // Endpoint 2 Flag Interrupt Enable
+  98      =1  EXTERN xdata volatile BYTE EP2FIFOIRQ        _AT_ 0xE651;  // Endpoint 2 Flag Interrupt Request
+  99      =1  EXTERN xdata volatile BYTE EP4FIFOIE         _AT_ 0xE652;  // Endpoint 4 Flag Interrupt Enable
+ 100      =1  EXTERN xdata volatile BYTE EP4FIFOIRQ        _AT_ 0xE653;  // Endpoint 4 Flag Interrupt Request
+ 101      =1  EXTERN xdata volatile BYTE EP6FIFOIE         _AT_ 0xE654;  // Endpoint 6 Flag Interrupt Enable
+ 102      =1  EXTERN xdata volatile BYTE EP6FIFOIRQ        _AT_ 0xE655;  // Endpoint 6 Flag Interrupt Request
+ 103      =1  EXTERN xdata volatile BYTE EP8FIFOIE         _AT_ 0xE656;  // Endpoint 8 Flag Interrupt Enable
+ 104      =1  EXTERN xdata volatile BYTE EP8FIFOIRQ        _AT_ 0xE657;  // Endpoint 8 Flag Interrupt Request
+ 105      =1  EXTERN xdata volatile BYTE IBNIE             _AT_ 0xE658;  // IN-BULK-NAK Interrupt Enable
+ 106      =1  EXTERN xdata volatile BYTE IBNIRQ            _AT_ 0xE659;  // IN-BULK-NAK interrupt Request
+ 107      =1  EXTERN xdata volatile BYTE NAKIE             _AT_ 0xE65A;  // Endpoint Ping NAK interrupt Enable
+ 108      =1  EXTERN xdata volatile BYTE NAKIRQ            _AT_ 0xE65B;  // Endpoint Ping NAK interrupt Request
+ 109      =1  EXTERN xdata volatile BYTE USBIE             _AT_ 0xE65C;  // USB Int Enables
+ 110      =1  EXTERN xdata volatile BYTE USBIRQ            _AT_ 0xE65D;  // USB Interrupt Requests
+ 111      =1  EXTERN xdata volatile BYTE EPIE              _AT_ 0xE65E;  // Endpoint Interrupt Enables
+ 112      =1  EXTERN xdata volatile BYTE EPIRQ             _AT_ 0xE65F;  // Endpoint Interrupt Requests
+ 113      =1  EXTERN xdata volatile BYTE GPIFIE            _AT_ 0xE660;  // GPIF Interrupt Enable
+ 114      =1  EXTERN xdata volatile BYTE GPIFIRQ           _AT_ 0xE661;  // GPIF Interrupt Request
+ 115      =1  EXTERN xdata volatile BYTE USBERRIE          _AT_ 0xE662;  // USB Error Interrupt Enables
+ 116      =1  EXTERN xdata volatile BYTE USBERRIRQ         _AT_ 0xE663;  // USB Error Interrupt Requests
+ 117      =1  EXTERN xdata volatile BYTE ERRCNTLIM         _AT_ 0xE664;  // USB Error counter and limit
+ 118      =1  EXTERN xdata volatile BYTE CLRERRCNT         _AT_ 0xE665;  // Clear Error Counter EC[3..0]
+ 119      =1  EXTERN xdata volatile BYTE INT2IVEC          _AT_ 0xE666;  // Interupt 2 (USB) Autovector
+ 120      =1  EXTERN xdata volatile BYTE INT4IVEC          _AT_ 0xE667;  // Interupt 4 (FIFOS & GPIF) Autovector
+ 121      =1  EXTERN xdata volatile BYTE INTSETUP          _AT_ 0xE668;  // Interrupt 2&4 Setup
+ 122      =1  
+ 123      =1  // Input/Output
+ 124      =1  
+ 125      =1  EXTERN xdata volatile BYTE PORTACFG          _AT_ 0xE670;  // I/O PORTA Alternate Configuration
+ 126      =1  EXTERN xdata volatile BYTE PORTCCFG          _AT_ 0xE671;  // I/O PORTC Alternate Configuration
+ 127      =1  EXTERN xdata volatile BYTE PORTECFG          _AT_ 0xE672;  // I/O PORTE Alternate Configuration
+ 128      =1  EXTERN xdata volatile BYTE I2CS              _AT_ 0xE678;  // Control & Status
+ 129      =1  EXTERN xdata volatile BYTE I2DAT             _AT_ 0xE679;  // Data
+ 130      =1  EXTERN xdata volatile BYTE I2CTL             _AT_ 0xE67A;  // I2C Control
+ 131      =1  EXTERN xdata volatile BYTE XAUTODAT1         _AT_ 0xE67B;  // Autoptr1 MOVX access
+ 132      =1  EXTERN xdata volatile BYTE XAUTODAT2         _AT_ 0xE67C;  // Autoptr2 MOVX access
+ 133      =1  
+ 134      =1  #define EXTAUTODAT1 XAUTODAT1
+ 135      =1  #define EXTAUTODAT2 XAUTODAT2
+ 136      =1  
+ 137      =1  // USB Control
+ 138      =1  
+ 139      =1  EXTERN xdata volatile BYTE USBCS             _AT_ 0xE680;  // USB Control & Status
+ 140      =1  EXTERN xdata volatile BYTE SUSPEND           _AT_ 0xE681;  // Put chip into suspend
+ 141      =1  EXTERN xdata volatile BYTE WAKEUPCS          _AT_ 0xE682;  // Wakeup source and polarity
+ 142      =1  EXTERN xdata volatile BYTE TOGCTL            _AT_ 0xE683;  // Toggle Control
+ 143      =1  EXTERN xdata volatile BYTE USBFRAMEH         _AT_ 0xE684;  // USB Frame count H
+ 144      =1  EXTERN xdata volatile BYTE USBFRAMEL         _AT_ 0xE685;  // USB Frame count L
+ 145      =1  EXTERN xdata volatile BYTE MICROFRAME        _AT_ 0xE686;  // Microframe count, 0-7
+ 146      =1  EXTERN xdata volatile BYTE FNADDR            _AT_ 0xE687;  // USB Function address
+ 147      =1  
+ 148      =1  // Endpoints
+ 149      =1  
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 9   
+
+ 150      =1  EXTERN xdata volatile BYTE EP0BCH            _AT_ 0xE68A;  // Endpoint 0 Byte Count H
+ 151      =1  EXTERN xdata volatile BYTE EP0BCL            _AT_ 0xE68B;  // Endpoint 0 Byte Count L
+ 152      =1  EXTERN xdata volatile BYTE EP1OUTBC          _AT_ 0xE68D;  // Endpoint 1 OUT Byte Count
+ 153      =1  EXTERN xdata volatile BYTE EP1INBC           _AT_ 0xE68F;  // Endpoint 1 IN Byte Count
+ 154      =1  EXTERN xdata volatile BYTE EP2BCH            _AT_ 0xE690;  // Endpoint 2 Byte Count H
+ 155      =1  EXTERN xdata volatile BYTE EP2BCL            _AT_ 0xE691;  // Endpoint 2 Byte Count L
+ 156      =1  EXTERN xdata volatile BYTE EP4BCH            _AT_ 0xE694;  // Endpoint 4 Byte Count H
+ 157      =1  EXTERN xdata volatile BYTE EP4BCL            _AT_ 0xE695;  // Endpoint 4 Byte Count L
+ 158      =1  EXTERN xdata volatile BYTE EP6BCH            _AT_ 0xE698;  // Endpoint 6 Byte Count H
+ 159      =1  EXTERN xdata volatile BYTE EP6BCL            _AT_ 0xE699;  // Endpoint 6 Byte Count L
+ 160      =1  EXTERN xdata volatile BYTE EP8BCH            _AT_ 0xE69C;  // Endpoint 8 Byte Count H
+ 161      =1  EXTERN xdata volatile BYTE EP8BCL            _AT_ 0xE69D;  // Endpoint 8 Byte Count L
+ 162      =1  EXTERN xdata volatile BYTE EP0CS             _AT_ 0xE6A0;  // Endpoint  Control and Status
+ 163      =1  EXTERN xdata volatile BYTE EP1OUTCS          _AT_ 0xE6A1;  // Endpoint 1 OUT Control and Status
+ 164      =1  EXTERN xdata volatile BYTE EP1INCS           _AT_ 0xE6A2;  // Endpoint 1 IN Control and Status
+ 165      =1  EXTERN xdata volatile BYTE EP2CS             _AT_ 0xE6A3;  // Endpoint 2 Control and Status
+ 166      =1  EXTERN xdata volatile BYTE EP4CS             _AT_ 0xE6A4;  // Endpoint 4 Control and Status
+ 167      =1  EXTERN xdata volatile BYTE EP6CS             _AT_ 0xE6A5;  // Endpoint 6 Control and Status
+ 168      =1  EXTERN xdata volatile BYTE EP8CS             _AT_ 0xE6A6;  // Endpoint 8 Control and Status
+ 169      =1  EXTERN xdata volatile BYTE EP2FIFOFLGS       _AT_ 0xE6A7;  // Endpoint 2 Flags
+ 170      =1  EXTERN xdata volatile BYTE EP4FIFOFLGS       _AT_ 0xE6A8;  // Endpoint 4 Flags
+ 171      =1  EXTERN xdata volatile BYTE EP6FIFOFLGS       _AT_ 0xE6A9;  // Endpoint 6 Flags
+ 172      =1  EXTERN xdata volatile BYTE EP8FIFOFLGS       _AT_ 0xE6AA;  // Endpoint 8 Flags
+ 173      =1  EXTERN xdata volatile BYTE EP2FIFOBCH        _AT_ 0xE6AB;  // EP2 FIFO total byte count H
+ 174      =1  EXTERN xdata volatile BYTE EP2FIFOBCL        _AT_ 0xE6AC;  // EP2 FIFO total byte count L
+ 175      =1  EXTERN xdata volatile BYTE EP4FIFOBCH        _AT_ 0xE6AD;  // EP4 FIFO total byte count H
+ 176      =1  EXTERN xdata volatile BYTE EP4FIFOBCL        _AT_ 0xE6AE;  // EP4 FIFO total byte count L
+ 177      =1  EXTERN xdata volatile BYTE EP6FIFOBCH        _AT_ 0xE6AF;  // EP6 FIFO total byte count H
+ 178      =1  EXTERN xdata volatile BYTE EP6FIFOBCL        _AT_ 0xE6B0;  // EP6 FIFO total byte count L
+ 179      =1  EXTERN xdata volatile BYTE EP8FIFOBCH        _AT_ 0xE6B1;  // EP8 FIFO total byte count H
+ 180      =1  EXTERN xdata volatile BYTE EP8FIFOBCL        _AT_ 0xE6B2;  // EP8 FIFO total byte count L
+ 181      =1  EXTERN xdata volatile BYTE SUDPTRH           _AT_ 0xE6B3;  // Setup Data Pointer high address byte
+ 182      =1  EXTERN xdata volatile BYTE SUDPTRL           _AT_ 0xE6B4;  // Setup Data Pointer low address byte
+ 183      =1  EXTERN xdata volatile BYTE SUDPTRCTL         _AT_ 0xE6B5;  // Setup Data Pointer Auto Mode
+ 184      =1  EXTERN xdata volatile BYTE SETUPDAT[8]       _AT_ 0xE6B8;  // 8 bytes of SETUP data
+ 185      =1  
+ 186      =1  // GPIF
+ 187      =1  
+ 188      =1  EXTERN xdata volatile BYTE GPIFWFSELECT      _AT_ 0xE6C0;  // Waveform Selector
+ 189      =1  EXTERN xdata volatile BYTE GPIFIDLECS        _AT_ 0xE6C1;  // GPIF Done, GPIF IDLE drive mode
+ 190      =1  EXTERN xdata volatile BYTE GPIFIDLECTL       _AT_ 0xE6C2;  // Inactive Bus, CTL states
+ 191      =1  EXTERN xdata volatile BYTE GPIFCTLCFG        _AT_ 0xE6C3;  // CTL OUT pin drive
+ 192      =1  EXTERN xdata volatile BYTE GPIFADRH          _AT_ 0xE6C4;  // GPIF Address H
+ 193      =1  EXTERN xdata volatile BYTE GPIFADRL          _AT_ 0xE6C5;  // GPIF Address L
+ 194      =1  
+ 195      =1  EXTERN xdata volatile BYTE GPIFTCB3          _AT_ 0xE6CE;  // GPIF Transaction Count Byte 3
+ 196      =1  EXTERN xdata volatile BYTE GPIFTCB2          _AT_ 0xE6CF;  // GPIF Transaction Count Byte 2
+ 197      =1  EXTERN xdata volatile BYTE GPIFTCB1          _AT_ 0xE6D0;  // GPIF Transaction Count Byte 1
+ 198      =1  EXTERN xdata volatile BYTE GPIFTCB0          _AT_ 0xE6D1;  // GPIF Transaction Count Byte 0
+ 199      =1  
+ 200      =1  #define EP2GPIFTCH GPIFTCB1   // these are here for backwards compatibility
+ 201      =1  #define EP2GPIFTCL GPIFTCB0   // 
+ 202      =1  #define EP4GPIFTCH GPIFTCB1   // these are here for backwards compatibility
+ 203      =1  #define EP4GPIFTCL GPIFTCB0   // 
+ 204      =1  #define EP6GPIFTCH GPIFTCB1   // these are here for backwards compatibility
+ 205      =1  #define EP6GPIFTCL GPIFTCB0   // 
+ 206      =1  #define EP8GPIFTCH GPIFTCB1   // these are here for backwards compatibility
+ 207      =1  #define EP8GPIFTCL GPIFTCB0   // 
+ 208      =1  
+ 209      =1  EXTERN xdata volatile BYTE EP2GPIFFLGSEL     _AT_ 0xE6D2;  // EP2 GPIF Flag select
+ 210      =1  EXTERN xdata volatile BYTE EP2GPIFPFSTOP     _AT_ 0xE6D3;  // Stop GPIF EP2 transaction on prog. flag
+ 211      =1  EXTERN xdata volatile BYTE EP2GPIFTRIG       _AT_ 0xE6D4;  // EP2 FIFO Trigger
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 10  
+
+ 212      =1  EXTERN xdata volatile BYTE EP4GPIFFLGSEL     _AT_ 0xE6DA;  // EP4 GPIF Flag select
+ 213      =1  EXTERN xdata volatile BYTE EP4GPIFPFSTOP     _AT_ 0xE6DB;  // Stop GPIF EP4 transaction on prog. flag
+ 214      =1  EXTERN xdata volatile BYTE EP4GPIFTRIG       _AT_ 0xE6DC;  // EP4 FIFO Trigger
+ 215      =1  EXTERN xdata volatile BYTE EP6GPIFFLGSEL     _AT_ 0xE6E2;  // EP6 GPIF Flag select
+ 216      =1  EXTERN xdata volatile BYTE EP6GPIFPFSTOP     _AT_ 0xE6E3;  // Stop GPIF EP6 transaction on prog. flag
+ 217      =1  EXTERN xdata volatile BYTE EP6GPIFTRIG       _AT_ 0xE6E4;  // EP6 FIFO Trigger
+ 218      =1  EXTERN xdata volatile BYTE EP8GPIFFLGSEL     _AT_ 0xE6EA;  // EP8 GPIF Flag select
+ 219      =1  EXTERN xdata volatile BYTE EP8GPIFPFSTOP     _AT_ 0xE6EB;  // Stop GPIF EP8 transaction on prog. flag
+ 220      =1  EXTERN xdata volatile BYTE EP8GPIFTRIG       _AT_ 0xE6EC;  // EP8 FIFO Trigger
+ 221      =1  EXTERN xdata volatile BYTE XGPIFSGLDATH      _AT_ 0xE6F0;  // GPIF Data H (16-bit mode only)
+ 222      =1  EXTERN xdata volatile BYTE XGPIFSGLDATLX     _AT_ 0xE6F1;  // Read/Write GPIF Data L & trigger transac
+ 223      =1  EXTERN xdata volatile BYTE XGPIFSGLDATLNOX   _AT_ 0xE6F2;  // Read GPIF Data L, no transac trigger
+ 224      =1  EXTERN xdata volatile BYTE GPIFREADYCFG      _AT_ 0xE6F3;  // Internal RDY,Sync/Async, RDY5CFG
+ 225      =1  EXTERN xdata volatile BYTE GPIFREADYSTAT     _AT_ 0xE6F4;  // RDY pin states
+ 226      =1  EXTERN xdata volatile BYTE GPIFABORT         _AT_ 0xE6F5;  // Abort GPIF cycles
+ 227      =1  
+ 228      =1  // UDMA
+ 229      =1  
+ 230      =1  EXTERN xdata volatile BYTE FLOWSTATE         _AT_  0xE6C6; //Defines GPIF flow state
+ 231      =1  EXTERN xdata volatile BYTE FLOWLOGIC         _AT_  0xE6C7; //Defines flow/hold decision criteria
+ 232      =1  EXTERN xdata volatile BYTE FLOWEQ0CTL        _AT_  0xE6C8; //CTL states during active flow state
+ 233      =1  EXTERN xdata volatile BYTE FLOWEQ1CTL        _AT_  0xE6C9; //CTL states during hold flow state
+ 234      =1  EXTERN xdata volatile BYTE FLOWHOLDOFF       _AT_  0xE6CA;
+ 235      =1  EXTERN xdata volatile BYTE FLOWSTB           _AT_  0xE6CB; //CTL/RDY Signal to use as master data strobe 
+ 236      =1  EXTERN xdata volatile BYTE FLOWSTBEDGE       _AT_  0xE6CC; //Defines active master strobe edge
+ 237      =1  EXTERN xdata volatile BYTE FLOWSTBHPERIOD    _AT_  0xE6CD; //Half Period of output master strobe
+ 238      =1  EXTERN xdata volatile BYTE GPIFHOLDAMOUNT    _AT_  0xE60C; //Data delay shift 
+ 239      =1  EXTERN xdata volatile BYTE UDMACRCH          _AT_  0xE67D; //CRC Upper byte
+ 240      =1  EXTERN xdata volatile BYTE UDMACRCL          _AT_  0xE67E; //CRC Lower byte
+ 241      =1  EXTERN xdata volatile BYTE UDMACRCQUAL       _AT_  0xE67F; //UDMA In only, host terminated use only
+ 242      =1  
+ 243      =1  
+ 244      =1  // Debug/Test
+ 245      =1  // The following registers are for Cypress's internal testing purposes only.
+ 246      =1  // These registers are not documented in the datasheet or the Technical Reference
+ 247      =1  // Manual as they were not designed for end user application usage 
+ 248      =1  EXTERN xdata volatile BYTE DBUG              _AT_ 0xE6F8;  // Debug
+ 249      =1  EXTERN xdata volatile BYTE TESTCFG           _AT_ 0xE6F9;  // Test configuration
+ 250      =1  EXTERN xdata volatile BYTE USBTEST           _AT_ 0xE6FA;  // USB Test Modes
+ 251      =1  EXTERN xdata volatile BYTE CT1               _AT_ 0xE6FB;  // Chirp Test--Override
+ 252      =1  EXTERN xdata volatile BYTE CT2               _AT_ 0xE6FC;  // Chirp Test--FSM
+ 253      =1  EXTERN xdata volatile BYTE CT3               _AT_ 0xE6FD;  // Chirp Test--Control Signals
+ 254      =1  EXTERN xdata volatile BYTE CT4               _AT_ 0xE6FE;  // Chirp Test--Inputs
+ 255      =1  
+ 256      =1  // Endpoint Buffers
+ 257      =1  
+ 258      =1  EXTERN xdata volatile BYTE EP0BUF[64]        _AT_ 0xE740;  // EP0 IN-OUT buffer
+ 259      =1  EXTERN xdata volatile BYTE EP1OUTBUF[64]     _AT_ 0xE780;  // EP1-OUT buffer
+ 260      =1  EXTERN xdata volatile BYTE EP1INBUF[64]      _AT_ 0xE7C0;  // EP1-IN buffer
+ 261      =1  EXTERN xdata volatile BYTE EP2FIFOBUF[1024]  _AT_ 0xF000;  // 512/1024-byte EP2 buffer (IN or OUT)
+ 262      =1  EXTERN xdata volatile BYTE EP4FIFOBUF[1024]  _AT_ 0xF400;  // 512 byte EP4 buffer (IN or OUT)
+ 263      =1  EXTERN xdata volatile BYTE EP6FIFOBUF[1024]  _AT_ 0xF800;  // 512/1024-byte EP6 buffer (IN or OUT)
+ 264      =1  EXTERN xdata volatile BYTE EP8FIFOBUF[1024]  _AT_ 0xFC00;  // 512 byte EP8 buffer (IN or OUT)
+ 265      =1  
+ 266      =1  // Error Correction Code (ECC) Registers (FX2LP/FX1 only)
+ 267      =1  
+ 268      =1  EXTERN xdata volatile BYTE ECCCFG            _AT_ 0xE628;  // ECC Configuration
+ 269      =1  EXTERN xdata volatile BYTE ECCRESET          _AT_ 0xE629;  // ECC Reset
+ 270      =1  EXTERN xdata volatile BYTE ECC1B0            _AT_ 0xE62A;  // ECC1 Byte 0
+ 271      =1  EXTERN xdata volatile BYTE ECC1B1            _AT_ 0xE62B;  // ECC1 Byte 1
+ 272      =1  EXTERN xdata volatile BYTE ECC1B2            _AT_ 0xE62C;  // ECC1 Byte 2
+ 273      =1  EXTERN xdata volatile BYTE ECC2B0            _AT_ 0xE62D;  // ECC2 Byte 0
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 11  
+
+ 274      =1  EXTERN xdata volatile BYTE ECC2B1            _AT_ 0xE62E;  // ECC2 Byte 1
+ 275      =1  EXTERN xdata volatile BYTE ECC2B2            _AT_ 0xE62F;  // ECC2 Byte 2
+ 276      =1  
+ 277      =1  // Feature Registers  (FX2LP/FX1 only)
+ 278      =1  EXTERN xdata volatile BYTE GPCR2             _AT_ 0xE50D;  // Chip Features
+ 279      =1  
+ 280      =1  #undef EXTERN
+ 281      =1  #undef _AT_
+ 282      =1  
+ 283      =1  /*-----------------------------------------------------------------------------
+ 284      =1     Special Function Registers (SFRs)
+ 285      =1     The byte registers and bits defined in the following list are based
+ 286      =1     on the Synopsis definition of the 8051 Special Function Registers for EZ-USB. 
+ 287      =1      If you modify the register definitions below, please regenerate the file 
+ 288      =1      "ezregs.inc" which includes the same basic information for assembly inclusion.
+ 289      =1  -----------------------------------------------------------------------------*/
+ 290      =1  
+ 291      =1  sfr IOA     = 0x80;
+ 292      =1           /*  IOA  */
+ 293      =1           sbit PA0    = 0x80 + 0;
+ 294      =1           sbit PA1    = 0x80 + 1;
+ 295      =1           sbit PA2    = 0x80 + 2;
+ 296      =1           sbit PA3    = 0x80 + 3;
+ 297      =1  
+ 298      =1           sbit PA4    = 0x80 + 4;
+ 299      =1           sbit PA5    = 0x80 + 5;
+ 300      =1           sbit PA6    = 0x80 + 6;
+ 301      =1           sbit PA7    = 0x80 + 7;
+ 302      =1  sfr SP      = 0x81;
+ 303      =1  sfr DPL     = 0x82;
+ 304      =1  sfr DPH     = 0x83;
+ 305      =1  sfr DPL1    = 0x84;
+ 306      =1  sfr DPH1    = 0x85;
+ 307      =1  sfr DPS     = 0x86;
+ 308      =1           /*  DPS  */
+ 309      =1           // sbit SEL   = 0x86+0;
+ 310      =1  sfr PCON    = 0x87;
+ 311      =1           /*  PCON  */
+ 312      =1           //sbit IDLE   = 0x87+0;
+ 313      =1           //sbit STOP   = 0x87+1;
+ 314      =1           //sbit GF0    = 0x87+2;
+ 315      =1           //sbit GF1    = 0x87+3;
+ 316      =1           //sbit SMOD0  = 0x87+7;
+ 317      =1  sfr TCON    = 0x88;
+ 318      =1           /*  TCON  */
+ 319      =1           sbit IT0    = 0x88+0;
+ 320      =1           sbit IE0    = 0x88+1;
+ 321      =1           sbit IT1    = 0x88+2;
+ 322      =1           sbit IE1    = 0x88+3;
+ 323      =1           sbit TR0    = 0x88+4;
+ 324      =1           sbit TF0    = 0x88+5;
+ 325      =1           sbit TR1    = 0x88+6;
+ 326      =1           sbit TF1    = 0x88+7;
+ 327      =1  sfr TMOD    = 0x89;
+ 328      =1           /*  TMOD  */
+ 329      =1           //sbit M00    = 0x89+0;
+ 330      =1           //sbit M10    = 0x89+1;
+ 331      =1           //sbit CT0    = 0x89+2;
+ 332      =1           //sbit GATE0  = 0x89+3;
+ 333      =1           //sbit M01    = 0x89+4;
+ 334      =1           //sbit M11    = 0x89+5;
+ 335      =1           //sbit CT1    = 0x89+6;
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 12  
+
+ 336      =1           //sbit GATE1  = 0x89+7;
+ 337      =1  sfr TL0     = 0x8A;
+ 338      =1  sfr TL1     = 0x8B;
+ 339      =1  sfr TH0     = 0x8C;
+ 340      =1  sfr TH1     = 0x8D;
+ 341      =1  sfr CKCON   = 0x8E;
+ 342      =1           /*  CKCON  */
+ 343      =1           //sbit MD0    = 0x89+0;
+ 344      =1           //sbit MD1    = 0x89+1;
+ 345      =1           //sbit MD2    = 0x89+2;
+ 346      =1           //sbit T0M    = 0x89+3;
+ 347      =1           //sbit T1M    = 0x89+4;
+ 348      =1           //sbit T2M    = 0x89+5;
+ 349      =1  sfr SPC_FNC = 0x8F; // Was WRS in Reg320
+ 350      =1           /*  CKCON  */
+ 351      =1           //sbit WRS    = 0x8F+0;
+ 352      =1  sfr IOB     = 0x90;
+ 353      =1           /*  IOB  */
+ 354      =1           sbit PB0    = 0x90 + 0;
+ 355      =1           sbit PB1    = 0x90 + 1;
+ 356      =1           sbit PB2    = 0x90 + 2;
+ 357      =1           sbit PB3    = 0x90 + 3;
+ 358      =1  
+ 359      =1           sbit PB4    = 0x90 + 4;
+ 360      =1           sbit PB5    = 0x90 + 5;
+ 361      =1           sbit PB6    = 0x90 + 6;
+ 362      =1           sbit PB7    = 0x90 + 7;
+ 363      =1  sfr EXIF    = 0x91; // EXIF Bit Values differ from Reg320
+ 364      =1           /*  EXIF  */
+ 365      =1           //sbit USBINT = 0x91+4;
+ 366      =1           //sbit I2CINT = 0x91+5;
+ 367      =1           //sbit IE4    = 0x91+6;
+ 368      =1           //sbit IE5    = 0x91+7;
+ 369      =1  sfr MPAGE  = 0x92;
+ 370      =1  sfr SCON0  = 0x98;
+ 371      =1           /*  SCON0  */
+ 372      =1           sbit RI    = 0x98+0;
+ 373      =1           sbit TI    = 0x98+1;
+ 374      =1           sbit RB8   = 0x98+2;
+ 375      =1           sbit TB8   = 0x98+3;
+ 376      =1           sbit REN   = 0x98+4;
+ 377      =1           sbit SM2   = 0x98+5;
+ 378      =1           sbit SM1   = 0x98+6;
+ 379      =1           sbit SM0   = 0x98+7;
+ 380      =1  sfr SBUF0  = 0x99;
+ 381      =1  
+ 382      =1  #define AUTOPTR1H AUTOPTRH1 // for backwards compatibility with examples
+ 383      =1  #define AUTOPTR1L AUTOPTRL1 // for backwards compatibility with examples
+ 384      =1  #define APTR1H AUTOPTRH1 // for backwards compatibility with examples
+ 385      =1  #define APTR1L AUTOPTRL1 // for backwards compatibility with examples
+ 386      =1  
+ 387      =1  // this is how they are defined in the TRM
+ 388      =1  sfr AUTOPTRH1     = 0x9A; 
+ 389      =1  sfr AUTOPTRL1     = 0x9B; 
+ 390      =1  sfr AUTOPTRH2     = 0x9D;
+ 391      =1  sfr AUTOPTRL2     = 0x9E; 
+ 392      =1  
+ 393      =1  sfr IOC        = 0xA0;
+ 394      =1           /*  IOC  */
+ 395      =1           sbit PC0    = 0xA0 + 0;
+ 396      =1           sbit PC1    = 0xA0 + 1;
+ 397      =1           sbit PC2    = 0xA0 + 2;
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 13  
+
+ 398      =1           sbit PC3    = 0xA0 + 3;
+ 399      =1  
+ 400      =1           sbit PC4    = 0xA0 + 4;
+ 401      =1           sbit PC5    = 0xA0 + 5;
+ 402      =1           sbit PC6    = 0xA0 + 6;
+ 403      =1           sbit PC7    = 0xA0 + 7;
+ 404      =1  sfr INT2CLR    = 0xA1;
+ 405      =1  sfr INT4CLR    = 0xA2;
+ 406      =1  
+ 407      =1  sfr IE     = 0xA8;
+ 408      =1           /*  IE  */
+ 409      =1           sbit EX0   = 0xA8+0;
+ 410      =1           sbit ET0   = 0xA8+1;
+ 411      =1           sbit EX1   = 0xA8+2;
+ 412      =1           sbit ET1   = 0xA8+3;
+ 413      =1           sbit ES0   = 0xA8+4;
+ 414      =1           sbit ET2   = 0xA8+5;
+ 415      =1           sbit ES1   = 0xA8+6;
+ 416      =1           sbit EA    = 0xA8+7;
+ 417      =1  
+ 418      =1  sfr EP2468STAT     = 0xAA;
+ 419      =1           /* EP2468STAT */
+ 420      =1           //sbit EP2E   = 0xAA+0;
+ 421      =1           //sbit EP2F   = 0xAA+1;
+ 422      =1           //sbit EP4E   = 0xAA+2;
+ 423      =1           //sbit EP4F   = 0xAA+3;
+ 424      =1           //sbit EP6E   = 0xAA+4;
+ 425      =1           //sbit EP6F   = 0xAA+5;
+ 426      =1           //sbit EP8E   = 0xAA+6;
+ 427      =1           //sbit EP8F   = 0xAA+7;
+ 428      =1  
+ 429      =1  sfr EP24FIFOFLGS   = 0xAB;
+ 430      =1  sfr EP68FIFOFLGS   = 0xAC;
+ 431      =1  sfr AUTOPTRSETUP  = 0xAF;
+ 432      =1           /* AUTOPTRSETUP */
+ 433      =1           //   sbit EXTACC  = 0xAF+0;
+ 434      =1           //   sbit APTR1FZ = 0xAF+1;
+ 435      =1           //   sbit APTR2FZ = 0xAF+2;
+ 436      =1  
+ 437      =1  sfr IOD     = 0xB0;
+ 438      =1           /*  IOD  */
+ 439      =1           sbit PD0    = 0xB0 + 0;
+ 440      =1           sbit PD1    = 0xB0 + 1;
+ 441      =1           sbit PD2    = 0xB0 + 2;
+ 442      =1           sbit PD3    = 0xB0 + 3;
+ 443      =1  
+ 444      =1           sbit PD4    = 0xB0 + 4;
+ 445      =1           sbit PD5    = 0xB0 + 5;
+ 446      =1           sbit PD6    = 0xB0 + 6;
+ 447      =1           sbit PD7    = 0xB0 + 7;
+ 448      =1  sfr IOE     = 0xB1;
+ 449      =1  sfr OEA     = 0xB2;
+ 450      =1  sfr OEB     = 0xB3;
+ 451      =1  sfr OEC     = 0xB4;
+ 452      =1  sfr OED     = 0xB5;
+ 453      =1  sfr OEE     = 0xB6;
+ 454      =1  
+ 455      =1  sfr IP     = 0xB8;
+ 456      =1           /*  IP  */
+ 457      =1           sbit PX0   = 0xB8+0;
+ 458      =1           sbit PT0   = 0xB8+1;
+ 459      =1           sbit PX1   = 0xB8+2;
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 14  
+
+ 460      =1           sbit PT1   = 0xB8+3;
+ 461      =1           sbit PS0   = 0xB8+4;
+ 462      =1           sbit PT2   = 0xB8+5;
+ 463      =1           sbit PS1   = 0xB8+6;
+ 464      =1  
+ 465      =1  sfr EP01STAT    = 0xBA;
+ 466      =1  sfr GPIFTRIG    = 0xBB;
+ 467      =1                  
+ 468      =1  sfr GPIFSGLDATH     = 0xBD;
+ 469      =1  sfr GPIFSGLDATLX    = 0xBE;
+ 470      =1  sfr GPIFSGLDATLNOX  = 0xBF;
+ 471      =1  
+ 472      =1  sfr SCON1  = 0xC0;
+ 473      =1           /*  SCON1  */
+ 474      =1           sbit RI1   = 0xC0+0;
+ 475      =1           sbit TI1   = 0xC0+1;
+ 476      =1           sbit RB81  = 0xC0+2;
+ 477      =1           sbit TB81  = 0xC0+3;
+ 478      =1           sbit REN1  = 0xC0+4;
+ 479      =1           sbit SM21  = 0xC0+5;
+ 480      =1           sbit SM11  = 0xC0+6;
+ 481      =1           sbit SM01  = 0xC0+7;
+ 482      =1  sfr SBUF1  = 0xC1;
+ 483      =1  sfr T2CON  = 0xC8;
+ 484      =1           /*  T2CON  */
+ 485      =1           sbit CP_RL2 = 0xC8+0;
+ 486      =1           sbit C_T2  = 0xC8+1;
+ 487      =1           sbit TR2   = 0xC8+2;
+ 488      =1           sbit EXEN2 = 0xC8+3;
+ 489      =1           sbit TCLK  = 0xC8+4;
+ 490      =1           sbit RCLK  = 0xC8+5;
+ 491      =1           sbit EXF2  = 0xC8+6;
+ 492      =1           sbit TF2   = 0xC8+7;
+ 493      =1  sfr RCAP2L = 0xCA;
+ 494      =1  sfr RCAP2H = 0xCB;
+ 495      =1  sfr TL2    = 0xCC;
+ 496      =1  sfr TH2    = 0xCD;
+ 497      =1  sfr PSW    = 0xD0;
+ 498      =1           /*  PSW  */
+ 499      =1           sbit P     = 0xD0+0;
+ 500      =1           sbit FL    = 0xD0+1;
+ 501      =1           sbit OV    = 0xD0+2;
+ 502      =1           sbit RS0   = 0xD0+3;
+ 503      =1           sbit RS1   = 0xD0+4;
+ 504      =1           sbit F0    = 0xD0+5;
+ 505      =1           sbit AC    = 0xD0+6;
+ 506      =1           sbit CY    = 0xD0+7;
+ 507      =1  sfr EICON  = 0xD8; // Was WDCON in DS80C320; Bit Values differ from Reg320
+ 508      =1           /*  EICON  */
+ 509      =1           sbit INT6  = 0xD8+3;
+ 510      =1           sbit RESI  = 0xD8+4;
+ 511      =1           sbit ERESI = 0xD8+5;
+ 512      =1           sbit SMOD1 = 0xD8+7;
+ 513      =1  sfr ACC    = 0xE0;
+ 514      =1  sfr EIE    = 0xE8; // EIE Bit Values differ from Reg320
+ 515      =1           /*  EIE  */
+ 516      =1           sbit EUSB    = 0xE8+0;
+ 517      =1           sbit EI2C    = 0xE8+1;
+ 518      =1           sbit EIEX4   = 0xE8+2;
+ 519      =1           sbit EIEX5   = 0xE8+3;
+ 520      =1           sbit EIEX6   = 0xE8+4;
+ 521      =1  sfr B      = 0xF0;
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 15  
+
+ 522      =1  sfr EIP    = 0xF8; // EIP Bit Values differ from Reg320
+ 523      =1           /*  EIP  */
+ 524      =1           sbit PUSB    = 0xF8+0;
+ 525      =1           sbit PI2C    = 0xF8+1;
+ 526      =1           sbit EIPX4   = 0xF8+2;
+ 527      =1           sbit EIPX5   = 0xF8+3;
+ 528      =1           sbit EIPX6   = 0xF8+4;
+ 529      =1  
+ 530      =1  /*-----------------------------------------------------------------------------
+ 531      =1     Bit Masks
+ 532      =1  -----------------------------------------------------------------------------*/
+ 533      =1  
+ 534      =1  /* CPU Control & Status Register (CPUCS) */
+ 535      =1  #define bmPRTCSTB    bmBIT5
+ 536      =1  #define bmCLKSPD     (bmBIT4 | bmBIT3)
+ 537      =1  #define bmCLKSPD1    bmBIT4
+ 538      =1  #define bmCLKSPD0    bmBIT3
+ 539      =1  #define bmCLKINV     bmBIT2
+ 540      =1  #define bmCLKOE      bmBIT1
+ 541      =1  #define bm8051RES    bmBIT0
+ 542      =1  /* Port Alternate Configuration Registers */
+ 543      =1  /* Port A (PORTACFG) */
+ 544      =1  #define bmFLAGD      bmBIT7
+ 545      =1  #define bmINT1       bmBIT1
+ 546      =1  #define bmINT0       bmBIT0
+ 547      =1  /* Port C (PORTCCFG) */
+ 548      =1  #define bmGPIFA7     bmBIT7
+ 549      =1  #define bmGPIFA6     bmBIT6
+ 550      =1  #define bmGPIFA5     bmBIT5
+ 551      =1  #define bmGPIFA4     bmBIT4
+ 552      =1  #define bmGPIFA3     bmBIT3
+ 553      =1  #define bmGPIFA2     bmBIT2
+ 554      =1  #define bmGPIFA1     bmBIT1
+ 555      =1  #define bmGPIFA0     bmBIT0
+ 556      =1  /* Port E (PORTECFG) */
+ 557      =1  #define bmGPIFA8     bmBIT7
+ 558      =1  #define bmT2EX       bmBIT6
+ 559      =1  #define bmINT6       bmBIT5
+ 560      =1  #define bmRXD1OUT    bmBIT4
+ 561      =1  #define bmRXD0OUT    bmBIT3
+ 562      =1  #define bmT2OUT      bmBIT2
+ 563      =1  #define bmT1OUT      bmBIT1
+ 564      =1  #define bmT0OUT      bmBIT0
+ 565      =1  
+ 566      =1  /* I2C Control & Status Register (I2CS) */
+ 567      =1  #define bmSTART      bmBIT7
+ 568      =1  #define bmSTOP       bmBIT6
+ 569      =1  #define bmLASTRD     bmBIT5
+ 570      =1  #define bmID         (bmBIT4 | bmBIT3)
+ 571      =1  #define bmBERR       bmBIT2
+ 572      =1  #define bmACK        bmBIT1
+ 573      =1  #define bmDONE       bmBIT0
+ 574      =1  /* I2C Control Register (I2CTL) */
+ 575      =1  #define bmSTOPIE     bmBIT1
+ 576      =1  #define bm400KHZ     bmBIT0
+ 577      =1  /* Interrupt 2 (USB) Autovector Register (INT2IVEC) */
+ 578      =1  #define bmIV4        bmBIT6
+ 579      =1  #define bmIV3        bmBIT5
+ 580      =1  #define bmIV2        bmBIT4
+ 581      =1  #define bmIV1        bmBIT3
+ 582      =1  #define bmIV0        bmBIT2
+ 583      =1  /* USB Interrupt Request & Enable Registers (USBIE/USBIRQ) */
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 16  
+
+ 584      =1  #define bmEP0ACK     bmBIT6
+ 585      =1  #define bmHSGRANT    bmBIT5
+ 586      =1  #define bmURES       bmBIT4
+ 587      =1  #define bmSUSP       bmBIT3
+ 588      =1  #define bmSUTOK      bmBIT2
+ 589      =1  #define bmSOF        bmBIT1
+ 590      =1  #define bmSUDAV      bmBIT0
+ 591      =1  /* Breakpoint register (BREAKPT) */
+ 592      =1  #define bmBREAK      bmBIT3
+ 593      =1  #define bmBPPULSE    bmBIT2
+ 594      =1  #define bmBPEN       bmBIT1
+ 595      =1  /* Interrupt 2 & 4 Setup (INTSETUP) */
+ 596      =1  #define bmAV2EN      bmBIT3
+ 597      =1  #define INT4IN       bmBIT1
+ 598      =1  #define bmAV4EN      bmBIT0
+ 599      =1  /* USB Control & Status Register (USBCS) */
+ 600      =1  #define bmHSM        bmBIT7
+ 601      =1  #define bmDISCON     bmBIT3
+ 602      =1  #define bmNOSYNSOF   bmBIT2
+ 603      =1  #define bmRENUM      bmBIT1
+ 604      =1  #define bmSIGRESUME  bmBIT0
+ 605      =1  /* Wakeup Control and Status Register (WAKEUPCS) */
+ 606      =1  #define bmWU2        bmBIT7
+ 607      =1  #define bmWU         bmBIT6
+ 608      =1  #define bmWU2POL     bmBIT5
+ 609      =1  #define bmWUPOL      bmBIT4
+ 610      =1  #define bmDPEN       bmBIT2
+ 611      =1  #define bmWU2EN      bmBIT1
+ 612      =1  #define bmWUEN       bmBIT0
+ 613      =1  /* End Point 0 Control & Status Register (EP0CS) */
+ 614      =1  #define bmHSNAK      bmBIT7
+ 615      =1  /* End Point 0-1 Control & Status Registers (EP0CS/EP1OUTCS/EP1INCS) */
+ 616      =1  #define bmEPBUSY     bmBIT1
+ 617      =1  #define bmEPSTALL    bmBIT0
+ 618      =1  /* End Point 2-8 Control & Status Registers (EP2CS/EP4CS/EP6CS/EP8CS) */
+ 619      =1  #define bmNPAK       (bmBIT6 | bmBIT5 | bmBIT4)
+ 620      =1  #define bmEPFULL     bmBIT3
+ 621      =1  #define bmEPEMPTY    bmBIT2
+ 622      =1  /* Endpoint Status (EP2468STAT) SFR bits */
+ 623      =1  #define bmEP8FULL    bmBIT7
+ 624      =1  #define bmEP8EMPTY   bmBIT6
+ 625      =1  #define bmEP6FULL    bmBIT5
+ 626      =1  #define bmEP6EMPTY   bmBIT4
+ 627      =1  #define bmEP4FULL    bmBIT3
+ 628      =1  #define bmEP4EMPTY   bmBIT2
+ 629      =1  #define bmEP2FULL    bmBIT1
+ 630      =1  #define bmEP2EMPTY   bmBIT0
+ 631      =1  /* SETUP Data Pointer Auto Mode (SUDPTRCTL) */
+ 632      =1  #define bmSDPAUTO    bmBIT0
+ 633      =1  /* Endpoint Data Toggle Control (TOGCTL) */
+ 634      =1  #define bmQUERYTOGGLE  bmBIT7
+ 635      =1  #define bmSETTOGGLE    bmBIT6
+ 636      =1  #define bmRESETTOGGLE  bmBIT5
+ 637      =1  #define bmTOGCTLEPMASK bmBIT3 | bmBIT2 | bmBIT1 | bmBIT0
+ 638      =1  /* IBN (In Bulk Nak) enable and request bits (IBNIE/IBNIRQ) */
+ 639      =1  #define bmEP8IBN     bmBIT5
+ 640      =1  #define bmEP6IBN     bmBIT4
+ 641      =1  #define bmEP4IBN     bmBIT3
+ 642      =1  #define bmEP2IBN     bmBIT2
+ 643      =1  #define bmEP1IBN     bmBIT1
+ 644      =1  #define bmEP0IBN     bmBIT0
+ 645      =1  
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 17  
+
+ 646      =1  /* PING-NAK enable and request bits (NAKIE/NAKIRQ) */
+ 647      =1  #define bmEP8PING     bmBIT7
+ 648      =1  #define bmEP6PING     bmBIT6
+ 649      =1  #define bmEP4PING     bmBIT5
+ 650      =1  #define bmEP2PING     bmBIT4
+ 651      =1  #define bmEP1PING     bmBIT3
+ 652      =1  #define bmEP0PING     bmBIT2
+ 653      =1  #define bmIBN         bmBIT0
+ 654      =1  
+ 655      =1  /* Interface Configuration bits (IFCONFIG) */
+ 656      =1  #define bmIFCLKSRC    bmBIT7
+ 657      =1  #define bm3048MHZ     bmBIT6
+ 658      =1  #define bmIFCLKOE     bmBIT5
+ 659      =1  #define bmIFCLKPOL    bmBIT4
+ 660      =1  #define bmASYNC       bmBIT3
+ 661      =1  #define bmGSTATE      bmBIT2
+ 662      =1  #define bmIFCFG1      bmBIT1
+ 663      =1  #define bmIFCFG0      bmBIT0
+ 664      =1  #define bmIFCFGMASK   (bmIFCFG0 | bmIFCFG1)
+ 665      =1  #define bmIFGPIF      bmIFCFG1
+ 666      =1  
+ 667      =1  /* EP 2468 FIFO Configuration bits (EP2FIFOCFG,EP4FIFOCFG,EP6FIFOCFG,EP8FIFOCFG) */
+ 668      =1  #define bmINFM       bmBIT6
+ 669      =1  #define bmOEP        bmBIT5
+ 670      =1  #define bmAUTOOUT    bmBIT4
+ 671      =1  #define bmAUTOIN     bmBIT3
+ 672      =1  #define bmZEROLENIN  bmBIT2
+ 673      =1  #define bmWORDWIDE   bmBIT0
+ 674      =1  
+ 675      =1  /* Chip Revision Control Bits (REVCTL) - used to ebable/disable revision specidic
+ 676      =1     features */ 
+ 677      =1  #define bmNOAUTOARM    bmBIT1
+ 678      =1  #define bmSKIPCOMMIT   bmBIT0
+ 679      =1  
+ 680      =1  /* Fifo Reset bits (FIFORESET) */
+ 681      =1  #define bmNAKALL       bmBIT7
+ 682      =1  
+ 683      =1  /* Chip Feature Register (GPCR2) */
+ 684      =1  #define bmFULLSPEEDONLY    bmBIT4
+ 685      =1  
+ 686      =1  #endif   /* FX2REGS_H */
+   9          #include "pins_def.h"
+   1      =1  #ifndef PINS_DEF_H              //Header sentry
+   2      =1  #define PINS_DEF_H
+   3      =1  
+   4      =1  // PINS FUNCTIONS DEFINITIONS
+   5      =1  
+   6      =1  // PORT BIT DEFINITIONS : OUTPUTS
+   7      =1  //#define USB_LED_PORT_OUT              OUTB    // USB Led output pin
+   8      =1  //#define USB_LED_PIN                   bmBIT6  // USB Led
+   9      =1  #define Z8_RESET_PORT_OUT               IOE             // Reset control of Z8 board
+  10      =1  #define Z8_RESET_PIN                    bmBIT1  // Reset control of Z8 board
+  11      =1  #define OCD_EN_PORT_OUT                 IOE             // OCD Enable output port
+  12      =1  #define OCD_EN_PIN                              bmBIT0  // OCD Enable output pin
+  13      =1  #define FORCE_OCD_Z8_PORT_OUT   IOE             // Reset control of Z8 board
+  14      =1  #define FORCE_OCD_Z8_PIN                bmBIT3  // Reset control of Z8 board
+  15      =1  
+  16      =1  // PORT BIT DEFINITIONS : INPUTS
+  17      =1  #define VUSB_PORT_IN                    IOE             // usb power supply monitor input port
+  18      =1  #define VUSB_PIN                                bmBIT2  // usb power supply monitor input pin
+  19      =1  
+  20      =1  
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 18  
+
+  21      =1  // OPTIONAL PINS ACTUALLY NOT USED
+  22      =1  
+  23      =1  
+  24      =1  #endif
+  25      =1  
+  26      =1  
+  27      =1  
+  28      =1  
+  29      =1  
+  10          #include "common_def.h"
+   1      =1  #ifndef COMMON_DEF_H            //Header sentry
+   2      =1  #define COMMON_DEF_H
+   3      =1  
+   4      =1  // GLOBAL DEFINES
+   5      =1  // #define EZ_COMPIL 1
+   6      =1  
+   7      =1  //#define SIMUL 1
+   8      =1  
+   9      =1  // MIDI MERGERS BUFFERS LENGHT
+  10      =1  #define MIDI_IN_FROM_CON_BUFF_LENGHT    128     // V1.5 128
+  11      =1  #define MIDI_IN_FROM_USB_BUFF_LENGHT    128 // V1.5 128
+  12      =1  #define SERIAL_IN_FROM_Z8_BUFF_LENGHT   128 // V1.5 128 
+  13      =1  #define MIDI_IN_REALTIME_BUFF_LENGHT    8
+  14      =1  
+  15      =1  typedef struct {
+  16      =1  BYTE start_index;                                                       // start index on input buffer
+  17      =1  volatile BYTE end_index;                                        // end index on input buffer
+  18      =1  BYTE merger_state;                                                      // merger state of input buffer
+  19      =1  volatile BYTE current_index;                            // current index on input buffer
+  20      =1  volatile BYTE input_status;                                     // Status register : see bits definition below
+  21      =1  BYTE buffer[MIDI_IN_FROM_CON_BUFF_LENGHT];      // input buffer
+  22      =1  } Midi_In_Struct;
+  23      =1  
+  24      =1  
+  25      =1  // bits definition for input_status in the aove structure
+  26      =1  #define input_overflow                  (1 << 0)        // bit 0 : input overflow
+  27      =1  
+  28      =1  typedef struct {
+  29      =1  BYTE realtime[MIDI_IN_REALTIME_BUFF_LENGHT];// realtime midi input buffer
+  30      =1  BYTE realtime_start_index;                                      // current index on realtime buffer
+  31      =1  BYTE realtime_end_index;                                        // current index on realtime buffer
+  32      =1  volatile BYTE input_status;                                     // Status register : see bits definition below
+  33      =1  } Midi_In_Realtime_Struct;
+  34      =1  
+  35      =1  // bits definition for input_status in the above realtime structure
+  36      =1  #define realtime_overflow               (1 << 0)        // bit 0 : realtime input overflow
+  37      =1  
+  38      =1  // enums for the following registers updated from Z8 board
+  39      =1  // enum {CTRL_REG_0_7BITS_FROM_Z8,CTRL_REG_1_7BITS_FROM_Z8  };
+  40      =1  
+  41      =1  #endif
+  11          #include <common_z8_ez.h>
+   1      =1  #ifndef COMMON_Z8_EZ
+   2      =1  #define COMMON_Z8_EZ
+   3      =1  
+   4      =1  typedef unsigned char uchar;
+   5      =1  typedef unsigned int  uint;
+   6      =1  
+   7      =1  #define Z8_FREQ 20000000ul      // 20.0 MHz
+   8      =1  
+   9      =1  #define BAUD_Z8_EZ                              31250L                  // 62.5K baud for UART0
+  10      =1  #define BAUD_OCD_Z8_EZ                  62500L                  // 62.5K baud for Z8 On Chip debugger (Must be > 39kb at 20MHz)
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 19  
+
+  11      =1  
+  12      =1  
+  13      =1  // #define HW_V10       1 // uncoment only if hw v1.0 (usb monitor pin and cancel pins are inverted)
+  14      =1  
+  15      =1  #define FW_VERSION_INDEX                0U
+  16      =1  #define FW_SUB_VERSION_INDEX    1U
+  17      =1  #define HW_VERSION_INDEX                2U
+  18      =1  #define HW_SUB_VERSION_INDEX    3U
+  19      =1  #define MANUF_YEAR_INDEX                4U
+  20      =1  #define MANUF_MONTH_INDEX               5U
+  21      =1  #define SERIAL_4_INDEX                  6U
+  22      =1  #define SERIAL_3_INDEX                  7U
+  23      =1  #define SERIAL_2_INDEX                  8U
+  24      =1  #define SERIAL_1_INDEX                  9U
+  25      =1  #define SERIAL_0_INDEX                  10U
+  26      =1  
+  27      =1  #define IDENTITY_LENGHT                 11
+  28      =1  
+  29      =1  // Z8_STATUS_0_NVM bits definition (MUST BE LOADED From NVM AT STARTUP)
+  30      =1  // bit 7 always 0
+  31      =1  #define new_video_mode_z0nvm            (1<<6)  // 1 = inverted
+  32      =1  #define video_mode_z0nvm                        (1<<5)  // 1 = inverted
+  33      =1  #define encoder_tempo_lock_z0nvm        (1<<4)  // 1 = lock tempo encoder
+  34      =1  #define mtc_mode_on_off_z0nvm           (1<<3)  // 1 = realtime off, 0 = realtime on    DO NOT CHANGE ORDER
+  35      =1  #define mtc_mode_z0nvm                          (1<<2)  // 1 = mtc / 0 = midi clock                             DO NOT CHANGE ORDER
+  36      =1  #define hook_zjump_mode_z0nvm           (1<<1)  // 1 = jumpless
+  37      =1  #define jog_lock_z0nvm                          (1<<0)  // 1 = lock big encoder
+  38      =1  
+  39      =1  #define MTC_MODE_MASK_BIT       0x0C    // Bits 2 & 3
+  40      =1  
+  41      =1  // Z8_STATUS_1_NVM bits definition (MUST BE LOADED From NVM AT STARTUP)
+  42      =1  // bit 7 always 0
+  43      =1  #define must_autoassign_z1nvm           (1<<6)  // 1 = must auto assign
+  44      =1  #define smpte_frame_rate_1_z1nvm        (1<<2)  // 0 0 = 24 fps         0 1 = 25 fps            DO NOT CHANGE ORDER
+  45      =1  #define smpte_frame_rate_0_z1nvm        (1<<1)  // 1 0 = 30 fps nd      1 1 = 30 fps            DO NOT CHANGE ORDER
+  46      =1  
+  47      =1  #define SMPTE_FRAME_RATE_MASK_BIT       0x06    // Bits 1 & 2
+  48      =1  
+  49      =1  // Z8_STATUS_2_NVM bits definition (MUST BE LOADED From NVM AT STARTUP)
+  50      =1  // bit 7 always 0
+  51      =1  
+  52      =1  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+  53      =1  /////////////////////////// REGISTERS THAT MUST BE SENT TO EZ AT STARTUP ///////////////////////////////
+  54      =1  
+  55      =1  // CTRL_REG_0_7BITS_TO_EZ bits definition (MUST BE LOADED From NVM AT STARTUP, MUST BE SENT TO EZBOARD)
+  56      =1  // Bit 7 must be 0 since this control reg is sent to EZBOARD
+  57      =1  #define filter_state_z_ez0_bit_pos                              6       
+  58      =1  //#define                                                                               5       
+  59      =1  #define filter_type_z_ez0_bit_pos                               4
+  60      =1  #define midi_thru_ez0_bit_pos                                   3       
+  61      =1  //#define merger_src_midi_in_state_z_ez0_bit_pos        3
+  62      =1  //#define merger_src_usb_in_state_z_ez0_bit_pos 2
+  63      =1  //#define merger_dst_usb_out_state_z_ez0_bit_pos        1
+  64      =1  //#define merger_dst_out1_state_z_ez0_bit_pos           0
+  65      =1  
+  66      =1  #ifdef Z8_COMPIL
+           =1 #define filter_state_z_ez0                                      (1<<filter_state_z_ez0_bit_pos)                         // on/off
+           =1 // #define 
+           =1 #define filter_type_z_ez0                                       (1<<filter_type_z_ez0_bit_pos)                          // 1=filter all, 0=filter realtime
+           =1 #define midi_thru_ez0                                           (1<<midi_thru_ez0_bit_pos)      // on/off
+           =1 //#define merger_src_midi_in_state_z_ez0        (1<<merger_src_midi_in_state_z_ez0_bit_pos)     // on/off
+           =1 //#define merger_src_usb_in_state_z_ez0         (1<<merger_src_usb_in_state_z_ez0_bit_pos)      // on/off
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 20  
+
+           =1 //#define merger_dst_usb_out_state_z_ez0        (1<<merger_dst_usb_out_state_z_ez0_bit_pos)     // on/off
+           =1 //#define merger_dst_out1_state_z_ez0           (1<<merger_dst_out1_state_z_ez0_bit_pos)        // on/off
+           =1 #endif
+  76      =1  
+  77      =1  #ifdef EZ_COMPIL
+  78      =1  #define filter_state_z_ez0                                      (CTRL_REGS_7BITS_FROM_Z8[CTRL_REG_0_7BITS_TO_EZ_INDEX] ^ filter_state_z_ez0
+             -_bit_pos)
+  79      =1  // #define 
+  80      =1  #define filter_type_z_ez0                                       (CTRL_REGS_7BITS_FROM_Z8[CTRL_REG_0_7BITS_TO_EZ_INDEX] ^ filter_type_z_ez0_b
+             -it_pos)
+  81      =1  #define midi_thru_ez0                                           (CTRL_REGS_7BITS_FROM_Z8[CTRL_REG_0_7BITS_TO_EZ_INDEX] ^ midi_thru_ez0_bit_pos)
+  82      =1  //#define merger_src_midi_in_state_z_ez0        (CTRL_REGS_7BITS_FROM_Z8[CTRL_REG_0_7BITS_TO_EZ_INDEX] ^ merger_
+             -src_midi_in_state_z_ez0_bit_pos)
+  83      =1  //#define merger_src_usb_in_state_z_ez0         (CTRL_REGS_7BITS_FROM_Z8[CTRL_REG_0_7BITS_TO_EZ_INDEX] ^ merger_s
+             -rc_usb_in_state_z_ez0_bit_pos)
+  84      =1  //#define merger_dst_usb_out_state_z_ez0        (CTRL_REGS_7BITS_FROM_Z8[CTRL_REG_0_7BITS_TO_EZ_INDEX] ^ merger_d
+             -st_usb_out_state_z_ez0_bit_pos)
+  85      =1  //#define merger_dst_out1_state_z_ez0           (CTRL_REGS_7BITS_FROM_Z8[CTRL_REG_0_7BITS_TO_EZ_INDEX] ^ merger_dst
+             -_out1_state_z_ez0_bit_pos)
+  86      =1  #endif
+  87      =1  
+  88      =1  
+  89      =1  // CTRL_REG_1_7BITS_TO_EZ bits definition (MUST BE LOADED From NVM AT STARTUP, MUST BE SENT TO EZBOARD)
+  90      =1  // Bit 7 must be 0 since this control reg is sent to EZBOARD
+  91      =1  #define ez_fw_midi_to_z8_z_ez1_bit_pos          4       // V1.5 ; z8 indicates to EZ it must receive midi events
+  92      =1  #define realtime_source_int_z_ez1_bit_pos       1       // DO NOT CHANGE ORDER
+  93      =1  #define realtime_source_ext_z_ez1_bit_pos       0       // DO NOT CHANGE ORDER
+  94      =1  #define REALTIME_SRC_MSK        0x03                            // Midi in, Usb in, internal
+  95      =1  
+  96      =1  #ifdef Z8_COMPIL
+           =1 #define ez_fw_midi_to_z8_z_ez1                          (1<<ez_fw_midi_to_z8_z_ez1_bit_pos)             // on/off
+           =1 #define realtime_source_int_z_ez1                       (1<<realtime_source_int_z_ez1_bit_pos)  // 0=internal 0ff, 1=internal o
+             -n 
+           =1 #define realtime_source_ext_z_ez1                       (1<<realtime_source_ext_z_ez1_bit_pos)  // 0=midi in, 1=usb in (externa
+             -l sync input)
+           =1 #endif
+ 101      =1  
+ 102      =1  #ifdef EZ_COMPIL
+ 103      =1  #define ez_fw_midi_to_z8_z_ez1                          (CTRL_REGS_7BITS_FROM_Z8[CTRL_REG_1_7BITS_TO_EZ_INDEX] ^ ez_fw_midi_to_z
+             -8_z_ez1_bit_pos)
+ 104      =1  #define realtime_source_int_z_ez1                       (CTRL_REGS_7BITS_FROM_Z8[CTRL_REG_1_7BITS_TO_EZ_INDEX] ^ realtime_sour
+             -ce_int_z_ez1_bit_pos)
+ 105      =1  #define realtime_source_ext_z_ez1                       (CTRL_REGS_7BITS_FROM_Z8[CTRL_REG_1_7BITS_TO_EZ_INDEX] ^ realtime_sour
+             -ce_ext_z_ez1_bit_pos)
+ 106      =1  #endif
+ 107      =1  
+ 108      =1  // LAST_CTRL_REG_7BITS_TO_EZ_INDEX bits definition (MUST BE LOADED From NVM AT STARTUP, MUST BE SENT TO EZ
+             -BOARD)
+ 109      =1  // Bit 7 must be 0 since this control reg is sent to EZBOARD
+ 110      =1  //#define ez_board_fully_updated_ezlast         (1<<6)  // 1 when all regs dedicated to EZ have been sent
+ 111      =1  // or
+ 112      =1  #define EZ_FULLY_UPDATED        0x55U
+ 113      =1  
+ 114      =1  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+ 115      =1  // MISC REGISTERS (PARTIALY) USED BY EZ BOARD, NOT TO SEND (COMMON DEF ONLY)
+ 116      =1  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+ 117      =1  
+ 118      =1  // Z8_STATUS_8 bits definition
+ 119      =1  #define onewire_rx_overflow_z8                  (1<<5)  // 0 =no overflow               DO NOT CHANGE ORDER
+ 120      =1  #define serial_in_overflow_z8                   (1<<4)  // 0 =no overflow               DO NOT CHANGE ORDER
+ 121      =1  #define midi_in_realtime_overflow_z8    (1<<3)  // 0 =no overflow               DO NOT CHANGE ORDER
+ 122      =1  #define usb_in_realtime_overflow_z8             (1<<2)  // 0 =no overflow               DO NOT CHANGE ORDER
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 21  
+
+ 123      =1  #define midi_in_overflow_z8                             (1<<1)  // 0 =no overflow               DO NOT CHANGE ORDER
+ 124      =1  #define usb_in_overflow_z8                              (1<<0)  // 0 =no overflow               DO NOT CHANGE ORDER
+ 125      =1  
+ 126      =1  #define OVERFLOW_MSK                                    0x3FU   // mask bits 0-5
+ 127      =1  #define OVERFLOW_FROM_EZ_MSK                    0x0FU   // mask bits 0-3 (only overflows from EZ board)
+ 128      =1  #define OVERFLOW_REALTIME_MSK                   0x0CU   // mask bits 3-2
+ 129      =1  #define OVERFLOW_INPUT_MSK                              0x03U   // mask bits 1-0
+ 130      =1  #define OVERFLOW_FROM_MIDI_MSK                  0x0AU   // mask bits 1 and 3
+ 131      =1  #define OVERFLOW_FROM_USB_MSK                   0x05U   // mask bits 0 and 2
+ 132      =1  
+ 133      =1  //////////////////////////////////////////////////////////
+ 134      =1  // Z8 TO EZ (only) COMMUNICATION PROTOCOL ////////////////
+ 135      =1  //////////////////////////////////////////////////////////
+ 136      =1  #define SOF_TO_EZ                                               0xFFU
+ 137      =1  #define FRAME_FROM_Z8_TO_EZ_TYPE_MSK    0x60U   // Bits 6-5 : data type (reg/midi)
+ 138      =1  #define FRAME_TO_EZ_IS_MIDI                             0x20U
+ 139      =1  #define FRAME_TO_EZ_IS_CTRL_REG                 0x00U
+ 140      =1  #define EOF_TO_EZ                                               0xFEU
+ 141      =1  
+ 142      =1  // frame from z8 to ez status byte bits definition
+ 143      =1  // bit 7 is always 0                                    //  bit 7 : always 0
+ 144      =1  // bits 6:5                                                     // frame type 00=ctrl_reg 01=midi 
+ 145      =1  #define send_to_usb                     (1 << 4)        // bit 4        // reg address or send to usb
+ 146      =1  #define send_to_out1            (1 << 3)        // bit 3        // reg address or send to out 0
+ 147      =1  #define send_to_out2            (1 << 2)        // bit 2        // reg address or send to out 1
+ 148      =1  // bits 1:0                                                             // bits 1:0     // reg address or rfu
+ 149      =1  
+ 150      =1  #define CTRL_REG_Z8_TO_EZ_ADDR_MSK              0x1F
+ 151      =1  
+ 152      =1  //////////////////////////////////////////////////////////
+ 153      =1  // EZ TO Z8 (only) COMMUNICATION PROTOCOL ////////////////
+ 154      =1  //////////////////////////////////////////////////////////
+ 155      =1  
+ 156      =1  #define CTRL_REG_MAX_FROM_EZ_TO_Z8              1U              // Nb of registers updated to the Z8 board
+ 157      =1  
+ 158      =1  // CTRL_REG_0_7BITS_FROM_EZ bits definition : TOGGLE REGISTER
+ 159      =1  // the following bits def MUST be duplicated in main.c from EZ project file
+ 160      =1  //  bit 7 is always 0                                                   //  bit 7 : always 0
+ 161      =1  #define usb_state_from_ez0_bit_pos                                      6
+ 162      =1  #define z8_board_fully_updated_from_ez0_bit_pos         5
+ 163      =1  #define must_start_bootloader_from_ez0_bit_pos          4
+ 164      =1  #define usb_enumrated_from_ez0_bit_pos                          3
+ 165      =1  
+ 166      =1  #ifdef Z8_COMPIL
+           =1 #define usb_state_from_ez0                                      (1<<usb_state_from_ez0_bit_pos) // 0=midi in, 1=usb in
+           =1 #define z8_board_fully_updated_from_ez0         (1<<z8_board_fully_updated_from_ez0_bit_pos)    // on/off
+           =1 #define must_start_bootloader_from_ez0          (1<<must_start_bootloader_from_ez0_bit_pos)     // on/off
+           =1 #define usb_enumrated_from_ez0                          (1<<usb_enumrated_from_ez0_bit_pos)     // on/off
+           =1 #endif
+ 172      =1  
+ 173      =1  #ifdef EZ_COMPIL
+ 174      =1  #define usb_state_from_ez0                                      (CTRL_REGS_7BITS_TO_Z8[0] ^ usb_state_from_ez0_bit_pos)
+ 175      =1  #define z8_board_fully_updated_from_ez0         (CTRL_REGS_7BITS_TO_Z8[0] ^ z8_board_fully_updated_from_ez0_bit_
+             -pos)
+ 176      =1  #define must_start_bootloader_from_ez0          (CTRL_REGS_7BITS_TO_Z8[0] ^ must_start_bootloader_from_ez0_bit_pos
+             -)
+ 177      =1  #define usb_enumrated_from_ez0                          (CTRL_REGS_7BITS_TO_Z8[0] ^ usb_enumrated_from_ez0_bit_pos)
+ 178      =1  #endif
+ 179      =1  
+ 180      =1  // SYSEX ID0 (BYTE 6)   
+ 181      =1  //  bit 7 is always 0                                                   //  bit 7 : always 0
+ 182      =1  #define sysex_direction_sysxid0                 (1<<6U) //  bit 6 :                                                     0=received sysex, 1=sent sysex
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 22  
+
+ 183      =1  #define prog_upload_sysxid0                             (1<<5U) //      bit 5 : program or upload request       0=program request/answer 1=upl
+             -oad request/answer
+ 184      =1  #define prog_ez_z8_sysxid0                              (1<<5U) //      bit 5 : 0= program ez firmware 1= program z8 firmware 
+ 185      =1  #define pure_midi_from_usb_sysxid0              (1<<5U) //      bit 5 : 0= pure midi from MIDI in conn 1= pure Midi from US
+             -B in (V1.5)
+ 186      =1  #define acknoledge_sysxid0                              (1<<4U) //      bit 4 : ack request/answer                      0=no ack required/prog error  1=ack 
+             -required/prog succeeded
+ 187      =1  #define checksum_check_sysxid0                  (1<<3U) //      bit 3 : checksum check request          0=no checksum to check  1=must
+             - check embedeed checksum (calculated from SYSEX ID2 to checksum)
+ 188      =1  //#define checksum_return_sysxid0               (1<<2U) //      bit 2 : checksum return request         0=checksum return is not re
+             -quested 1:checksum return is requested 
+ 189      =1  #define fw_znext_finish_sysxid0                 (1<<2U) //      bit 2 : 0= next firmware data available / 1=finish programmin
+             -g firmware
+ 190      =1  // bits 1:0 : frame type content                                //  00=common parameter 01=lcd control assign   // DO NOT CHANGE ORDER
+ 191      =1                                                                                                  //  10=firmware or midi 11=midi control assign  // DO NOT CHANGE ORDER
+ 192      =1  #define FRAME_TO_Z8_TYPE_MSK                    0x03U   //      sysex content 
+ 193      =1                                                  
+ 194      =1  //v1.1 enum { FRAME_IS_COMMON_PARAM, FRAME_IS_LCD_CTRL_ASSIGN, FRAME_IS_FIRMWARE, FRAME_IS_MIDI_CTRL_ASSIG
+             -N, FRAME_IS_PURE_MIDI};
+ 195      =1  enum { FRAME_IS_COMMON_PARAM, FRAME_IS_LCD_CTRL_ASSIGN, FRAME_IS_FIRMWARE_OR_PURE_MIDI, FRAME_IS_MIDI_CTRL
+             -_ASSIGN};
+ 196      =1  
+ 197      =1  // Addresses of common parameters uploaded/programmed from EZ board or external sysex
+ 198      =1  enum {  // then with NVM regs dedicated to EZ board
+ 199      =1                  CTRL_REG_0_7BITS_TO_EZ_INDEX, CTRL_REG_1_7BITS_TO_EZ_INDEX, 
+ 200      =1                  LAST_CTRL_REG_7BITS_TO_EZ_INDEX,
+ 201      =1                  // continue with NVM regs dedicated to Z8 only
+ 202      =1                  Z8_STATUS_0_NVM_INDEX, Z8_STATUS_1_NVM_INDEX, CHANNEL_INDEX, GROUP_INDEX, INT_TEMPO_INDEX, 
+ 203      =1          // the following regs cannot be accessed (from EZ board only)
+ 204      =1          CTRL_REG_0_7B_FROM_EZ_INDEX, LCD_MESSAGE_TO_Z8_INDEX };
+ 205      =1  
+ 206      =1  #define IDENTITY_REQUEST_INDEX 0x7F
+ 207      =1  
+ 208      =1  // first index of NVM registers dedicated to EZ
+ 209      =1  #define CTRL_REG_TO_EZ_START_INDEX       CTRL_REG_0_7BITS_TO_EZ_INDEX   
+ 210      =1  // last index of NVM register that can be programmed by external sysex
+ 211      =1  
+ 212      =1  // last index of NVM register that can be programmed by external sysex or EZ board
+ 213      =1  #define LAST_COMMON_PARAM_INDEX      LCD_MESSAGE_TO_Z8_INDEX
+ 214      =1  // Nb of registers updated from the Z8 board
+ 215      =1  #define CTRL_REG_NB_FROM_Z8_TO_EZ        (LAST_CTRL_REG_7BITS_TO_EZ_INDEX-CTRL_REG_0_7BITS_TO_EZ_INDEX+1)               
+ 216      =1  
+ 217      =1  //SYSEX ID3 (BYTE 8)    
+ 218      =1  //  bit 7               : always 0
+ 219      =1  //      bits 6:0        : group or address      : control assign group GG
+ 220      =1   
+ 221      =1  // JLABS SYSEX header from MMA
+ 222      =1  #define JLABS_SYX_ID0                           0x00U
+ 223      =1  #define JLABS_SYX_ID1                           0x20U
+ 224      =1  #define JLABS_SYX_ID2                           0x4FU
+ 225      =1  #define JLABS_SYX_ID3                           0x00U
+ 226      =1  #define JLABS_SYX_ID4                           0x01U
+ 227      =1  
+ 228      =1  #define MIDI_PROGRAM_CHANGE                     0xC0U
+ 229      =1  #define MIDI_CONTROL_CHANGE                     0xB0U
+ 230      =1  #define MIDI_PITCH_WHEEL                        0xE0U
+ 231      =1  #define MIDI_CHANN_PRESSURE                     0xD0U
+ 232      =1  #define MIDI_NOTE_ON                            0x90U
+ 233      =1  #define MIDI_NOTE_OFF                           0x80U
+ 234      =1  #define MIDI_MMC_PAUSE                          0x09U
+ 235      =1  #define MIDI_MMC_BACKWARD                       0x05U
+ 236      =1  #define MIDI_MMC_FORWARD                        0x04U
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 23  
+
+ 237      =1  #define MIDI_MMC_PLAY                           0x02U
+ 238      =1  #define MIDI_MMC_STOP                           0x01U
+ 239      =1  #define MIDI_MMC_REC                            0x06U
+ 240      =1  #define MIDI_CLOCK                                      0xF8U
+ 241      =1  #define MIDI_TICK                                       0xF9U
+ 242      =1  #define MIDI_START                                      0xFAU
+ 243      =1  #define MIDI_CONTINUE                           0xFBU
+ 244      =1  #define MIDI_STOP                                       0xFCU
+ 245      =1  #define MIDI_SOX                                        0xF0U
+ 246      =1  #define MIDI_EOX                                        0xF7U
+ 247      =1  #define MIDI_ACTIVE_SENSE                       0xFEU   // never received, filtered by EZ board
+ 248      =1  #define MIDI_TIME_CODE                          0xF1U
+ 249      =1  #define MIDI_SONG_POSITION_POINTER      0xF2U
+ 250      =1  #define MIDI_SONG_SELECTED                      0xF3U
+ 251      =1  #define MIDI_STATUS_MASK                        0x80U
+ 252      =1  
+ 253      =1  #define JLABS_SYX_HEADER_SIZE                   6U                                                              // f0 00 20 4f 00 01 
+ 254      =1  #define JLABS_SYX_UPLOAD_HEADER_SIZE    (JLABS_SYX_HEADER_SIZE + 4U)    // f0 00 20 4f 00 01 UL LL GG NN 
+ 255      =1  
+ 256      =1  #define DATA_LENGHT_START_BOOTLOADER    0x7F
+ 257      =1  #define Z8_ERASING_TIME                                 4000
+ 258      =1  #define EE_24C64_PAGE_LENGHT                    32
+ 259      =1  #define EE24C64_SIZE                                    16384
+ 260      =1  
+ 261      =1  #define MAX_LCD_TEXT_LENGHT                     (16U + 1U)              // 16 chars + eoc
+ 262      =1  
+ 263      =1  
+ 264      =1  #define DEFAULT_INTERNAL_TEMPO          100 // 30 will be added : 130
+ 265      =1  #define MAX_REAL_TEMPO                          255
+ 266      =1  #define TEMPO_ADD_OFFSET                        30
+ 267      =1  
+ 268      =1  #endif
+  12          #include "main.h"
+   1      =1  #ifndef MAIN_H          //Header sentry
+   2      =1  #define MAIN_H
+   3      =1  
+   4      =1  // PROTOTYPES
+   5      =1  //void TD_Poll(void);
+   6      =1  void Check_Midi_In_Buffer(Midi_In_Struct *midi_struct, bit merger_src_enable);
+   7      =1  void Check_Serial_In_From_Z8_Buffer(void);
+   8      =1  void Check_Realtime(void);
+   9      =1  void Check_Realtime_Buffers(Midi_In_Realtime_Struct *midi_struct, bit merger_src_enable);
+  10      =1  void Check_Overflow_Flags(void);
+  11      =1  void Update_Sync24(unsigned char data_received);
+  12      =1  //void Check_Realtime_From_Z8(void);
+  13      =1  
+  14      =1  #endif
+  15      =1  
+  13          #include "usb.h"
+   1      =1  #ifndef USB_H           //Header sentry
+   2      =1  #define USB_H
+   3      =1  
+   4      =1  
+   5      =1  
+   6      =1  // PROTOTYPES
+   7      =1  void Check_If_Usb_Attached(void);
+   8      =1  void Check_Usb(void);
+   9      =1  void Create_Send_USB_Frame_From_MIDI_Buffer( BYTE CN, Midi_In_Struct *midi_struct, BYTE end_index_local);
+  10      =1  void Create_Send_Realtime_USB_Frame_From_MIDI_Buffer( BYTE CN, BYTE realtime_data);
+  11      =1  void Ep2out_Function(void);
+  12      =1  #endif
+  14          #include "macros.inc"
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 24  
+
+   1      =1  #ifndef MACROS_INC              //Header sentry
+   2      =1  #define MACROS_INC
+   3      =1  
+   4      =1  /* ************************************** MACROS ***************************** */
+   5      =1  
+   6      =1  /*
+   7      =1  #define MAC_MIDI_In_Inc_Index(index, max_index) {       index++; \
+   8      =1                                                          if(index >= max_index)  \
+   9      =1                                                             index = 0; }
+  10      =1  
+  11      =1  #define MAC_MIDI_In_Add_Index(index, added, max_index) { index = index+added; \
+  12      =1                                                          if(index >= max_index)  \
+  13      =1                                                             index -= max_index; }
+  14      =1  */
+  15      =1  
+  16      =1  #endif
+  17      =1  
+  15          #include "serial.h"
+   1      =1  #ifndef SERIAL_H                //Header sentry
+   2      =1  #define SERIAL_H
+   3      =1  
+   4      =1  #define Z8_MEM_SIZE                                     65536
+   5      =1  #define EZUSB_MEM_SIZE                          8192
+   6      =1  
+   7      =1  #define XTAL                                            48000000L       // in hertz
+   8      =1  #define MIDI_OUT_1_BAUD_RATE            31250L          // in bauds
+   9      =1  
+  10      =1  #define MIDI_OUT_1_BAUD_RELOAD                  (65536-(XTAL/(32L*MIDI_OUT_1_BAUD_RATE)))       // timer 2
+  11      =1  #define SERIAL_TO_Z8_BAUD_RELOAD                ((2*XTAL)/(32*12*BAUD_Z8_EZ))   // timer 1
+  12      =1  #define SERIAL_TO_OCD_Z8_BAUD_RELOAD    ((2*XTAL)/(32*12*BAUD_OCD_Z8_EZ))       // timer 1 (ON CHIP DEBUGGER Z8)
+  13      =1  
+  14      =1  
+  15      =1  #define TIMER0_PERIOD                           2 // in milliseconds
+  16      =1  #define TIMER0_RELOAD                           (65536-(((XTAL*TIMER0_PERIOD)/(12*1000L))))
+  17      =1  
+  18      =1  #define SERIAL_TX_BUFF_LENGTH           32 // used as a buffer for MIDI outputs
+  19      =1  
+  20      =1  enum {WAIT_SOF, FRAME_STATUS_BYTE, WAIT_EOF }; // Frame state from Z8 serial
+  21      =1  enum {WAIT_FOR_CORRECT_DATA, IN_SYSEX, SYSEX_RECEIVED, NORMAL, FIFO_FULL }; // MIDI Merger State Byte
+  22      =1  enum {CN0, CN1 };        // USB MIDI CABLE NUMBER
+  23      =1  enum {SERIAL, USB }; // Bootloader source port
+  24      =1  
+  25      =1  #define CTRL_REG_Z8_FRAME_LENGHT                0x04 // FF SS VV FE FF SS VV FE
+  26      =1  
+  27      =1  // jlabs MAWZER RECOGNIZED SYSEXS (RECEIVED BY MAWZER)
+  28      =1  
+  29      =1  // jlabs MAWZER RECOGNIZED SYSEXS (SENT BY MAWZER)
+  30      =1  
+  31      =1  
+  32      =1  // FUNCTION PROTOTYPES
+  33      =1  void Init_Serial_Ports(void);
+  34      =1  void Send_To_Midi_Out_Con(BYTE data_to_send);
+  35      =1  void Check_MIDI_Buff_Send_To_Z8_Board(Midi_In_Struct *midi_struct, BYTE end_index_local);
+  36      =1  void Send_To_Serial_Z8(BYTE data_to_send);
+  37      =1  void Send_Single_Framed_byte_To_Z8(/*v1.1 BYTE SYSEX_ID0,*/ BYTE SYSEX_ID2, BYTE byte_to_send);
+  38      =1  
+  39      =1  #endif // SERIAL_H
+  16          
+  17          ///////////////////// GLOBAL VARS ///////////////////////////////////////
+  18          
+  19          // CTRL_REGS_7BITS_TO_Z8 must be sent to Z8 board when updated
+  20          unsigned char bdata CTRL_REGS_7BITS_TO_Z8[CTRL_REG_MAX_FROM_EZ_TO_Z8];
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 25  
+
+  21          // bit 7 is always 0 since sent to Z8
+  22          // the following bits def MUST be duplicated in common_z8_ez.h file
+  23                  sbit usb_state_from_ez0_bit                                     = usb_state_from_ez0;   // DO NOT CHANGE ORDER
+  24                  sbit z8_board_fully_updated_from_ez0_bit        = z8_board_fully_updated_from_ez0;      
+  25                  sbit must_start_bootloader_from_ez0_bit         = must_start_bootloader_from_ez0;
+  26                  sbit usb_enumrated_from_ez0_bit                         = usb_enumrated_from_ez0;
+  27          
+  28          // Registers updated from the Z8 board (7 bits wide)
+  29          unsigned char bdata CTRL_REGS_7BITS_FROM_Z8[CTRL_REG_NB_FROM_Z8_TO_EZ];
+  30                  sbit filter_state_z_ez0_bit                     = filter_state_z_ez0;
+  31          //      sbit sync24_state_z_ez0_bit                     = sync24_state_z_ez0;
+  32                  sbit filter_type_z_ez0_bit                              = filter_type_z_ez0;
+  33                  sbit midi_thru_ez0_bit                                  = midi_thru_ez0;
+  34          //      sbit merger_src_midi_in_state_z_ez0_bit = merger_src_midi_in_state_z_ez0;
+  35          //      sbit merger_src_usb_in_state_z_ez0_bit  = merger_src_usb_in_state_z_ez0;
+  36          //      sbit merger_dst_usb_out_state_z_ez0_bit = merger_dst_usb_out_state_z_ez0;
+  37          //      sbit merger_dst_out1_state_z_ez0_bit    = merger_dst_out1_state_z_ez0;
+  38          
+  39                  sbit ez_fw_midi_to_z8_z_ez1_bit                 = ez_fw_midi_to_z8_z_ez1;
+  40                  sbit realtime_source_int_z_ez1_bit              = realtime_source_int_z_ez1;
+  41                  sbit realtime_source_ext_z_ez1_bit              = realtime_source_ext_z_ez1;
+  42          
+  43          // sync24 counters to clear lines : also shared with bootloader registers
+  44          volatile BYTE sync24_clear_clock_cpt;
+  45          volatile BYTE sync24_clear_cont_cpt;
+  46          
+  47          xdata Midi_In_Struct MIDI_In_From_Con, MIDI_In_From_Usb, Serial_In_From_Z8;
+  48          idata Midi_In_Realtime_Struct MIDI_In_Realtime_From_Con, MIDI_In_Realtime_From_Usb, Realtime_From_Z8;
+  49          
+  50          // ***************************************************************************
+  51          // Routine      : Check_Midi_In_Buffer()
+  52          // Input        : 
+  53          // Output       : None
+  54          // Process      : There are "pure" midi data in the buffer
+  55          // ***************************************************************************
+  56          void Check_Midi_In_Buffer(Midi_In_Struct *midi_struct, bit merger_src_enable)
+  57          {
+  58   1              BYTE Start_Index_LOCAL;
+  59   1              BYTE End_Index_LOCAL;
+  60   1      
+  61   1              Start_Index_LOCAL = midi_struct->start_index;
+  62   1              EA = 0;
+  63   1              End_Index_LOCAL   = midi_struct->end_index;
+  64   1              EA = 1;
+  65   1      
+  66   1              // Check if something must be sent to Z8 Board (JLABS sysex or pure midi if arpeggio on)
+  67   1              Check_MIDI_Buff_Send_To_Z8_Board(midi_struct, End_Index_LOCAL);
+  68   1      
+  69   1              // Check if current MIDI In buffer has to be merged
+  70   1              if(merger_src_enable)
+  71   1              {
+  72   2                      // merge only if midi filter is off OR midi filter realtime only is on 
+  73   2                      if( (!filter_state_z_ez0_bit) || (!filter_type_z_ez0_bit) )
+  74   2                      {
+  75   3                              // Merge to USB out CN0 ?
+  76   3                              // if(merger_dst_usb_out_state_z_ez0_bit)
+  77   3                              // if(midi_thru_ez0_bit)
+  78   3                                      Create_Send_USB_Frame_From_MIDI_Buffer(CN0, midi_struct, End_Index_LOCAL);
+  79   3                              
+  80   3                              // Merge to MIDI out 1 ?
+  81   3                              //if(merger_dst_out1_state_z_ez0_bit)
+  82   3                              // if(midi_thru_ez0_bit)
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 26  
+
+  83   3                              {
+  84   4                                      // Send all bytes to MIDI Out Connector
+  85   4                                      while (Start_Index_LOCAL != End_Index_LOCAL)
+  86   4                                      {
+  87   5                                              Send_To_Midi_Out_Con(midi_struct->buffer[Start_Index_LOCAL]);
+  88   5                                              Start_Index_LOCAL = (Start_Index_LOCAL + 1) & (MIDI_IN_FROM_CON_BUFF_LENGHT -1);
+  89   5                                      }
+  90   4                              } // end merge to midi out con 
+  91   3              
+  92   3                      } // end midi filter allows merge
+  93   2              } // end merger is on
+  94   1      
+  95   1              // Update treated pointers
+  96   1              midi_struct->start_index = End_Index_LOCAL;
+  97   1      }
+  98          
+  99          // ***************************************************************************
+ 100          // Routine      : Check_Serial_In_From_Z8_Buffer()
+ 101          // Input        : 
+ 102          // Output       : None
+ 103          // Process      : this buffer contains midi data + other registers [all framed]
+ 104          // ***************************************************************************
+ 105          void Check_Serial_In_From_Z8_Buffer(void)
+ 106          {
+ 107   1              BYTE Start_Index_LOCAL;
+ 108   1              BYTE End_Index_LOCAL_minus_one, End_Index_LOCAL;
+ 109   1              BYTE frame_status, frame_type;
+ 110   1      //      BYTE data_local; // V1.6
+ 111   1      
+ 112   1              Start_Index_LOCAL = Serial_In_From_Z8.start_index;
+ 113   1      
+ 114   1              // v1.1 assign end index - 1 to a local variable
+ 115   1              EA = 0;
+ 116   1              End_Index_LOCAL                         =  Serial_In_From_Z8.end_index;
+ 117   1              EA = 1;
+ 118   1              End_Index_LOCAL_minus_one       = (End_Index_LOCAL - 1)&(SERIAL_IN_FROM_Z8_BUFF_LENGHT-1);
+ 119   1      
+ 120   1              // Detect if there is a valid frame into the buffer
+ 121   1              //v1.1 while(Start_Index_LOCAL != Serial_In_From_Z8.end_index)
+ 122   1              while(Start_Index_LOCAL != End_Index_LOCAL)
+ 123   1              {
+ 124   2                      // assign end index - 1 to a local variable
+ 125   2      //              EA = 0;
+ 126   2      //v1.1  End_Index_LOCAL                         =  Serial_In_From_Z8.end_index;
+ 127   2      //v1.1  End_Index_LOCAL_minus_one       = (End_Index_LOCAL - 1)&(SERIAL_IN_FROM_Z8_BUFF_LENGHT-1);
+ 128   2      //              EA = 1;
+ 129   2                      // Check valid frame is present (if SOF and EOF are presents)
+ 130   2                      if(Serial_In_From_Z8.buffer[Start_Index_LOCAL]         == SOF_TO_EZ)
+ 131   2                      // if(Serial_In_From_Z8.buffer[(End_Index_LOCAL_minus_one-1)&(SERIAL_IN_FROM_Z8_BUFF_LENGHT-1)] == EOF_T
+             -O_EZ)
+ 132   2                      if(Serial_In_From_Z8.buffer[End_Index_LOCAL_minus_one] == EOF_TO_EZ)
+ 133   2                      {
+ 134   3                              // Detect here which frame type has been received
+ 135   3                              frame_status  = Serial_In_From_Z8.buffer[(Start_Index_LOCAL + 1)&(SERIAL_IN_FROM_Z8_BUFF_LENGHT-1)];
+ 136   3                              frame_type = frame_status & FRAME_FROM_Z8_TO_EZ_TYPE_MSK;
+ 137   3                              ///////////////////////////////////// NEW CONTROL REG RECEIVED /////////////////////////
+ 138   3                              ///// 0xFF 0b000rrrrr 0b0vvvvvvv 0xFE (r=reg select 0-31) (v=reg value 0-127) //////////
+ 139   3                              ////////////////////////////////////////////////////////////////////////////////////////
+ 140   3                              if(frame_type == FRAME_TO_EZ_IS_CTRL_REG)
+ 141   3                              {
+ 142   4                                      // here we received a new control reg from Z8 board
+ 143   4                                      // data_local = Serial_In_From_Z8.buffer[(Start_Index_LOCAL + 2)&(SERIAL_IN_FROM_Z8_BUFF_LENGHT-1)]; /
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 27  
+
+             -/ V1.6 
+ 144   4                                      
+ 145   4                                      // Bits 4-0 are the control reg address to update
+ 146   4                                      // CTRL_REGS_7BITS_FROM_Z8[(frame_status & CTRL_REG_Z8_TO_EZ_ADDR_MSK)] = data_local; // V1.6 Serial_I
+             -n_From_Z8.buffer[(Start_Index_LOCAL + 2)&(SERIAL_IN_FROM_Z8_BUFF_LENGHT-1)];
+ 147   4                                      CTRL_REGS_7BITS_FROM_Z8[(frame_status & CTRL_REG_Z8_TO_EZ_ADDR_MSK)] = Serial_In_From_Z8.buffer[(Start
+             -_Index_LOCAL + 2)&(SERIAL_IN_FROM_Z8_BUFF_LENGHT-1)];
+ 148   4      
+ 149   4                                      // V1.6 each time the last control reg to ez is received then send sync back to Z8
+ 150   4                                      // This is used when the Z8 is in factory default, Sync to EZ occurs later and the Z8 still need to re
+             -ceive
+ 151   4                                      // registers from EZ 
+ 152   4      /*                              if( (frame_status & CTRL_REG_Z8_TO_EZ_ADDR_MSK) == LAST_CTRL_REG_7BITS_TO_EZ_INDEX)
+ 153   4                                      if( data_local == EZ_FULLY_UPDATED)
+ 154   4                                      {
+ 155   4                                              Send_Single_Framed_byte_To_Z8(CTRL_REG_0_7B_FROM_EZ_INDEX, (CTRL_REGS_7BITS_TO_Z8[0] | (1<<z8_board_f
+             -ully_updated_from_ez0_bit_pos)));
+ 156   4                                              // z8_board_fully_updated_from_ez0_bit = 1;
+ 157   4                                      }
+ 158   4      */
+ 159   4                                      // V1.4 If autotest mode is active then turn on the USB led
+ 160   4      //                              if(autotest_mode_z_ez1_bit) USB_LED_PORT_OUT |= USB_LED_PIN;
+ 161   4      
+ 162   4                                      // update start index
+ 163   4                                      Start_Index_LOCAL =  (Start_Index_LOCAL + CTRL_REG_Z8_FRAME_LENGHT) & (SERIAL_IN_FROM_Z8_BUFF_LENGHT -
+             -1 );
+ 164   4                              } // end we received a control reg
+ 165   3                              else
+ 166   3                              ///////////////////////////////////// NEW MIDI FRAME RECEIVED /////////////////////////
+ 167   3                              ///// 0xFF 0b001u12xx 0b0lllllll vv vv vv vv 0xFE (u=usb out en, 1/2=midi out1/2 en
+ 168   3                              ///// lllll = midi message lenght / vv = midi mess bytes
+ 169   3                              ////////////////////////////////////////////////////////////////////////////////////////
+ 170   3                              if(frame_type == FRAME_TO_EZ_IS_MIDI)
+ 171   3                              {
+ 172   4                                      // decode where to send this midi message from Z8 (out1, usb1, usb2)
+ 173   4                                      // Need to send to midi out 0 ?
+ 174   4                                      if(frame_status & send_to_out1)
+ 175   4                                      {
+ 176   5                                              // need to send to usb out 1 ?
+ 177   5      //                                      if(frame_status & send_to_usb) 
+ 178   5      //                                              Create_Send_USB_Frame_From_MIDI_Buffer(CN0, &Serial_In_From_Z8, End_Index_LOCAL);
+ 179   5      
+ 180   5                                              // Send all bytes to MIDI Out Connector
+ 181   5                                              //Start_Index_LOCAL =  (Start_Index_LOCAL + 3) & (SERIAL_IN_FROM_Z8_BUFF_LENGHT - 1);
+ 182   5                                              while (Start_Index_LOCAL != End_Index_LOCAL)
+ 183   5                                              {
+ 184   6                                                      // need to skip sof from z8 board ?
+ 185   6                                                      if(Serial_In_From_Z8.buffer[Start_Index_LOCAL] == SOF_TO_EZ)
+ 186   6                                                              Start_Index_LOCAL =  (Start_Index_LOCAL + 3) & (SERIAL_IN_FROM_Z8_BUFF_LENGHT - 1);
+ 187   6                                                      // send midi data to out connector
+ 188   6                                                      Send_To_Midi_Out_Con(Serial_In_From_Z8.buffer[Start_Index_LOCAL]);
+ 189   6                                                      // increase index
+ 190   6                                                      Start_Index_LOCAL =  (Start_Index_LOCAL + 1) & (SERIAL_IN_FROM_Z8_BUFF_LENGHT - 1);
+ 191   6                                                      // need to skip eof from z8 board ?
+ 192   6                                                      if(Serial_In_From_Z8.buffer[Start_Index_LOCAL] == EOF_TO_EZ)
+ 193   6                                                              Start_Index_LOCAL =  (Start_Index_LOCAL + 1) & (SERIAL_IN_FROM_Z8_BUFF_LENGHT - 1);
+ 194   6                                              }
+ 195   5                                      }
+ 196   4      
+ 197   4                                      // send to usb out 2 ?
+ 198   4                                      if(frame_status & send_to_usb) 
+ 199   4      //                                      if(frame_status & send_to_out2)
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 28  
+
+ 200   4                                                      Create_Send_USB_Frame_From_MIDI_Buffer(CN0, &Serial_In_From_Z8, End_Index_LOCAL);
+ 201   4                                      
+ 202   4                                      // all buffer now treated
+ 203   4                                      //v1.1 Start_Index_LOCAL =  End_Index_LOCAL;
+ 204   4                                      //v1.2 
+ 205   4                                      Start_Index_LOCAL =  End_Index_LOCAL;
+ 206   4                              } // end frame is midi
+ 207   3                      } // end frame is valid
+ 208   2              } // end start <> end index             
+ 209   1      
+ 210   1              // the buffer has now been treated
+ 211   1              Serial_In_From_Z8.start_index = Start_Index_LOCAL;
+ 212   1      }
+ 213          
+ 214          
+ 215          // ***************************************************************************
+ 216          // Routine      : Check_Overflow_Flags()
+ 217          // Input        : 
+ 218          // Output       : None
+ 219          // Process      : Check Overflow flags and send results to lcd Z8, results are sent
+ 220          //                        sequencialy so we avoid message missing       
+ 221          // ***************************************************************************
+ 222          void Check_Overflow_Flags(void)
+ 223          {
+ 224   1              // check realtime from Midi in connector overflow flags
+ 225   1              if(MIDI_In_Realtime_From_Con.input_status & realtime_overflow)
+ 226   1              {
+ 227   2                      // send to Z8 board
+ 228   2                      Send_Single_Framed_byte_To_Z8(LCD_MESSAGE_TO_Z8_INDEX, midi_in_realtime_overflow_z8);
+ 229   2                      // clear overflow flag
+ 230   2                      MIDI_In_Realtime_From_Con.input_status &= ~realtime_overflow;
+ 231   2              }
+ 232   1      
+ 233   1              // check Midi in connector overflow flags
+ 234   1              if(MIDI_In_From_Con.input_status & input_overflow)
+ 235   1              {
+ 236   2                      // send to Z8 board
+ 237   2                      Send_Single_Framed_byte_To_Z8(LCD_MESSAGE_TO_Z8_INDEX, midi_in_overflow_z8);
+ 238   2                      // clear overflow flag
+ 239   2                      MIDI_In_From_Con.input_status &= ~input_overflow;
+ 240   2              }
+ 241   1      
+ 242   1              if(usb_state_from_ez0_bit)
+ 243   1              {
+ 244   2                      // check realtime from USB in overflow flags
+ 245   2                      if(MIDI_In_Realtime_From_Usb.input_status & realtime_overflow)
+ 246   2                      {
+ 247   3                              // send to Z8 board
+ 248   3                              Send_Single_Framed_byte_To_Z8(LCD_MESSAGE_TO_Z8_INDEX, usb_in_realtime_overflow_z8);
+ 249   3                              // clear overflow flag
+ 250   3                              MIDI_In_Realtime_From_Usb.input_status &= ~realtime_overflow;
+ 251   3                      }
+ 252   2              
+ 253   2                      // check Usb in overflow flags
+ 254   2                      if(MIDI_In_From_Usb.input_status & input_overflow)
+ 255   2                      {
+ 256   3                              // send to Z8 board
+ 257   3                              Send_Single_Framed_byte_To_Z8(LCD_MESSAGE_TO_Z8_INDEX, usb_in_overflow_z8);
+ 258   3                              // clear overflow flag
+ 259   3                              MIDI_In_From_Usb.input_status &= ~input_overflow;
+ 260   3                      }
+ 261   2              }
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 29  
+
+ 262   1      }
+ 263          
+ 264          
+ 265          // ***************************************************************************
+ 266          // Routine      : Check_Realtime()
+ 267          // Input        : 
+ 268          // Output       : None
+ 269          // Process      : Check if Realtime MIDI has to be merged/treated 
+ 270          // ***************************************************************************
+ 271          void Check_Realtime(void)
+ 272          {
+ 273   1              // Check Realtime MIDI Input buffer
+ 274   1              Check_Realtime_Buffers(&MIDI_In_Realtime_From_Con, /*merger_src_midi_in_state_z_ez0_bit*/midi_thru_ez0_bi
+             -t);
+ 275   1      
+ 276   1              // Check Realtime MIDI Input buffer
+ 277   1              Check_Realtime_Buffers(&Realtime_From_Z8, 1);
+ 278   1      
+ 279   1              if(usb_state_from_ez0_bit)
+ 280   1              {
+ 281   2                      // Check Realtime USB MIDI Input buffer 
+ 282   2                      Check_Realtime_Buffers(&MIDI_In_Realtime_From_Usb, /*merger_src_usb_in_state_z_ez0_bit*/midi_thru_ez0_bi
+             -t);
+ 283   2              }
+ 284   1      }
+ 285          
+ 286          
+ 287          // ***************************************************************************
+ 288          // Routine      : Check_Realtime_Buffers()
+ 289          // Input        : 
+ 290          // Output       : None
+ 291          // Process      : Check if incoming Realtime MIDI has to be merged/treated 
+ 292          // ***************************************************************************
+ 293          void Check_Realtime_Buffers(Midi_In_Realtime_Struct *midi_struct, bit merger_src_enable)
+ 294          {
+ 295   1              BYTE realtime_start_index_local = midi_struct->realtime_start_index;
+ 296   1              BYTE realtime_data_local;       
+ 297   1      
+ 298   1              // if realtime data is Active sense 0xFE or 0xFF then do not send to Z8 board
+ 299   1              // if midi filter is On then exit
+ 300   1              // if merger on MIDI out 1 is enabled then immediately send to MIDI out 1
+ 301   1              // if merger on USB  out 1 is enabled then forward incoming midi events
+ 302   1              // always send realtime to z8
+ 303   1              // send realtime to outputs midi & usb if respective mergers destination are on 
+ 304   1              
+ 305   1              // for each byte into the realtimer buffer
+ 306   1              while(realtime_start_index_local != midi_struct->realtime_end_index)
+ 307   1              {
+ 308   2                      realtime_data_local = midi_struct->realtime[realtime_start_index_local];
+ 309   2      
+ 310   2                      // Check if must send to Z8 board : MUST FILTER ACTIVE SENSE HERE FE and also FF (since SOF & EOF)
+ 311   2                      // also send realtime to Z8 only if realtime source is not Z8 (to avoid loopback)
+ 312   2                      if(midi_struct != &Realtime_From_Z8)
+ 313   2                              if(realtime_data_local < MIDI_ACTIVE_SENSE)
+ 314   2                                      // Realtime MIDI is NOT encapsuled into frames when sent to Z8 board
+ 315   2                                      Send_To_Serial_Z8(realtime_data_local);
+ 316   2      
+ 317   2                      // check for possible merges to midi out 1 and usb out 1
+ 318   2                      if(!filter_state_z_ez0_bit)
+ 319   2                      {
+ 320   3                              // no midi filter, is the merger source on ?
+ 321   3                              if(merger_src_enable)
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 30  
+
+ 322   3                              {
+ 323   4                                      // is the merger destination midi out 1 active ?
+ 324   4                                      // if(merger_dst_out1_state_z_ez0_bit)
+ 325   4                                      // if(midi_thru_ez0_bit)
+ 326   4                                              Send_To_Midi_Out_Con(realtime_data_local);
+ 327   4      
+ 328   4                                      // is the merger destination usb out 1 active ?
+ 329   4                                      if(usb_state_from_ez0_bit)
+ 330   4                                              // if(merger_dst_usb_out_state_z_ez0_bit)
+ 331   4                                              // if(midi_thru_ez0_bit)
+ 332   4                                                      Create_Send_Realtime_USB_Frame_From_MIDI_Buffer( CN0, realtime_data_local);
+ 333   4      
+ 334   4                              } // end merger source is active
+ 335   3                      } // end midi filter is off
+ 336   2              
+ 337   2                      realtime_start_index_local = (realtime_start_index_local + 1) & (MIDI_IN_REALTIME_BUFF_LENGHT-1);
+ 338   2              } // end realtime buffer contains data
+ 339   1      
+ 340   1              // Update treated pointers
+ 341   1              midi_struct->realtime_start_index = realtime_start_index_local;
+ 342   1      }
+ 343          
+ 344           /*
+ 345          // ***************************************************************************
+ 346          // Routine      : Check_Realtime_From_Z8()
+ 347          // Input        : 
+ 348          // Output       : None
+ 349          // Process      : Check if Realtime MIDI has to be sent from Z8 internal midi sync 
+ 350          // ***************************************************************************
+ 351          void Check_Realtime_From_Z8(void)
+ 352          {
+ 353          
+ 354          }
+ 355          */
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 31  
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION Com0026 (BEGIN)
+0000         L?0039:
+0000         L?0040:
+0000 7400        R     MOV     A,#LOW Serial_In_From_Z8+05H
+0002 2500        R     ADD     A,Start_Index_LOCAL
+0004         L?0041:
+0004 F582              MOV     DPL,A
+0006 E4                CLR     A
+0007 3400        R     ADDC    A,#HIGH Serial_In_From_Z8+05H
+0009 F583              MOV     DPH,A
+000B E0                MOVX    A,@DPTR
+000C 22                RET     
+             ; FUNCTION Com0026 (END)
+
+             ; FUNCTION _Check_Midi_In_Buffer (BEGIN)
+                                           ; SOURCE LINE # 56
+0000 8B00        R     MOV     midi_struct,R3
+0002 8A00        R     MOV     midi_struct+01H,R2
+0004 8900        R     MOV     midi_struct+02H,R1
+                                           ; SOURCE LINE # 57
+                                           ; SOURCE LINE # 61
+0006 120000      E     LCALL   ?C?CLDPTR
+0009 F500        R     MOV     Start_Index_LOCAL,A
+                                           ; SOURCE LINE # 62
+000B C2AF              CLR     EA
+                                           ; SOURCE LINE # 63
+000D 900001            MOV     DPTR,#01H
+0010 120000      E     LCALL   ?C?CLDOPTR
+0013 F500        R     MOV     End_Index_LOCAL,A
+                                           ; SOURCE LINE # 64
+0015 D2AF              SETB    EA
+                                           ; SOURCE LINE # 67
+0017 FD                MOV     R5,A
+0018 120000      E     LCALL   _Check_MIDI_Buff_Send_To_Z8_Board
+                                           ; SOURCE LINE # 70
+001B 30003E      R     JNB     merger_src_enable,?C0001
+                                           ; SOURCE LINE # 71
+                                           ; SOURCE LINE # 73
+001E 300003      R     JNB     filter_state_z_ez0_bit,?C0003
+0021 200038      R     JB      filter_type_z_ez0_bit,?C0001
+0024         ?C0003:
+                                           ; SOURCE LINE # 74
+                                           ; SOURCE LINE # 78
+0024 AB00        R     MOV     R3,midi_struct
+0026 AA00        R     MOV     R2,midi_struct+01H
+0028 A900        R     MOV     R1,midi_struct+02H
+002A 850000      E     MOV     ?_Create_Send_USB_Frame_From_MIDI_Buffer?BYTE+04H,End_Index_LOCAL
+002D E4                CLR     A
+002E FF                MOV     R7,A
+002F 120000      E     LCALL   _Create_Send_USB_Frame_From_MIDI_Buffer
+                                           ; SOURCE LINE # 83
+0032         ?C0004:
+                                           ; SOURCE LINE # 85
+0032 E500        R     MOV     A,Start_Index_LOCAL
+0034 6500        R     XRL     A,End_Index_LOCAL
+0036 6024              JZ      ?C0001
+                                           ; SOURCE LINE # 86
+                                           ; SOURCE LINE # 87
+0038 AB00        R     MOV     R3,midi_struct
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 32  
+
+003A E500        R     MOV     A,midi_struct+02H
+003C 2405              ADD     A,#05H
+003E F9                MOV     R1,A
+003F E4                CLR     A
+0040 3500        R     ADDC    A,midi_struct+01H
+0042 FA                MOV     R2,A
+0043 7E00              MOV     R6,#00H
+0045 E9                MOV     A,R1
+0046 2500        R     ADD     A,Start_Index_LOCAL
+0048 F9                MOV     R1,A
+0049 EE                MOV     A,R6
+004A 3A                ADDC    A,R2
+004B FA                MOV     R2,A
+004C 120000      E     LCALL   ?C?CLDPTR
+004F FF                MOV     R7,A
+0050 120000      E     LCALL   _Send_To_Midi_Out_Con
+                                           ; SOURCE LINE # 88
+0053 E500        R     MOV     A,Start_Index_LOCAL
+0055 04                INC     A
+0056 547F              ANL     A,#07FH
+0058 F500        R     MOV     Start_Index_LOCAL,A
+                                           ; SOURCE LINE # 89
+005A 80D6              SJMP    ?C0004
+                                           ; SOURCE LINE # 90
+                                           ; SOURCE LINE # 92
+                                           ; SOURCE LINE # 93
+005C         ?C0001:
+                                           ; SOURCE LINE # 96
+005C AB00        R     MOV     R3,midi_struct
+005E AA00        R     MOV     R2,midi_struct+01H
+0060 A900        R     MOV     R1,midi_struct+02H
+0062 E500        R     MOV     A,End_Index_LOCAL
+0064 020000      E     LJMP    ?C?CSTPTR
+             ; FUNCTION _Check_Midi_In_Buffer (END)
+
+             ; FUNCTION Check_Serial_In_From_Z8_Buffer (BEGIN)
+                                           ; SOURCE LINE # 105
+                                           ; SOURCE LINE # 106
+                                           ; SOURCE LINE # 112
+0000 900000      R     MOV     DPTR,#Serial_In_From_Z8
+0003 E0                MOVX    A,@DPTR
+0004 F500        R     MOV     Start_Index_LOCAL,A
+                                           ; SOURCE LINE # 115
+0006 C2AF              CLR     EA
+                                           ; SOURCE LINE # 116
+0008 A3                INC     DPTR
+0009 E0                MOVX    A,@DPTR
+000A F500        R     MOV     End_Index_LOCAL,A
+                                           ; SOURCE LINE # 117
+000C D2AF              SETB    EA
+                                           ; SOURCE LINE # 118
+000E 14                DEC     A
+000F 547F              ANL     A,#07FH
+0011 F500        R     MOV     End_Index_LOCAL_minus_one,A
+0013         ?C0007:
+                                           ; SOURCE LINE # 122
+0013 E500        R     MOV     A,Start_Index_LOCAL
+0015 6500        R     XRL     A,End_Index_LOCAL
+0017 7003              JNZ     $ + 5H
+0019 020000      R     LJMP    ?C0008
+                                           ; SOURCE LINE # 123
+                                           ; SOURCE LINE # 130
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 33  
+
+001C 120000      R     LCALL   L?0039
+001F B4FFF1            CJNE    A,#0FFH,?C0007
+                                           ; SOURCE LINE # 132
+0022 7400        R     MOV     A,#LOW Serial_In_From_Z8+05H
+0024 2500        R     ADD     A,End_Index_LOCAL_minus_one
+0026 120000      R     LCALL   L?0041
+0029 B4FEE7            CJNE    A,#0FEH,?C0007
+                                           ; SOURCE LINE # 133
+                                           ; SOURCE LINE # 135
+002C AF00        R     MOV     R7,Start_Index_LOCAL
+002E 7E00              MOV     R6,#00H
+0030 EF                MOV     A,R7
+0031 2401              ADD     A,#01H
+0033 FD                MOV     R5,A
+0034 7C00              MOV     R4,#00H
+0036 ED                MOV     A,R5
+0037 547F              ANL     A,#07FH
+0039 2400        R     ADD     A,#LOW Serial_In_From_Z8+05H
+003B F582              MOV     DPL,A
+003D EC                MOV     A,R4
+003E 3400        R     ADDC    A,#HIGH Serial_In_From_Z8+05H
+0040 F583              MOV     DPH,A
+0042 E0                MOVX    A,@DPTR
+0043 F500        R     MOV     frame_status,A
+                                           ; SOURCE LINE # 136
+0045 5460              ANL     A,#060H
+0047 F500        R     MOV     frame_type,A
+                                           ; SOURCE LINE # 140
+0049 7027              JNZ     ?C0011
+                                           ; SOURCE LINE # 141
+                                           ; SOURCE LINE # 147
+004B EF                MOV     A,R7
+004C 2402              ADD     A,#02H
+004E FF                MOV     R7,A
+004F 7E00              MOV     R6,#00H
+0051 EF                MOV     A,R7
+0052 547F              ANL     A,#07FH
+0054 2400        R     ADD     A,#LOW Serial_In_From_Z8+05H
+0056 F582              MOV     DPL,A
+0058 EE                MOV     A,R6
+0059 3400        R     ADDC    A,#HIGH Serial_In_From_Z8+05H
+005B F583              MOV     DPH,A
+005D E0                MOVX    A,@DPTR
+005E FF                MOV     R7,A
+005F E500        R     MOV     A,frame_status
+0061 541F              ANL     A,#01FH
+0063 2400        R     ADD     A,#LOW CTRL_REGS_7BITS_FROM_Z8
+0065 F8                MOV     R0,A
+0066 A607              MOV     @R0,AR7
+                                           ; SOURCE LINE # 163
+0068 E500        R     MOV     A,Start_Index_LOCAL
+006A 2404              ADD     A,#04H
+006C 547F              ANL     A,#07FH
+006E F500        R     MOV     Start_Index_LOCAL,A
+                                           ; SOURCE LINE # 164
+0070 80A1              SJMP    ?C0007
+0072         ?C0011:
+                                           ; SOURCE LINE # 170
+0072 E500        R     MOV     A,frame_type
+0074 B4209C            CJNE    A,#020H,?C0007
+                                           ; SOURCE LINE # 171
+                                           ; SOURCE LINE # 174
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 34  
+
+0077 E500        R     MOV     A,frame_status
+0079 30E333            JNB     ACC.3,?C0014
+                                           ; SOURCE LINE # 175
+007C         ?C0015:
+                                           ; SOURCE LINE # 182
+007C E500        R     MOV     A,Start_Index_LOCAL
+007E 6500        R     XRL     A,End_Index_LOCAL
+0080 602D              JZ      ?C0014
+                                           ; SOURCE LINE # 183
+                                           ; SOURCE LINE # 185
+0082 120000      R     LCALL   L?0039
+0085 B4FF08            CJNE    A,#0FFH,?C0017
+                                           ; SOURCE LINE # 186
+0088 E500        R     MOV     A,Start_Index_LOCAL
+008A 2403              ADD     A,#03H
+008C 547F              ANL     A,#07FH
+008E F500        R     MOV     Start_Index_LOCAL,A
+0090         ?C0017:
+                                           ; SOURCE LINE # 188
+0090 120000      R     LCALL   L?0040
+0093 FF                MOV     R7,A
+0094 120000      E     LCALL   _Send_To_Midi_Out_Con
+                                           ; SOURCE LINE # 190
+0097 E500        R     MOV     A,Start_Index_LOCAL
+0099 04                INC     A
+009A 547F              ANL     A,#07FH
+009C F500        R     MOV     Start_Index_LOCAL,A
+                                           ; SOURCE LINE # 192
+009E 2400        R     ADD     A,#LOW Serial_In_From_Z8+05H
+00A0 120000      R     LCALL   L?0041
+00A3 B4FED6            CJNE    A,#0FEH,?C0015
+                                           ; SOURCE LINE # 193
+00A6 E500        R     MOV     A,Start_Index_LOCAL
+00A8 04                INC     A
+00A9 547F              ANL     A,#07FH
+00AB F500        R     MOV     Start_Index_LOCAL,A
+                                           ; SOURCE LINE # 194
+00AD 80CD              SJMP    ?C0015
+                                           ; SOURCE LINE # 195
+00AF         ?C0014:
+                                           ; SOURCE LINE # 198
+00AF E500        R     MOV     A,frame_status
+00B1 30E40E            JNB     ACC.4,?C0019
+                                           ; SOURCE LINE # 200
+00B4 7B01              MOV     R3,#01H
+00B6 7A00        R     MOV     R2,#HIGH Serial_In_From_Z8
+00B8 7900        R     MOV     R1,#LOW Serial_In_From_Z8
+00BA 850000      E     MOV     ?_Create_Send_USB_Frame_From_MIDI_Buffer?BYTE+04H,End_Index_LOCAL
+00BD E4                CLR     A
+00BE FF                MOV     R7,A
+00BF 120000      E     LCALL   _Create_Send_USB_Frame_From_MIDI_Buffer
+00C2         ?C0019:
+                                           ; SOURCE LINE # 205
+00C2 850000      R     MOV     Start_Index_LOCAL,End_Index_LOCAL
+                                           ; SOURCE LINE # 206
+                                           ; SOURCE LINE # 207
+                                           ; SOURCE LINE # 208
+00C5 020000      R     LJMP    ?C0007
+00C8         ?C0008:
+                                           ; SOURCE LINE # 211
+00C8 900000      R     MOV     DPTR,#Serial_In_From_Z8
+00CB E500        R     MOV     A,Start_Index_LOCAL
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 35  
+
+00CD F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 212
+00CE 22                RET     
+             ; FUNCTION Check_Serial_In_From_Z8_Buffer (END)
+
+             ; FUNCTION Check_Overflow_Flags (BEGIN)
+                                           ; SOURCE LINE # 222
+                                           ; SOURCE LINE # 223
+                                           ; SOURCE LINE # 225
+0000 7800        R     MOV     R0,#LOW MIDI_In_Realtime_From_Con+0AH
+0002 E6                MOV     A,@R0
+0003 30E00D            JNB     ACC.0,?C0021
+                                           ; SOURCE LINE # 226
+                                           ; SOURCE LINE # 228
+0006 7D08              MOV     R5,#08H
+0008 7F09              MOV     R7,#09H
+000A 120000      E     LCALL   _Send_Single_Framed_byte_To_Z8
+                                           ; SOURCE LINE # 230
+000D 7800        R     MOV     R0,#LOW MIDI_In_Realtime_From_Con+0AH
+000F E6                MOV     A,@R0
+0010 54FE              ANL     A,#0FEH
+0012 F6                MOV     @R0,A
+                                           ; SOURCE LINE # 231
+0013         ?C0021:
+                                           ; SOURCE LINE # 234
+0013 900000      R     MOV     DPTR,#MIDI_In_From_Con+04H
+0016 E0                MOVX    A,@DPTR
+0017 30E00E            JNB     ACC.0,?C0022
+                                           ; SOURCE LINE # 235
+                                           ; SOURCE LINE # 237
+001A 7D02              MOV     R5,#02H
+001C 7F09              MOV     R7,#09H
+001E 120000      E     LCALL   _Send_Single_Framed_byte_To_Z8
+                                           ; SOURCE LINE # 239
+0021 900000      R     MOV     DPTR,#MIDI_In_From_Con+04H
+0024 E0                MOVX    A,@DPTR
+0025 54FE              ANL     A,#0FEH
+0027 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 240
+0028         ?C0022:
+                                           ; SOURCE LINE # 242
+0028 300028      R     JNB     usb_state_from_ez0_bit,?C0026
+                                           ; SOURCE LINE # 243
+                                           ; SOURCE LINE # 245
+002B 7800        R     MOV     R0,#LOW MIDI_In_Realtime_From_Usb+0AH
+002D E6                MOV     A,@R0
+002E 30E00D            JNB     ACC.0,?C0024
+                                           ; SOURCE LINE # 246
+                                           ; SOURCE LINE # 248
+0031 7D04              MOV     R5,#04H
+0033 7F09              MOV     R7,#09H
+0035 120000      E     LCALL   _Send_Single_Framed_byte_To_Z8
+                                           ; SOURCE LINE # 250
+0038 7800        R     MOV     R0,#LOW MIDI_In_Realtime_From_Usb+0AH
+003A E6                MOV     A,@R0
+003B 54FE              ANL     A,#0FEH
+003D F6                MOV     @R0,A
+                                           ; SOURCE LINE # 251
+003E         ?C0024:
+                                           ; SOURCE LINE # 254
+003E 900000      R     MOV     DPTR,#MIDI_In_From_Usb+04H
+0041 E0                MOVX    A,@DPTR
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 36  
+
+0042 30E00E            JNB     ACC.0,?C0026
+                                           ; SOURCE LINE # 255
+                                           ; SOURCE LINE # 257
+0045 7D01              MOV     R5,#01H
+0047 7F09              MOV     R7,#09H
+0049 120000      E     LCALL   _Send_Single_Framed_byte_To_Z8
+                                           ; SOURCE LINE # 259
+004C 900000      R     MOV     DPTR,#MIDI_In_From_Usb+04H
+004F E0                MOVX    A,@DPTR
+0050 54FE              ANL     A,#0FEH
+0052 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 260
+                                           ; SOURCE LINE # 261
+                                           ; SOURCE LINE # 262
+0053         ?C0026:
+0053 22                RET     
+             ; FUNCTION Check_Overflow_Flags (END)
+
+             ; FUNCTION Check_Realtime (BEGIN)
+                                           ; SOURCE LINE # 271
+                                           ; SOURCE LINE # 272
+                                           ; SOURCE LINE # 274
+0000 7A00        R     MOV     R2,#HIGH MIDI_In_Realtime_From_Con
+0002 7900        R     MOV     R1,#LOW MIDI_In_Realtime_From_Con
+0004 120000      R     LCALL   L?0042
+                                           ; SOURCE LINE # 277
+0007 7B00              MOV     R3,#00H
+0009 7A00        R     MOV     R2,#HIGH Realtime_From_Z8
+000B 7900        R     MOV     R1,#LOW Realtime_From_Z8
+000D D200        R     SETB    ?_Check_Realtime_Buffers?BIT
+000F 120000      R     LCALL   _Check_Realtime_Buffers
+                                           ; SOURCE LINE # 279
+0012 300007      R     JNB     usb_state_from_ez0_bit,?C0028
+                                           ; SOURCE LINE # 280
+                                           ; SOURCE LINE # 282
+0015 7A00        R     MOV     R2,#HIGH MIDI_In_Realtime_From_Usb
+0017 7900        R     MOV     R1,#LOW MIDI_In_Realtime_From_Usb
+0019 120000      R     LCALL   L?0042
+                                           ; SOURCE LINE # 283
+                                           ; SOURCE LINE # 284
+001C         ?C0028:
+001C 22                RET     
+001D         L?0042:
+001D 7B00              MOV     R3,#00H
+001F A200        R     MOV     C,midi_thru_ez0_bit
+0021 9200        R     MOV     ?_Check_Realtime_Buffers?BIT,C
+0023 120000      R     LCALL   _Check_Realtime_Buffers
+0026 22                RET     
+             ; FUNCTION Check_Realtime (END)
+
+             ; FUNCTION _Check_Realtime_Buffers (BEGIN)
+                                           ; SOURCE LINE # 293
+0000 8B00        R     MOV     midi_struct,R3
+0002 8A00        R     MOV     midi_struct+01H,R2
+0004 8900        R     MOV     midi_struct+02H,R1
+                                           ; SOURCE LINE # 294
+                                           ; SOURCE LINE # 295
+0006 900008            MOV     DPTR,#08H
+0009 120000      E     LCALL   ?C?CLDOPTR
+000C F500        R     MOV     realtime_start_index_local,A
+000E         ?C0029:
+                                           ; SOURCE LINE # 306
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 37  
+
+000E AB00        R     MOV     R3,midi_struct
+0010 AA00        R     MOV     R2,midi_struct+01H
+0012 A900        R     MOV     R1,midi_struct+02H
+0014 900009            MOV     DPTR,#09H
+0017 120000      E     LCALL   ?C?CLDOPTR
+001A 6500        R     XRL     A,realtime_start_index_local
+001C 6051              JZ      ?C0030
+                                           ; SOURCE LINE # 307
+                                           ; SOURCE LINE # 308
+001E 850082      R     MOV     DPL,realtime_start_index_local
+0021 758300            MOV     DPH,#00H
+0024 120000      E     LCALL   ?C?CLDOPTR
+0027 F500        R     MOV     realtime_data_local,A
+                                           ; SOURCE LINE # 312
+0029 7B00              MOV     R3,#00H
+002B 7A00        R     MOV     R2,#HIGH Realtime_From_Z8
+002D 7900        R     MOV     R1,#LOW Realtime_From_Z8
+002F E500        R     MOV     A,midi_struct
+0031 850083      R     MOV     DPH,midi_struct+01H
+0034 850082      R     MOV     DPL,midi_struct+02H
+0037 700A              JNZ     ?C0037
+0039 7400        R     MOV     A,#LOW Realtime_From_Z8
+003B 6582              XRL     A,DPL
+003D 7004              JNZ     ?C0037
+003F 7400        R     MOV     A,#HIGH Realtime_From_Z8
+0041 6583              XRL     A,DPH
+0043         ?C0037:
+0043 600C              JZ      ?C0031
+                                           ; SOURCE LINE # 313
+0045 E500        R     MOV     A,realtime_data_local
+0047 C3                CLR     C
+0048 94FE              SUBB    A,#0FEH
+004A 5005              JNC     ?C0031
+                                           ; SOURCE LINE # 315
+004C AF00        R     MOV     R7,realtime_data_local
+004E 120000      E     LCALL   _Send_To_Serial_Z8
+0051         ?C0031:
+                                           ; SOURCE LINE # 318
+0051 200012      R     JB      filter_state_z_ez0_bit,?C0033
+                                           ; SOURCE LINE # 319
+                                           ; SOURCE LINE # 321
+0054 30000F      R     JNB     merger_src_enable,?C0033
+                                           ; SOURCE LINE # 322
+                                           ; SOURCE LINE # 326
+0057 AF00        R     MOV     R7,realtime_data_local
+0059 120000      E     LCALL   _Send_To_Midi_Out_Con
+                                           ; SOURCE LINE # 329
+005C 300007      R     JNB     usb_state_from_ez0_bit,?C0033
+                                           ; SOURCE LINE # 332
+005F AD00        R     MOV     R5,realtime_data_local
+0061 E4                CLR     A
+0062 FF                MOV     R7,A
+0063 120000      E     LCALL   _Create_Send_Realtime_USB_Frame_From_MIDI_Buffer
+                                           ; SOURCE LINE # 334
+                                           ; SOURCE LINE # 335
+0066         ?C0033:
+                                           ; SOURCE LINE # 337
+0066 E500        R     MOV     A,realtime_start_index_local
+0068 04                INC     A
+0069 5407              ANL     A,#07H
+006B F500        R     MOV     realtime_start_index_local,A
+                                           ; SOURCE LINE # 338
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 38  
+
+006D 809F              SJMP    ?C0029
+006F         ?C0030:
+                                           ; SOURCE LINE # 341
+006F AB00        R     MOV     R3,midi_struct
+0071 AA00        R     MOV     R2,midi_struct+01H
+0073 A900        R     MOV     R1,midi_struct+02H
+0075 900008            MOV     DPTR,#08H
+0078 E500        R     MOV     A,realtime_start_index_local
+007A 020000      E     LJMP    ?C?CSTOPTR
+             ; FUNCTION _Check_Realtime_Buffers (END)
+
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 39  
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+WAIT_SOF . . . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+DWORD. . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_LONG   -----  4
+EA . . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00AFH  1
+Midi_In_Struct . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  133
+  start_index. . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  end_index. . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  merger_state . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+  current_index. . . . . . . . . . . .  MEMBER   -----  U_CHAR   0003H  1
+  input_status . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0004H  1
+  buffer . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0005H  128
+STRINGDSCR . . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  2
+  length . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  type . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+CTRL_REGS_7BITS_TO_Z8. . . . . . . . .  PUBLIC   DATA   ARRAY    0000H  1
+_Check_Realtime_Buffers. . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  midi_struct. . . . . . . . . . . . .  AUTO     DATA   PTR      0000H  3
+  merger_src_enable. . . . . . . . . .  AUTO     DATA   BIT      0000H  1
+  realtime_start_index_local . . . . .  AUTO     DATA   U_CHAR   0003H  1
+  realtime_data_local. . . . . . . . .  AUTO     DATA   U_CHAR   0004H  1
+LCD_MESSAGE_TO_Z8_INDEX. . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+_Send_To_Midi_Out_Con. . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+_Create_Send_Realtime_USB_Frame_From_M  EXTERN   CODE   PROC     -----  -----
+_Send_Single_Framed_byte_To_Z8 . . . .  EXTERN   CODE   PROC     -----  -----
+IN_SYSEX . . . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+uchar. . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_CHAR   -----  1
+DEVICEQUALDSCR . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  10
+  length . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  type . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  spec_ver_minor . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+  spec_ver_major . . . . . . . . . . .  MEMBER   -----  U_CHAR   0003H  1
+  dev_class. . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0004H  1
+  sub_class. . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0005H  1
+  protocol . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0006H  1
+  max_packet . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0007H  1
+  configs. . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0008H  1
+  reserved0. . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0009H  1
+Z8_STATUS_0_NVM_INDEX. . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+Z8_STATUS_1_NVM_INDEX. . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+must_start_bootloader_from_ez0_bit . .  ABSBIT   -----  BIT      0004H  1
+filter_type_z_ez0_bit. . . . . . . . .  ABSBIT   -----  BIT      000CH  1
+CTRL_REGS_7BITS_FROM_Z8. . . . . . . .  PUBLIC   DATA   ARRAY    0001H  3
+Midi_In_Realtime_Struct. . . . . . . .  TYPEDEF  -----  STRUCT   -----  11
+  realtime . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0000H  8
+  realtime_start_index . . . . . . . .  MEMBER   -----  U_CHAR   0008H  1
+  realtime_end_index . . . . . . . . .  MEMBER   -----  U_CHAR   0009H  1
+  input_status . . . . . . . . . . . .  MEMBER   -----  U_CHAR   000AH  1
+usb_enumrated_from_ez0_bit . . . . . .  ABSBIT   -----  BIT      0003H  1
+Realtime_From_Z8 . . . . . . . . . . .  PUBLIC   IDATA  STRUCT   0000H  11
+z8_board_fully_updated_from_ez0_bit. .  ABSBIT   -----  BIT      0005H  1
+sync24_clear_clock_cpt . . . . . . . .  PUBLIC   DATA   U_CHAR   0000H  1
+DSCR . . . . . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  2
+  length . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  type . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+BOOL . . . . . . . . . . . . . . . . .  TYPEDEF  DATA   BIT      -----  1
+INT_TEMPO_INDEX. . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+FRAME_IS_MIDI_CTRL_ASSIGN. . . . . . .  E_CONST  -----  U_CHAR   -----  1
+CTRL_REG_0_7BITS_TO_EZ_INDEX . . . . .  E_CONST  -----  U_CHAR   -----  1
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 40  
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+CTRL_REG_1_7BITS_TO_EZ_INDEX . . . . .  E_CONST  -----  U_CHAR   -----  1
+MIDI_In_From_Con . . . . . . . . . . .  PUBLIC   XDATA  STRUCT   0000H  133
+BYTE . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_CHAR   -----  1
+LAST_CTRL_REG_7BITS_TO_EZ_INDEX. . . .  E_CONST  -----  U_CHAR   -----  1
+FIFO_FULL. . . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+WORD . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_INT    -----  2
+MIDI_In_From_Usb . . . . . . . . . . .  PUBLIC   XDATA  STRUCT   0085H  133
+CN0. . . . . . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+SERIAL . . . . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+CN1. . . . . . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+uint . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_INT    -----  2
+_Send_To_Serial_Z8 . . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+SYSEX_RECEIVED . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+FRAME_STATUS_BYTE. . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+NORMAL . . . . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+MIDI_In_Realtime_From_Con. . . . . . .  PUBLIC   IDATA  STRUCT   000BH  11
+CTRL_REG_0_7B_FROM_EZ_INDEX. . . . . .  E_CONST  -----  U_CHAR   -----  1
+FRAME_IS_FIRMWARE_OR_PURE_MIDI . . . .  E_CONST  -----  U_CHAR   -----  1
+sync24_clear_cont_cpt. . . . . . . . .  PUBLIC   DATA   U_CHAR   0001H  1
+CHANNEL_INDEX. . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+MIDI_In_Realtime_From_Usb. . . . . . .  PUBLIC   IDATA  STRUCT   0016H  11
+midi_thru_ez0_bit. . . . . . . . . . .  ABSBIT   -----  BIT      000BH  1
+FRAME_IS_LCD_CTRL_ASSIGN . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+DEVICEDSCR . . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  18
+  length . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  type . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  spec_ver_minor . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+  spec_ver_major . . . . . . . . . . .  MEMBER   -----  U_CHAR   0003H  1
+  dev_class. . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0004H  1
+  sub_class. . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0005H  1
+  protocol . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0006H  1
+  max_packet . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0007H  1
+  vendor_id. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0008H  2
+  product_id . . . . . . . . . . . . .  MEMBER   -----  U_INT    000AH  2
+  version_id . . . . . . . . . . . . .  MEMBER   -----  U_INT    000CH  2
+  mfg_str. . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   000EH  1
+  prod_str . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   000FH  1
+  serialnum_str. . . . . . . . . . . .  MEMBER   -----  U_CHAR   0010H  1
+  configs. . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0011H  1
+Serial_In_From_Z8. . . . . . . . . . .  PUBLIC   XDATA  STRUCT   010AH  133
+Check_Serial_In_From_Z8_Buffer . . . .  PUBLIC   CODE   PROC     0000H  -----
+  Start_Index_LOCAL. . . . . . . . . .  AUTO     DATA   U_CHAR   0000H  1
+  End_Index_LOCAL_minus_one. . . . . .  AUTO     DATA   U_CHAR   0001H  1
+  End_Index_LOCAL. . . . . . . . . . .  AUTO     DATA   U_CHAR   0002H  1
+  frame_status . . . . . . . . . . . .  AUTO     DATA   U_CHAR   0003H  1
+  frame_type . . . . . . . . . . . . .  AUTO     DATA   U_CHAR   0004H  1
+CONFIGDSCR . . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  9
+  length . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  type . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  config_len . . . . . . . . . . . . .  MEMBER   -----  U_INT    0002H  2
+  interfaces . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0004H  1
+  index. . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0005H  1
+  config_str . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0006H  1
+  attrib . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0007H  1
+  power. . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0008H  1
+realtime_source_int_z_ez1_bit. . . . .  ABSBIT   -----  BIT      0011H  1
+ez_fw_midi_to_z8_z_ez1_bit . . . . . .  ABSBIT   -----  BIT      0014H  1
+C51 COMPILER V8.02   MAIN                                                                  02/19/2007 12:06:38 PAGE 41  
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+GROUP_INDEX. . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+FRAME_IS_COMMON_PARAM. . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+USB. . . . . . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+Check_Overflow_Flags . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+realtime_source_ext_z_ez1_bit. . . . .  ABSBIT   -----  BIT      0010H  1
+WAIT_FOR_CORRECT_DATA. . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+WAIT_EOF . . . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+EPIOC. . . . . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  2
+  cntrl. . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  bytes. . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+I2CPCKT. . . . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  6
+  length . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  dat. . . . . . . . . . . . . . . . .  MEMBER   -----  PTR      0001H  3
+  count. . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0004H  1
+  status . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0005H  1
+INTRFCDSCR . . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  9
+  length . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  type . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  index. . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+  alt_setting. . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0003H  1
+  ep_cnt . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0004H  1
+  class. . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0005H  1
+  sub_class. . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0006H  1
+  protocol . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0007H  1
+  interface_str. . . . . . . . . . . .  MEMBER   -----  U_CHAR   0008H  1
+_Create_Send_USB_Frame_From_MIDI_Buffer EXTERN   CODE   PROC     -----  -----
+usb_state_from_ez0_bit . . . . . . . .  ABSBIT   -----  BIT      0006H  1
+Check_Realtime . . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+ENDPNTDSCR . . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  7
+  length . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  type . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  addr . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+  ep_type. . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0003H  1
+  mp_L . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0004H  1
+  mp_H . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0005H  1
+  interval . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0006H  1
+_Check_MIDI_Buff_Send_To_Z8_Board. . .  EXTERN   CODE   PROC     -----  -----
+filter_state_z_ez0_bit . . . . . . . .  ABSBIT   -----  BIT      000EH  1
+_Check_Midi_In_Buffer. . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  midi_struct. . . . . . . . . . . . .  AUTO     DATA   PTR      0000H  3
+  merger_src_enable. . . . . . . . . .  AUTO     DATA   BIT      0000H  1
+  Start_Index_LOCAL. . . . . . . . . .  AUTO     DATA   U_CHAR   0003H  1
+  End_Index_LOCAL. . . . . . . . . . .  AUTO     DATA   U_CHAR   0004H  1
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    571    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =    399    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      6      15
+   IDATA SIZE       =     33    ----
+   BIT SIZE         =   ----       2
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

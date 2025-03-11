@@ -1,0 +1,16 @@
+"USBJmpTb.obj",
+".\EZUSB.LIB",
+"identity.obj",
+"usb.obj",
+"fw.obj",
+"periph.obj",
+"bootloader.obj",
+"hardware.obj",
+"itr.obj",
+"main.obj",
+"serial.obj",
+"dscr_mawzer.obj" 
+TO "EzUsb_FX1_Fw_v10" 
+RAMSIZE(256) 
+CODE( 0x80-0x27FF )
+XDATA( 0x2000 )

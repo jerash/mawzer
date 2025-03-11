@@ -1,0 +1,154 @@
+<html>
+<body>
+<pre>
+<h1>µVision3 Build Log</h1>
+<h2>Project:</h2>
+W:\backup_jd\Service\Mawzer\work\firmware\Motherboard\EzUsb_FX1_Fw_v10\EzUsb_FX1_Fw_v10.uv2
+Project File Date:  01/17/2007
+
+<h2>Output:</h2>
+Build target 'Target 1'
+assembling USBJmpTb.a51...
+assembling identity.asm...
+compiling usb.c...
+compiling fw.c...
+compiling periph.c...
+compiling bootloader.c...
+compiling hardware.c...
+compiling itr.c...
+compiling main.c...
+compiling serial.c...
+assembling dscr_mawzer.a51...
+linking...
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+*** WARNING L5: CODE SPACE MEMORY OVERLAP
+    FROM:    0003H
+    TO:      0005H
+Program Size: data=217.6 xdata=4876 code=6873
+creating hex file from "EzUsb_FX1_Fw_v10"...
+User command #1: hex2bix -i -f 0xC2 -o EzUsb_FX1_Fw_v10_C2.iic EzUsb_FX1_Fw_v10.hex
+Intel Hex file to EZ-USB Binary file conversion utility
+Copyright (c) 1997-2005, Cypress Semiconductor Inc.
+6823 Bytes written.
+Total Code Bytes = 6750
+Conversion completed successfully.
+"EzUsb_FX1_Fw_v10" - 0 Error(s), 41 Warning(s).

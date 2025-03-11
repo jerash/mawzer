@@ -1,0 +1,159 @@
+Mawzer_firmware_v10a.hex
+---------------
+- écrans (boot, recherche modules, livescreen)
+- USB auto compliant
+- Mise à jour par USB
+- gestion des boutons et encodeurs
+- génération midiclock/MMC
+
+Mawzer_firmware_v10b.hex
+---------------
+- Navigation et Menus
+
+Mawzer_firmware_v10c.hex
+---------------
+- livescreen amélioré
+
+Mawzer_firmware_v10d.hex
+---------------
+- midiclock ne suit pas les changements de tempo
+- gestion des modules (dialogue sur le bus, rapatriement des données)
+
+Mawzer_firmware_v10e.hex
+---------------
+- livescreen retouché
+- intégration symbole activité bus
+- changements de tempo continus
+
+Mawzer_firmware_v10f.hex
+---------------
+- récup infos des modules
+- auto-assignation des numéros de CC aux modules
+- comparaison des modules avec la table précédente et mise à jour si besoin
+- nouvelle entrée dans le menu : lancement de l'auto assignation
+- supprimé encoder lock inutile dans le menu
+- ajout du cadre au menu
+- blocage de la navigation dans les menues haut/bas ok
+- ajout MTC mode "OFF" dans le menu
+- shift+tempo par pas de 5
+- gros bitmap pour les symboles transports
+
+Mawzer_firmware_v10g.hex
+---------------
+- correction de sauvegarde du video mode en eeprom
+- correction sur l'ordre des CC assignés a chaque module
+- affichage du nombre de modules trouvés au boot
+
+Mawzer_firmware_v10h.hex
+---------------
+- anti rebond encodeur NAV
+- implémentation du SMPTE
+
+
+Mawzer_firmware_v10i.hex
+---------------
+- compilé en release
+- smpte timings avec corrections (affichage timecode)
+- implementation de +-1 frame avec encodeur de tempo
+- implementation de +-1 sec avec boutons bw/fw (reste a faire appui long avec repetition)
+- augmentation de l'antirebond sur encoder bouton
+
+Mawzer_firmware_v10j.hex
+---------------
+- assignations modules via le menu ok (ca genere des notes/cc avec le midi channel et le num que tu veux)
+- valeurs min & max ok
+- edition module name ok !
+- qques corrections sur smpte lorsque rew ou bw alors qu'on est en play
+
+Mawzer_firmware_v10k.hex
+---------------
+- petite correction sur les sequences play-pause-stop smpte
+- edition de module name ok et optimisé
+- edition des chaines assiciees a chaque controle ok
+
+Mawzer_firmware_v10l.hex
+---------------
+- supression du message done apres init (ne sert a rien)
+- edition preset name dans les menus
+- optimisations diverses
+
+Mawzer_firmware_v10m.hex 05/03/07
+------------------------
+- mise a jour bmp ow lorsque module present
+- compile en release avec optims
+
+
+Mawzer_firmware_v10n.hex 12/03/07
+------------------------
+
+- Rew et ffw 4s en normal et 8 sec avec shift OK
+- sens de l'encodeur NAV en original OK
+- rajouter un espace avant et après les : widget name liverscreen OK
+- supprimer les : a la fin de la ligne widget liverscreen OK
+- bloquer la tournante des presets ? NON
+- AutoAssign modules > incohérent de devoir confirmer en faisant BACK/NO   OK
+- Pouvoir Quitter le manual assign en appuyant sur NO OK
+
+Mawzer_firmware_v10o.hex 12/03/07
+------------------------
+Test recompil suite problèmes de détection des modules
+
+Mawzer_firmware_v10p.hex 12/03/07
+------------------------
+- deplacementr des :
+-  si un module merde : le scan du suivant est mainteant fait
+- consolidation des auto assignation
+
+Mawzer_firmware_v10q.hex 12/03/07
+------------------------
+- correction pb autoassign sur BUT
+- consolidation autoassign
+- lorsque realtime OFF : encoder bloqué
+- lorsque realtime OFF : affichage --- BPM
+- lorsque realtime OFF : bouton de transport bloqués
+- deplacement des : entre control name et module name
+- raptriement des assignations correct lorsque module change de place ou lorsque le nb de modules a changé
+
+Mawzer_firmware_v10q.hex 12/03/07
+------------------------
+- affiche le nom du module (pas du controle) pdt l'assignation
+- corrections transparentes pour toi (consolidations, optimisations...)
+- rapatriement des structures enfin ok !
+
+Mawzer_firmware_v10r.hex 12/03/07
+------------------------
+- déblocage du JOG Dial
+
+Mawzer_firmware_v10s.hex 12/03/07
+------------------------
+- Shift bloque l'envoi du midi
+- modules list avec ok + cancel en mode live screen
+
+Mawzer_firmware_v10t.hex 26/03/07
+------------------------
+- règle bug lorsque valeur min = valeur max
+- Accepte 8 modules pas Bus (pour version 32 modules)
+
+Mawzer_firmware_v10u.hex 02/04/07
+------------------------
+- améliorations USB pour 1.1 et 2.0
+- intégration du sysex ID Jerash Labs (00H 20H 67H)
+
+Mawzer_firmware_v10v.hex 03/04/07
+------------------------
+- possibilite d'assigner plusieurs controles sans sortir des menus
+- supression de "edit name" pour l'edition des strings (donc bug encodeur viré)
+
+Mawzer_firmware_v10w.hex 23/04/07 >> 11/05/07
+------------------------
+- ajout du choix de la sortie midi/usb/both pour chaque controle
+- correction du bug "appui sur NO depuis livescreen fait défiler les module name"
+- correction du bug qui affiche le mauvais nom de module en sortant du menu
+
+Mawzer_firmware_v10x.hex 09/10/07
+------------------------
+- ajout du mode de tests (rec+play+ffw)
+
+MAWZER_Compiled_All_v10_RC_270407.rar 27/04/07
+------------------------
+- BOOTLOADER sur les modules

@@ -1,0 +1,2133 @@
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 1   
+
+
+C51 COMPILER V8.02, COMPILATION OF MODULE HARDWARE
+OBJECT MODULE PLACED IN hardware.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE hardware.c OPTIMIZE(9,SIZE) INCDIR(..\..\Common_Ez_Z8) DEFINE(EZ_COMPIL) CO
+                    -DE LISTINCLUDE SYMBOLS PREPRINT
+
+line level    source
+
+   1          // ==========================================================================
+   2          // Copyright (C) MAWZER - Jerash Labs 2006
+   3          // ==========================================================================
+   4          
+   5          //#pragma NOIV  // Do not generate interrupt vectors
+   6           
+   7          // **************************** HARDWARE.C *********************************
+   8          // All code relating to ezusb hardware
+   9          // *************************************************************************
+  10          
+  11          #include "fx2.h"
+   1      =1  //-----------------------------------------------------------------------------
+   2      =1  //   File:      FX2.h
+   3      =1  //   Contents:  EZ-USB FX2/FX2LP/FX1 constants, macros, datatypes, globals, and library
+   4      =1  //              function prototypes.
+   5      =1  //
+   6      =1  // $Archive: /USB/Target/Inc/Fx2.h $
+   7      =1  // $Date: 3/23/05 2:30p $
+   8      =1  // $Revision: 16 $
+   9      =1  //
+  10      =1  //   Copyright (c) 2005 Cypress Semiconductor, All rights reserved
+  11      =1  //-----------------------------------------------------------------------------
+  12      =1  #ifndef FX2_H     //Header sentry
+  13      =1  #define FX2_H
+  14      =1  
+  15      =1  #define INTERNAL_DSCR_ADDR 0x0080   // Relocate Descriptors to 0x80
+  16      =1  #define bmSTRETCH 0x07
+  17      =1  #define FW_STRETCH_VALUE 0x0      // Set stretch to 0 in frameworks
+  18      =1  
+  19      =1  //-----------------------------------------------------------------------------
+  20      =1  // Constants
+  21      =1  //-----------------------------------------------------------------------------
+  22      =1  #define   TRUE    1
+  23      =1  #define FALSE   0
+  24      =1  
+  25      =1  #define bmBIT0   0x01
+  26      =1  #define bmBIT1   0x02
+  27      =1  #define bmBIT2   0x04
+  28      =1  #define bmBIT3   0x08
+  29      =1  #define bmBIT4   0x10
+  30      =1  #define bmBIT5   0x20
+  31      =1  #define bmBIT6   0x40
+  32      =1  #define bmBIT7   0x80
+  33      =1  
+  34      =1  #define DEVICE_DSCR      0x01      // Descriptor type: Device
+  35      =1  #define CONFIG_DSCR      0x02      // Descriptor type: Configuration
+  36      =1  #define STRING_DSCR      0x03      // Descriptor type: String
+  37      =1  #define INTRFC_DSCR      0x04      // Descriptor type: Interface
+  38      =1  #define ENDPNT_DSCR      0x05      // Descriptor type: End Point
+  39      =1  #define DEVQUAL_DSCR     0x06      // Descriptor type: Device Qualifier
+  40      =1  #define OTHERSPEED_DSCR  0x07      // Descriptor type: Other Speed Configuration
+  41      =1  
+  42      =1  #define bmBUSPWR  bmBIT7         // Config. attribute: Bus powered
+  43      =1  #define bmSELFPWR bmBIT6         // Config. attribute: Self powered
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 2   
+
+  44      =1  #define bmRWU     bmBIT5         // Config. attribute: Remote Wakeup
+  45      =1  
+  46      =1  #define bmEPOUT   bmBIT7
+  47      =1  #define bmEPIN    0x00
+  48      =1  
+  49      =1  #define EP_CONTROL   0x00        // End Point type: Control
+  50      =1  #define EP_ISO       0x01        // End Point type: Isochronous
+  51      =1  #define EP_BULK      0x02        // End Point type: Bulk
+  52      =1  #define EP_INT       0x03        // End Point type: Interrupt
+  53      =1  
+  54      =1  #define SUD_SIZE            8      // Setup data packet size
+  55      =1  
+  56      =1  //////////////////////////////////////////////////////////////////////////////
+  57      =1  //Added for HID
+  58      =1  
+  59      =1  #define SETUP_MASK                              0x60    //Used to mask off request type
+  60      =1  #define SETUP_STANDARD_REQUEST  0               //Standard Request
+  61      =1  #define SETUP_CLASS_REQUEST             0x20    //Class Request
+  62      =1  #define SETUP_VENDOR_REQUEST    0x40    //Vendor Request
+  63      =1  #define SETUP_RESERVED_REQUEST  0x60    //Reserved or illegal request
+  64      =1  
+  65      =1  //////////////////////////////////////////////////////////////////////////////
+  66      =1  
+  67      =1  
+  68      =1  #define SC_GET_STATUS         0x00   // Setup command: Get Status
+  69      =1  #define SC_CLEAR_FEATURE      0x01   // Setup command: Clear Feature
+  70      =1  #define SC_RESERVED            0x02   // Setup command: Reserved
+  71      =1  #define SC_SET_FEATURE         0x03   // Setup command: Set Feature
+  72      =1  #define SC_SET_ADDRESS         0x05   // Setup command: Set Address
+  73      =1  #define SC_GET_DESCRIPTOR      0x06   // Setup command: Get Descriptor
+  74      =1  #define SC_SET_DESCRIPTOR      0x07   // Setup command: Set Descriptor
+  75      =1  #define SC_GET_CONFIGURATION   0x08   // Setup command: Get Configuration
+  76      =1  #define SC_SET_CONFIGURATION   0x09   // Setup command: Set Configuration
+  77      =1  #define SC_GET_INTERFACE      0x0a   // Setup command: Get Interface
+  78      =1  #define SC_SET_INTERFACE      0x0b   // Setup command: Set Interface
+  79      =1  #define SC_SYNC_FRAME         0x0c   // Setup command: Sync Frame
+  80      =1  #define SC_ANCHOR_LOAD         0xa0   // Setup command: Anchor load
+  81      =1     
+  82      =1  #define GD_DEVICE          0x01  // Get descriptor: Device
+  83      =1  #define GD_CONFIGURATION   0x02  // Get descriptor: Configuration
+  84      =1  #define GD_STRING          0x03  // Get descriptor: String
+  85      =1  #define GD_INTERFACE       0x04  // Get descriptor: Interface
+  86      =1  #define GD_ENDPOINT        0x05  // Get descriptor: Endpoint
+  87      =1  #define GD_DEVICE_QUALIFIER 0x06  // Get descriptor: Device Qualifier
+  88      =1  #define GD_OTHER_SPEED_CONFIGURATION 0x07  // Get descriptor: Other Configuration
+  89      =1  #define GD_INTERFACE_POWER 0x08  // Get descriptor: Interface Power
+  90      =1  #define GD_HID              0x21        // Get descriptor: HID
+  91      =1  #define GD_REPORT                0x22   // Get descriptor: Report
+  92      =1  
+  93      =1  #define GS_DEVICE          0x80  // Get Status: Device
+  94      =1  #define GS_INTERFACE       0x81  // Get Status: Interface
+  95      =1  #define GS_ENDPOINT        0x82  // Get Status: End Point
+  96      =1  
+  97      =1  #define FT_DEVICE          0x00  // Feature: Device
+  98      =1  #define FT_ENDPOINT        0x02  // Feature: End Point
+  99      =1  
+ 100      =1  #define I2C_IDLE              0     // I2C Status: Idle mode
+ 101      =1  #define I2C_SENDING           1     // I2C Status: I2C is sending data
+ 102      =1  #define I2C_RECEIVING         2     // I2C Status: I2C is receiving data
+ 103      =1  #define I2C_PRIME             3     // I2C Status: I2C is receiving the first byte of a string
+ 104      =1  #define I2C_STOP              5     // I2C Status: I2C waiting for stop completion
+ 105      =1  #define I2C_BERROR            6     // I2C Status: I2C error; Bit Error
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 3   
+
+ 106      =1  #define I2C_NACK              7     // I2C Status: I2C error; No Acknowledge
+ 107      =1  #define I2C_OK                8     // I2C positive return code
+ 108      =1  #define I2C_WAITSTOP          9     // I2C Status: Wait for STOP complete
+ 109      =1  
+ 110      =1  /*-----------------------------------------------------------------------------
+ 111      =1     Macros
+ 112      =1  -----------------------------------------------------------------------------*/
+ 113      =1  
+ 114      =1  #define MSB(word)      (BYTE)(((WORD)(word) >> 8) & 0xff)
+ 115      =1  #define LSB(word)      (BYTE)((WORD)(word) & 0xff)
+ 116      =1  
+ 117      =1  #define SWAP_ENDIAN(word)   ((BYTE*)&word)[0] ^= ((BYTE*)&word)[1];\
+ 118      =1                       ((BYTE*)&word)[1] ^= ((BYTE*)&word)[0];\
+ 119      =1                       ((BYTE*)&word)[0] ^= ((BYTE*)&word)[1]
+ 120      =1  
+ 121      =1  #define EZUSB_IRQ_ENABLE()   EUSB = 1
+ 122      =1  #define EZUSB_IRQ_DISABLE()   EUSB = 0
+ 123      =1  #define EZUSB_IRQ_CLEAR()   EXIF &= ~0x10      // IE2_
+ 124      =1  
+ 125      =1  #define EZUSB_STALL_EP0()            EP0CS |= bmEPSTALL
+ 126      =1  
+ 127      =1  // WRITEDELAY() has been replaced by SYNCDELAY; macro in fx2sdly.h
+ 128      =1  // ...it is here for backwards compatibility...
+ 129      =1  
+ 130      =1  // the WRITEDELAY macro compiles to the time equivalent of 3 NOPs.
+ 131      =1  // It is used in the frameworks to allow for write recovery time
+ 132      =1  // requirements of certain registers.  This is only necessary for
+ 133      =1  // EZ-USB FX parts.  See the EZ-USB FX TRM for
+ 134      =1  // more information on write recovery time issues.
+ 135      =1  #define WRITEDELAY() {char writedelaydummy = 0;}
+ 136      =1  // if this firmware will never run on an EZ-USB FX part replace
+ 137      =1  // with:
+ 138      =1  // #define WRITEDELAY()
+ 139      =1  
+ 140      =1  // macro to reset and endpoint data toggle
+ 141      =1  #define EZUSB_RESET_DATA_TOGGLE(ep)     TOGCTL = (((ep & 0x80) >> 3) + (ep & 0x0F));\
+ 142      =1                                          TOGCTL |= bmRESETTOGGLE
+ 143      =1  
+ 144      =1  
+ 145      =1  #define EZUSB_ENABLE_RSMIRQ()      (EICON |= 0x20)      // Enable Resume Interrupt (EPFI_)
+ 146      =1  #define EZUSB_DISABLE_RSMIRQ()      (EICON &= ~0x20)   // Disable Resume Interrupt (EPFI_)
+ 147      =1  #define EZUSB_CLEAR_RSMIRQ()      (EICON &= ~0x10)   // Clear Resume Interrupt Flag (PFI_)
+ 148      =1  
+ 149      =1  #define EZUSB_GETI2CSTATUS()      (I2CPckt.status)
+ 150      =1  #define EZUSB_CLEARI2CSTATUS()      if((I2CPckt.status == I2C_BERROR) || (I2CPckt.status == I2C_NACK))\
+ 151      =1                                I2CPckt.status = I2C_IDLE;
+ 152      =1  
+ 153      =1  #define EZUSB_ENABLEBP()         (BREAKPT |= bmBPEN)
+ 154      =1  #define EZUSB_DISABLEBP()         (BREAKPT &= ~bmBPEN)
+ 155      =1  #define EZUSB_CLEARBP()            (BREAKPT |= bmBREAK)
+ 156      =1  #define EZUSB_BP(addr)            BPADDRH = (BYTE)(((WORD)addr >> 8) & 0xff);\      
+ 157      =1                                    BPADDRL = (BYTE)addr
+ 158      =1  
+ 159      =1  #define EZUSB_EXTWAKEUP()      (((WAKEUPCS & bmWU2) && (WAKEUPCS & bmWU2EN)) ||\
+ 160      =1                                  ((WAKEUPCS & bmWU) &&  (WAKEUPCS & bmWUEN)))
+ 161      =1  
+ 162      =1  #define EZUSB_HIGHSPEED()      (USBCS & bmHSM)
+ 163      =1  
+ 164      =1  //-----------------------------------------------------------------------------
+ 165      =1  // Datatypes
+ 166      =1  //-----------------------------------------------------------------------------
+ 167      =1  typedef unsigned char   BYTE;
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 4   
+
+ 168      =1  typedef unsigned short   WORD;
+ 169      =1  typedef unsigned long   DWORD;
+ 170      =1  typedef bit            BOOL;
+ 171      =1  
+ 172      =1  #define  INT0_VECT   0
+ 173      =1  #define  TMR0_VECT   1
+ 174      =1  #define  INT1_VECT   2
+ 175      =1  #define  TMR1_VECT   3
+ 176      =1  #define  COM0_VECT   4
+ 177      =1  #define  TMR2_VECT   5
+ 178      =1  #define  WKUP_VECT   6
+ 179      =1  #define  COM1_VECT   7
+ 180      =1  #define  USB_VECT    8
+ 181      =1  #define  I2C_VECT    9
+ 182      =1  #define  INT4_VECT   10
+ 183      =1  #define  INT5_VECT   11
+ 184      =1  #define  INT6_VECT   12
+ 185      =1  
+ 186      =1  
+ 187      =1  typedef struct
+ 188      =1  {
+ 189      =1     BYTE   length;
+ 190      =1     BYTE   type;
+ 191      =1  }DSCR;
+ 192      =1  
+ 193      =1  typedef struct            // Device Descriptor
+ 194      =1  {
+ 195      =1     BYTE   length;         // Descriptor length ( = sizeof(DEVICEDSCR) )
+ 196      =1     BYTE   type;         // Decriptor type (Device = 1)
+ 197      =1     BYTE   spec_ver_minor;   // Specification Version (BCD) minor
+ 198      =1     BYTE   spec_ver_major;   // Specification Version (BCD) major
+ 199      =1     BYTE   dev_class;      // Device class
+ 200      =1     BYTE   sub_class;      // Device sub-class
+ 201      =1     BYTE   protocol;      // Device sub-sub-class
+ 202      =1     BYTE   max_packet;      // Maximum packet size
+ 203      =1     WORD   vendor_id;      // Vendor ID
+ 204      =1     WORD   product_id;      // Product ID
+ 205      =1     WORD   version_id;      // Product version ID
+ 206      =1     BYTE   mfg_str;      // Manufacturer string index
+ 207      =1     BYTE   prod_str;      // Product string index
+ 208      =1     BYTE   serialnum_str;   // Serial number string index
+ 209      =1     BYTE   configs;      // Number of configurations
+ 210      =1  }DEVICEDSCR;
+ 211      =1  
+ 212      =1  typedef struct            // Device Qualifier Descriptor
+ 213      =1  {
+ 214      =1     BYTE   length;         // Descriptor length ( = sizeof(DEVICEQUALDSCR) )
+ 215      =1     BYTE   type;         // Decriptor type (Device Qualifier = 6)
+ 216      =1     BYTE   spec_ver_minor;   // Specification Version (BCD) minor
+ 217      =1     BYTE   spec_ver_major;   // Specification Version (BCD) major
+ 218      =1     BYTE   dev_class;      // Device class
+ 219      =1     BYTE   sub_class;      // Device sub-class
+ 220      =1     BYTE   protocol;      // Device sub-sub-class
+ 221      =1     BYTE   max_packet;      // Maximum packet size
+ 222      =1     BYTE   configs;      // Number of configurations
+ 223      =1     BYTE  reserved0;
+ 224      =1  }DEVICEQUALDSCR;
+ 225      =1  
+ 226      =1  typedef struct
+ 227      =1  {
+ 228      =1     BYTE   length;         // Configuration length ( = sizeof(CONFIGDSCR) )
+ 229      =1     BYTE   type;         // Descriptor type (Configuration = 2)
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 5   
+
+ 230      =1     WORD   config_len;      // Configuration + End Points length
+ 231      =1     BYTE   interfaces;      // Number of interfaces
+ 232      =1     BYTE   index;         // Configuration number
+ 233      =1     BYTE   config_str;      // Configuration string
+ 234      =1     BYTE   attrib;         // Attributes (b7 - buspwr, b6 - selfpwr, b5 - rwu
+ 235      =1     BYTE   power;         // Power requirement (div 2 ma)
+ 236      =1  }CONFIGDSCR;
+ 237      =1  
+ 238      =1  typedef struct
+ 239      =1  {
+ 240      =1     BYTE   length;         // Interface descriptor length ( - sizeof(INTRFCDSCR) )
+ 241      =1     BYTE   type;         // Descriptor type (Interface = 4)
+ 242      =1     BYTE   index;         // Zero-based index of this interface
+ 243      =1     BYTE   alt_setting;   // Alternate setting
+ 244      =1     BYTE   ep_cnt;         // Number of end points 
+ 245      =1     BYTE   class;         // Interface class
+ 246      =1     BYTE   sub_class;      // Interface sub class
+ 247      =1     BYTE   protocol;      // Interface sub sub class
+ 248      =1     BYTE   interface_str;   // Interface descriptor string index
+ 249      =1  }INTRFCDSCR;
+ 250      =1  
+ 251      =1  typedef struct
+ 252      =1  {
+ 253      =1     BYTE   length;         // End point descriptor length ( = sizeof(ENDPNTDSCR) )
+ 254      =1     BYTE   type;         // Descriptor type (End point = 5)
+ 255      =1     BYTE   addr;         // End point address
+ 256      =1     BYTE   ep_type;      // End point type
+ 257      =1     BYTE   mp_L;         // Maximum packet size
+ 258      =1     BYTE   mp_H;
+ 259      =1     BYTE   interval;      // Interrupt polling interval
+ 260      =1  }ENDPNTDSCR;
+ 261      =1  
+ 262      =1  typedef struct
+ 263      =1  {
+ 264      =1     BYTE   length;         // String descriptor length
+ 265      =1     BYTE   type;         // Descriptor type
+ 266      =1  }STRINGDSCR;
+ 267      =1  
+ 268      =1  typedef struct
+ 269      =1  {
+ 270      =1     BYTE   cntrl;         // End point control register
+ 271      =1     BYTE   bytes;         // End point buffer byte count
+ 272      =1  }EPIOC;
+ 273      =1  
+ 274      =1  typedef struct 
+ 275      =1  {
+ 276      =1     BYTE   length;
+ 277      =1     BYTE   *dat;
+ 278      =1     BYTE   count;
+ 279      =1     BYTE   status;
+ 280      =1  }I2CPCKT;
+ 281      =1  
+ 282      =1  //-----------------------------------------------------------------------------
+ 283      =1  // Globals
+ 284      =1  //-----------------------------------------------------------------------------
+ 285      =1  extern code BYTE   USB_AutoVector;
+ 286      =1  
+ 287      =1  extern WORD   pDeviceDscr;
+ 288      =1  extern WORD   pDeviceQualDscr;
+ 289      =1  extern WORD       pHighSpeedConfigDscr;
+ 290      =1  extern WORD       pFullSpeedConfigDscr; 
+ 291      =1  extern WORD   pConfigDscr;
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 6   
+
+ 292      =1  extern WORD   pOtherConfigDscr;
+ 293      =1  extern WORD   pStringDscr;
+ 294      =1  
+ 295      =1  extern code DEVICEDSCR        DeviceDscr;
+ 296      =1  extern code DEVICEQUALDSCR    DeviceQualDscr;
+ 297      =1  extern code CONFIGDSCR        HighSpeedConfigDscr;
+ 298      =1  extern code CONFIGDSCR        FullSpeedConfigDscr;
+ 299      =1  extern code STRINGDSCR        StringDscr;
+ 300      =1  extern code DSCR              UserDscr;
+ 301      =1  
+ 302      =1  extern I2CPCKT   I2CPckt;
+ 303      =1  
+ 304      =1  //-----------------------------------------------------------------------------
+ 305      =1  // Function Prototypes
+ 306      =1  //-----------------------------------------------------------------------------
+ 307      =1  
+ 308      =1  extern void EZUSB_Renum(void);
+ 309      =1  extern void EZUSB_Discon(BOOL renum);
+ 310      =1  
+ 311      =1  extern void EZUSB_Susp(void);
+ 312      =1  extern void EZUSB_Resume(void);
+ 313      =1  
+ 314      =1  extern void EZUSB_Delay1ms(void);
+ 315      =1  extern void EZUSB_Delay(WORD ms);
+ 316      =1  
+ 317      =1  extern CONFIGDSCR xdata*   EZUSB_GetConfigDscr(BYTE ConfigIdx);
+ 318      =1  extern INTRFCDSCR xdata*   EZUSB_GetIntrfcDscr(BYTE ConfigIdx, BYTE IntrfcIdx, BYTE AltSetting);
+ 319      =1  extern STRINGDSCR xdata*   EZUSB_GetStringDscr(BYTE StrIdx);
+ 320      =1  extern DSCR xdata*      EZUSB_GetDscr(BYTE index, DSCR* dscr, BYTE type);
+ 321      =1  
+ 322      =1  extern void EZUSB_InitI2C(void);
+ 323      =1  extern BOOL EZUSB_WriteI2C_(BYTE addr, BYTE length, BYTE xdata *dat);
+ 324      =1  extern BOOL EZUSB_ReadI2C_(BYTE addr, BYTE length, BYTE xdata *dat);
+ 325      =1  extern BOOL EZUSB_WriteI2C(BYTE addr, BYTE length, BYTE xdata *dat);
+ 326      =1  extern BOOL EZUSB_ReadI2C(BYTE addr, BYTE length, BYTE xdata *dat);
+ 327      =1  extern void EZUSB_WaitForEEPROMWrite(BYTE addr);
+ 328      =1  
+ 329      =1  extern void modify_endpoint_stall(BYTE epid, BYTE stall);
+ 330      =1  
+ 331      =1  #endif   // FX2_H
+  12          #include "fx2regs.h"
+   1      =1  //-----------------------------------------------------------------------------
+   2      =1  //   File:      FX2regs.h
+   3      =1  //   Contents:   EZ-USB FX2/FX2LP/FX1 register declarations and bit mask definitions.
+   4      =1  //
+   5      =1  // $Archive: /USB/Target/Inc/fx2regs.h $
+   6      =1  // $Date: 4/13/05 4:29p $
+   7      =1  // $Revision: 42 $
+   8      =1  //
+   9      =1  //
+  10      =1  //   Copyright (c) 2005 Cypress Semiconductor, All rights reserved
+  11      =1  //-----------------------------------------------------------------------------
+  12      =1  
+  13      =1  #ifndef FX2REGS_H   /* Header Sentry */
+  14      =1  #define FX2REGS_H
+  15      =1  
+  16      =1  //-----------------------------------------------------------------------------
+  17      =1  // FX2/FX2LP/FX1 Related Register Assignments
+  18      =1  //-----------------------------------------------------------------------------
+  19      =1  
+  20      =1  // The Ez-USB FX2/FX2LP/FX1 registers are defined here. We use fx2regs.h for register 
+  21      =1  // address allocation by using "#define ALLOCATE_EXTERN". 
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 7   
+
+  22      =1  // When using "#define ALLOCATE_EXTERN", you get (for instance): 
+  23      =1  // xdata volatile BYTE OUT7BUF[64]   _at_   0x7B40;
+  24      =1  // Such lines are created from FX2.h by using the preprocessor. 
+  25      =1  // Incidently, these lines will not generate any space in the resulting hex 
+  26      =1  // file; they just bind the symbols to the addresses for compilation. 
+  27      =1  // You just need to put "#define ALLOCATE_EXTERN" in your main program file; 
+  28      =1  // i.e. fw.c or a stand-alone C source file. 
+  29      =1  // Without "#define ALLOCATE_EXTERN", you just get the external reference: 
+  30      =1  // extern xdata volatile BYTE OUT7BUF[64]   ;//   0x7B40;
+  31      =1  // This uses the concatenation operator "##" to insert a comment "//" 
+  32      =1  // to cut off the end of the line, "_at_   0x7B40;", which is not wanted.
+  33      =1  
+  34      =1  #ifdef ALLOCATE_EXTERN
+           =1 #define EXTERN
+           =1 #define _AT_ _at_
+           =1 #else
+  38      =1  #define EXTERN extern
+  39      =1  #define _AT_ ;/ ## /
+  40      =1  #endif
+  41      =1  
+  42      =1  EXTERN xdata volatile BYTE GPIF_WAVE_DATA    _AT_ 0xE400;
+  43      =1  EXTERN xdata volatile BYTE RES_WAVEDATA_END  _AT_ 0xE480;
+  44      =1  
+  45      =1  // General Configuration
+  46      =1  
+  47      =1  EXTERN xdata volatile BYTE CPUCS             _AT_ 0xE600;  // Control & Status
+  48      =1  EXTERN xdata volatile BYTE IFCONFIG          _AT_ 0xE601;  // Interface Configuration
+  49      =1  EXTERN xdata volatile BYTE PINFLAGSAB        _AT_ 0xE602;  // FIFO FLAGA and FLAGB Assignments
+  50      =1  EXTERN xdata volatile BYTE PINFLAGSCD        _AT_ 0xE603;  // FIFO FLAGC and FLAGD Assignments
+  51      =1  EXTERN xdata volatile BYTE FIFORESET         _AT_ 0xE604;  // Restore FIFOS to default state
+  52      =1  EXTERN xdata volatile BYTE BREAKPT           _AT_ 0xE605;  // Breakpoint
+  53      =1  EXTERN xdata volatile BYTE BPADDRH           _AT_ 0xE606;  // Breakpoint Address H
+  54      =1  EXTERN xdata volatile BYTE BPADDRL           _AT_ 0xE607;  // Breakpoint Address L
+  55      =1  EXTERN xdata volatile BYTE UART230           _AT_ 0xE608;  // 230 Kbaud clock for T0,T1,T2
+  56      =1  EXTERN xdata volatile BYTE FIFOPINPOLAR      _AT_ 0xE609;  // FIFO polarities
+  57      =1  EXTERN xdata volatile BYTE REVID             _AT_ 0xE60A;  // Chip Revision
+  58      =1  EXTERN xdata volatile BYTE REVCTL            _AT_ 0xE60B;  // Chip Revision Control
+  59      =1  
+  60      =1  // Endpoint Configuration
+  61      =1  
+  62      =1  EXTERN xdata volatile BYTE EP1OUTCFG         _AT_ 0xE610;  // Endpoint 1-OUT Configuration
+  63      =1  EXTERN xdata volatile BYTE EP1INCFG          _AT_ 0xE611;  // Endpoint 1-IN Configuration
+  64      =1  EXTERN xdata volatile BYTE EP2CFG            _AT_ 0xE612;  // Endpoint 2 Configuration
+  65      =1  EXTERN xdata volatile BYTE EP4CFG            _AT_ 0xE613;  // Endpoint 4 Configuration
+  66      =1  EXTERN xdata volatile BYTE EP6CFG            _AT_ 0xE614;  // Endpoint 6 Configuration
+  67      =1  EXTERN xdata volatile BYTE EP8CFG            _AT_ 0xE615;  // Endpoint 8 Configuration
+  68      =1  EXTERN xdata volatile BYTE EP2FIFOCFG        _AT_ 0xE618;  // Endpoint 2 FIFO configuration
+  69      =1  EXTERN xdata volatile BYTE EP4FIFOCFG        _AT_ 0xE619;  // Endpoint 4 FIFO configuration
+  70      =1  EXTERN xdata volatile BYTE EP6FIFOCFG        _AT_ 0xE61A;  // Endpoint 6 FIFO configuration
+  71      =1  EXTERN xdata volatile BYTE EP8FIFOCFG        _AT_ 0xE61B;  // Endpoint 8 FIFO configuration
+  72      =1  EXTERN xdata volatile BYTE EP2AUTOINLENH     _AT_ 0xE620;  // Endpoint 2 Packet Length H (IN only)
+  73      =1  EXTERN xdata volatile BYTE EP2AUTOINLENL     _AT_ 0xE621;  // Endpoint 2 Packet Length L (IN only)
+  74      =1  EXTERN xdata volatile BYTE EP4AUTOINLENH     _AT_ 0xE622;  // Endpoint 4 Packet Length H (IN only)
+  75      =1  EXTERN xdata volatile BYTE EP4AUTOINLENL     _AT_ 0xE623;  // Endpoint 4 Packet Length L (IN only)
+  76      =1  EXTERN xdata volatile BYTE EP6AUTOINLENH     _AT_ 0xE624;  // Endpoint 6 Packet Length H (IN only)
+  77      =1  EXTERN xdata volatile BYTE EP6AUTOINLENL     _AT_ 0xE625;  // Endpoint 6 Packet Length L (IN only)
+  78      =1  EXTERN xdata volatile BYTE EP8AUTOINLENH     _AT_ 0xE626;  // Endpoint 8 Packet Length H (IN only)
+  79      =1  EXTERN xdata volatile BYTE EP8AUTOINLENL     _AT_ 0xE627;  // Endpoint 8 Packet Length L (IN only)
+  80      =1  EXTERN xdata volatile BYTE EP2FIFOPFH        _AT_ 0xE630;  // EP2 Programmable Flag trigger H
+  81      =1  EXTERN xdata volatile BYTE EP2FIFOPFL        _AT_ 0xE631;  // EP2 Programmable Flag trigger L
+  82      =1  EXTERN xdata volatile BYTE EP4FIFOPFH        _AT_ 0xE632;  // EP4 Programmable Flag trigger H
+  83      =1  EXTERN xdata volatile BYTE EP4FIFOPFL        _AT_ 0xE633;  // EP4 Programmable Flag trigger L
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 8   
+
+  84      =1  EXTERN xdata volatile BYTE EP6FIFOPFH        _AT_ 0xE634;  // EP6 Programmable Flag trigger H
+  85      =1  EXTERN xdata volatile BYTE EP6FIFOPFL        _AT_ 0xE635;  // EP6 Programmable Flag trigger L
+  86      =1  EXTERN xdata volatile BYTE EP8FIFOPFH        _AT_ 0xE636;  // EP8 Programmable Flag trigger H
+  87      =1  EXTERN xdata volatile BYTE EP8FIFOPFL        _AT_ 0xE637;  // EP8 Programmable Flag trigger L
+  88      =1  EXTERN xdata volatile BYTE EP2ISOINPKTS      _AT_ 0xE640;  // EP2 (if ISO) IN Packets per frame (1-3)
+  89      =1  EXTERN xdata volatile BYTE EP4ISOINPKTS      _AT_ 0xE641;  // EP4 (if ISO) IN Packets per frame (1-3)
+  90      =1  EXTERN xdata volatile BYTE EP6ISOINPKTS      _AT_ 0xE642;  // EP6 (if ISO) IN Packets per frame (1-3)
+  91      =1  EXTERN xdata volatile BYTE EP8ISOINPKTS      _AT_ 0xE643;  // EP8 (if ISO) IN Packets per frame (1-3)
+  92      =1  EXTERN xdata volatile BYTE INPKTEND          _AT_ 0xE648;  // Force IN Packet End
+  93      =1  EXTERN xdata volatile BYTE OUTPKTEND         _AT_ 0xE649;  // Force OUT Packet End
+  94      =1  
+  95      =1  // Interrupts
+  96      =1  
+  97      =1  EXTERN xdata volatile BYTE EP2FIFOIE         _AT_ 0xE650;  // Endpoint 2 Flag Interrupt Enable
+  98      =1  EXTERN xdata volatile BYTE EP2FIFOIRQ        _AT_ 0xE651;  // Endpoint 2 Flag Interrupt Request
+  99      =1  EXTERN xdata volatile BYTE EP4FIFOIE         _AT_ 0xE652;  // Endpoint 4 Flag Interrupt Enable
+ 100      =1  EXTERN xdata volatile BYTE EP4FIFOIRQ        _AT_ 0xE653;  // Endpoint 4 Flag Interrupt Request
+ 101      =1  EXTERN xdata volatile BYTE EP6FIFOIE         _AT_ 0xE654;  // Endpoint 6 Flag Interrupt Enable
+ 102      =1  EXTERN xdata volatile BYTE EP6FIFOIRQ        _AT_ 0xE655;  // Endpoint 6 Flag Interrupt Request
+ 103      =1  EXTERN xdata volatile BYTE EP8FIFOIE         _AT_ 0xE656;  // Endpoint 8 Flag Interrupt Enable
+ 104      =1  EXTERN xdata volatile BYTE EP8FIFOIRQ        _AT_ 0xE657;  // Endpoint 8 Flag Interrupt Request
+ 105      =1  EXTERN xdata volatile BYTE IBNIE             _AT_ 0xE658;  // IN-BULK-NAK Interrupt Enable
+ 106      =1  EXTERN xdata volatile BYTE IBNIRQ            _AT_ 0xE659;  // IN-BULK-NAK interrupt Request
+ 107      =1  EXTERN xdata volatile BYTE NAKIE             _AT_ 0xE65A;  // Endpoint Ping NAK interrupt Enable
+ 108      =1  EXTERN xdata volatile BYTE NAKIRQ            _AT_ 0xE65B;  // Endpoint Ping NAK interrupt Request
+ 109      =1  EXTERN xdata volatile BYTE USBIE             _AT_ 0xE65C;  // USB Int Enables
+ 110      =1  EXTERN xdata volatile BYTE USBIRQ            _AT_ 0xE65D;  // USB Interrupt Requests
+ 111      =1  EXTERN xdata volatile BYTE EPIE              _AT_ 0xE65E;  // Endpoint Interrupt Enables
+ 112      =1  EXTERN xdata volatile BYTE EPIRQ             _AT_ 0xE65F;  // Endpoint Interrupt Requests
+ 113      =1  EXTERN xdata volatile BYTE GPIFIE            _AT_ 0xE660;  // GPIF Interrupt Enable
+ 114      =1  EXTERN xdata volatile BYTE GPIFIRQ           _AT_ 0xE661;  // GPIF Interrupt Request
+ 115      =1  EXTERN xdata volatile BYTE USBERRIE          _AT_ 0xE662;  // USB Error Interrupt Enables
+ 116      =1  EXTERN xdata volatile BYTE USBERRIRQ         _AT_ 0xE663;  // USB Error Interrupt Requests
+ 117      =1  EXTERN xdata volatile BYTE ERRCNTLIM         _AT_ 0xE664;  // USB Error counter and limit
+ 118      =1  EXTERN xdata volatile BYTE CLRERRCNT         _AT_ 0xE665;  // Clear Error Counter EC[3..0]
+ 119      =1  EXTERN xdata volatile BYTE INT2IVEC          _AT_ 0xE666;  // Interupt 2 (USB) Autovector
+ 120      =1  EXTERN xdata volatile BYTE INT4IVEC          _AT_ 0xE667;  // Interupt 4 (FIFOS & GPIF) Autovector
+ 121      =1  EXTERN xdata volatile BYTE INTSETUP          _AT_ 0xE668;  // Interrupt 2&4 Setup
+ 122      =1  
+ 123      =1  // Input/Output
+ 124      =1  
+ 125      =1  EXTERN xdata volatile BYTE PORTACFG          _AT_ 0xE670;  // I/O PORTA Alternate Configuration
+ 126      =1  EXTERN xdata volatile BYTE PORTCCFG          _AT_ 0xE671;  // I/O PORTC Alternate Configuration
+ 127      =1  EXTERN xdata volatile BYTE PORTECFG          _AT_ 0xE672;  // I/O PORTE Alternate Configuration
+ 128      =1  EXTERN xdata volatile BYTE I2CS              _AT_ 0xE678;  // Control & Status
+ 129      =1  EXTERN xdata volatile BYTE I2DAT             _AT_ 0xE679;  // Data
+ 130      =1  EXTERN xdata volatile BYTE I2CTL             _AT_ 0xE67A;  // I2C Control
+ 131      =1  EXTERN xdata volatile BYTE XAUTODAT1         _AT_ 0xE67B;  // Autoptr1 MOVX access
+ 132      =1  EXTERN xdata volatile BYTE XAUTODAT2         _AT_ 0xE67C;  // Autoptr2 MOVX access
+ 133      =1  
+ 134      =1  #define EXTAUTODAT1 XAUTODAT1
+ 135      =1  #define EXTAUTODAT2 XAUTODAT2
+ 136      =1  
+ 137      =1  // USB Control
+ 138      =1  
+ 139      =1  EXTERN xdata volatile BYTE USBCS             _AT_ 0xE680;  // USB Control & Status
+ 140      =1  EXTERN xdata volatile BYTE SUSPEND           _AT_ 0xE681;  // Put chip into suspend
+ 141      =1  EXTERN xdata volatile BYTE WAKEUPCS          _AT_ 0xE682;  // Wakeup source and polarity
+ 142      =1  EXTERN xdata volatile BYTE TOGCTL            _AT_ 0xE683;  // Toggle Control
+ 143      =1  EXTERN xdata volatile BYTE USBFRAMEH         _AT_ 0xE684;  // USB Frame count H
+ 144      =1  EXTERN xdata volatile BYTE USBFRAMEL         _AT_ 0xE685;  // USB Frame count L
+ 145      =1  EXTERN xdata volatile BYTE MICROFRAME        _AT_ 0xE686;  // Microframe count, 0-7
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 9   
+
+ 146      =1  EXTERN xdata volatile BYTE FNADDR            _AT_ 0xE687;  // USB Function address
+ 147      =1  
+ 148      =1  // Endpoints
+ 149      =1  
+ 150      =1  EXTERN xdata volatile BYTE EP0BCH            _AT_ 0xE68A;  // Endpoint 0 Byte Count H
+ 151      =1  EXTERN xdata volatile BYTE EP0BCL            _AT_ 0xE68B;  // Endpoint 0 Byte Count L
+ 152      =1  EXTERN xdata volatile BYTE EP1OUTBC          _AT_ 0xE68D;  // Endpoint 1 OUT Byte Count
+ 153      =1  EXTERN xdata volatile BYTE EP1INBC           _AT_ 0xE68F;  // Endpoint 1 IN Byte Count
+ 154      =1  EXTERN xdata volatile BYTE EP2BCH            _AT_ 0xE690;  // Endpoint 2 Byte Count H
+ 155      =1  EXTERN xdata volatile BYTE EP2BCL            _AT_ 0xE691;  // Endpoint 2 Byte Count L
+ 156      =1  EXTERN xdata volatile BYTE EP4BCH            _AT_ 0xE694;  // Endpoint 4 Byte Count H
+ 157      =1  EXTERN xdata volatile BYTE EP4BCL            _AT_ 0xE695;  // Endpoint 4 Byte Count L
+ 158      =1  EXTERN xdata volatile BYTE EP6BCH            _AT_ 0xE698;  // Endpoint 6 Byte Count H
+ 159      =1  EXTERN xdata volatile BYTE EP6BCL            _AT_ 0xE699;  // Endpoint 6 Byte Count L
+ 160      =1  EXTERN xdata volatile BYTE EP8BCH            _AT_ 0xE69C;  // Endpoint 8 Byte Count H
+ 161      =1  EXTERN xdata volatile BYTE EP8BCL            _AT_ 0xE69D;  // Endpoint 8 Byte Count L
+ 162      =1  EXTERN xdata volatile BYTE EP0CS             _AT_ 0xE6A0;  // Endpoint  Control and Status
+ 163      =1  EXTERN xdata volatile BYTE EP1OUTCS          _AT_ 0xE6A1;  // Endpoint 1 OUT Control and Status
+ 164      =1  EXTERN xdata volatile BYTE EP1INCS           _AT_ 0xE6A2;  // Endpoint 1 IN Control and Status
+ 165      =1  EXTERN xdata volatile BYTE EP2CS             _AT_ 0xE6A3;  // Endpoint 2 Control and Status
+ 166      =1  EXTERN xdata volatile BYTE EP4CS             _AT_ 0xE6A4;  // Endpoint 4 Control and Status
+ 167      =1  EXTERN xdata volatile BYTE EP6CS             _AT_ 0xE6A5;  // Endpoint 6 Control and Status
+ 168      =1  EXTERN xdata volatile BYTE EP8CS             _AT_ 0xE6A6;  // Endpoint 8 Control and Status
+ 169      =1  EXTERN xdata volatile BYTE EP2FIFOFLGS       _AT_ 0xE6A7;  // Endpoint 2 Flags
+ 170      =1  EXTERN xdata volatile BYTE EP4FIFOFLGS       _AT_ 0xE6A8;  // Endpoint 4 Flags
+ 171      =1  EXTERN xdata volatile BYTE EP6FIFOFLGS       _AT_ 0xE6A9;  // Endpoint 6 Flags
+ 172      =1  EXTERN xdata volatile BYTE EP8FIFOFLGS       _AT_ 0xE6AA;  // Endpoint 8 Flags
+ 173      =1  EXTERN xdata volatile BYTE EP2FIFOBCH        _AT_ 0xE6AB;  // EP2 FIFO total byte count H
+ 174      =1  EXTERN xdata volatile BYTE EP2FIFOBCL        _AT_ 0xE6AC;  // EP2 FIFO total byte count L
+ 175      =1  EXTERN xdata volatile BYTE EP4FIFOBCH        _AT_ 0xE6AD;  // EP4 FIFO total byte count H
+ 176      =1  EXTERN xdata volatile BYTE EP4FIFOBCL        _AT_ 0xE6AE;  // EP4 FIFO total byte count L
+ 177      =1  EXTERN xdata volatile BYTE EP6FIFOBCH        _AT_ 0xE6AF;  // EP6 FIFO total byte count H
+ 178      =1  EXTERN xdata volatile BYTE EP6FIFOBCL        _AT_ 0xE6B0;  // EP6 FIFO total byte count L
+ 179      =1  EXTERN xdata volatile BYTE EP8FIFOBCH        _AT_ 0xE6B1;  // EP8 FIFO total byte count H
+ 180      =1  EXTERN xdata volatile BYTE EP8FIFOBCL        _AT_ 0xE6B2;  // EP8 FIFO total byte count L
+ 181      =1  EXTERN xdata volatile BYTE SUDPTRH           _AT_ 0xE6B3;  // Setup Data Pointer high address byte
+ 182      =1  EXTERN xdata volatile BYTE SUDPTRL           _AT_ 0xE6B4;  // Setup Data Pointer low address byte
+ 183      =1  EXTERN xdata volatile BYTE SUDPTRCTL         _AT_ 0xE6B5;  // Setup Data Pointer Auto Mode
+ 184      =1  EXTERN xdata volatile BYTE SETUPDAT[8]       _AT_ 0xE6B8;  // 8 bytes of SETUP data
+ 185      =1  
+ 186      =1  // GPIF
+ 187      =1  
+ 188      =1  EXTERN xdata volatile BYTE GPIFWFSELECT      _AT_ 0xE6C0;  // Waveform Selector
+ 189      =1  EXTERN xdata volatile BYTE GPIFIDLECS        _AT_ 0xE6C1;  // GPIF Done, GPIF IDLE drive mode
+ 190      =1  EXTERN xdata volatile BYTE GPIFIDLECTL       _AT_ 0xE6C2;  // Inactive Bus, CTL states
+ 191      =1  EXTERN xdata volatile BYTE GPIFCTLCFG        _AT_ 0xE6C3;  // CTL OUT pin drive
+ 192      =1  EXTERN xdata volatile BYTE GPIFADRH          _AT_ 0xE6C4;  // GPIF Address H
+ 193      =1  EXTERN xdata volatile BYTE GPIFADRL          _AT_ 0xE6C5;  // GPIF Address L
+ 194      =1  
+ 195      =1  EXTERN xdata volatile BYTE GPIFTCB3          _AT_ 0xE6CE;  // GPIF Transaction Count Byte 3
+ 196      =1  EXTERN xdata volatile BYTE GPIFTCB2          _AT_ 0xE6CF;  // GPIF Transaction Count Byte 2
+ 197      =1  EXTERN xdata volatile BYTE GPIFTCB1          _AT_ 0xE6D0;  // GPIF Transaction Count Byte 1
+ 198      =1  EXTERN xdata volatile BYTE GPIFTCB0          _AT_ 0xE6D1;  // GPIF Transaction Count Byte 0
+ 199      =1  
+ 200      =1  #define EP2GPIFTCH GPIFTCB1   // these are here for backwards compatibility
+ 201      =1  #define EP2GPIFTCL GPIFTCB0   // 
+ 202      =1  #define EP4GPIFTCH GPIFTCB1   // these are here for backwards compatibility
+ 203      =1  #define EP4GPIFTCL GPIFTCB0   // 
+ 204      =1  #define EP6GPIFTCH GPIFTCB1   // these are here for backwards compatibility
+ 205      =1  #define EP6GPIFTCL GPIFTCB0   // 
+ 206      =1  #define EP8GPIFTCH GPIFTCB1   // these are here for backwards compatibility
+ 207      =1  #define EP8GPIFTCL GPIFTCB0   // 
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 10  
+
+ 208      =1  
+ 209      =1  EXTERN xdata volatile BYTE EP2GPIFFLGSEL     _AT_ 0xE6D2;  // EP2 GPIF Flag select
+ 210      =1  EXTERN xdata volatile BYTE EP2GPIFPFSTOP     _AT_ 0xE6D3;  // Stop GPIF EP2 transaction on prog. flag
+ 211      =1  EXTERN xdata volatile BYTE EP2GPIFTRIG       _AT_ 0xE6D4;  // EP2 FIFO Trigger
+ 212      =1  EXTERN xdata volatile BYTE EP4GPIFFLGSEL     _AT_ 0xE6DA;  // EP4 GPIF Flag select
+ 213      =1  EXTERN xdata volatile BYTE EP4GPIFPFSTOP     _AT_ 0xE6DB;  // Stop GPIF EP4 transaction on prog. flag
+ 214      =1  EXTERN xdata volatile BYTE EP4GPIFTRIG       _AT_ 0xE6DC;  // EP4 FIFO Trigger
+ 215      =1  EXTERN xdata volatile BYTE EP6GPIFFLGSEL     _AT_ 0xE6E2;  // EP6 GPIF Flag select
+ 216      =1  EXTERN xdata volatile BYTE EP6GPIFPFSTOP     _AT_ 0xE6E3;  // Stop GPIF EP6 transaction on prog. flag
+ 217      =1  EXTERN xdata volatile BYTE EP6GPIFTRIG       _AT_ 0xE6E4;  // EP6 FIFO Trigger
+ 218      =1  EXTERN xdata volatile BYTE EP8GPIFFLGSEL     _AT_ 0xE6EA;  // EP8 GPIF Flag select
+ 219      =1  EXTERN xdata volatile BYTE EP8GPIFPFSTOP     _AT_ 0xE6EB;  // Stop GPIF EP8 transaction on prog. flag
+ 220      =1  EXTERN xdata volatile BYTE EP8GPIFTRIG       _AT_ 0xE6EC;  // EP8 FIFO Trigger
+ 221      =1  EXTERN xdata volatile BYTE XGPIFSGLDATH      _AT_ 0xE6F0;  // GPIF Data H (16-bit mode only)
+ 222      =1  EXTERN xdata volatile BYTE XGPIFSGLDATLX     _AT_ 0xE6F1;  // Read/Write GPIF Data L & trigger transac
+ 223      =1  EXTERN xdata volatile BYTE XGPIFSGLDATLNOX   _AT_ 0xE6F2;  // Read GPIF Data L, no transac trigger
+ 224      =1  EXTERN xdata volatile BYTE GPIFREADYCFG      _AT_ 0xE6F3;  // Internal RDY,Sync/Async, RDY5CFG
+ 225      =1  EXTERN xdata volatile BYTE GPIFREADYSTAT     _AT_ 0xE6F4;  // RDY pin states
+ 226      =1  EXTERN xdata volatile BYTE GPIFABORT         _AT_ 0xE6F5;  // Abort GPIF cycles
+ 227      =1  
+ 228      =1  // UDMA
+ 229      =1  
+ 230      =1  EXTERN xdata volatile BYTE FLOWSTATE         _AT_  0xE6C6; //Defines GPIF flow state
+ 231      =1  EXTERN xdata volatile BYTE FLOWLOGIC         _AT_  0xE6C7; //Defines flow/hold decision criteria
+ 232      =1  EXTERN xdata volatile BYTE FLOWEQ0CTL        _AT_  0xE6C8; //CTL states during active flow state
+ 233      =1  EXTERN xdata volatile BYTE FLOWEQ1CTL        _AT_  0xE6C9; //CTL states during hold flow state
+ 234      =1  EXTERN xdata volatile BYTE FLOWHOLDOFF       _AT_  0xE6CA;
+ 235      =1  EXTERN xdata volatile BYTE FLOWSTB           _AT_  0xE6CB; //CTL/RDY Signal to use as master data strobe 
+ 236      =1  EXTERN xdata volatile BYTE FLOWSTBEDGE       _AT_  0xE6CC; //Defines active master strobe edge
+ 237      =1  EXTERN xdata volatile BYTE FLOWSTBHPERIOD    _AT_  0xE6CD; //Half Period of output master strobe
+ 238      =1  EXTERN xdata volatile BYTE GPIFHOLDAMOUNT    _AT_  0xE60C; //Data delay shift 
+ 239      =1  EXTERN xdata volatile BYTE UDMACRCH          _AT_  0xE67D; //CRC Upper byte
+ 240      =1  EXTERN xdata volatile BYTE UDMACRCL          _AT_  0xE67E; //CRC Lower byte
+ 241      =1  EXTERN xdata volatile BYTE UDMACRCQUAL       _AT_  0xE67F; //UDMA In only, host terminated use only
+ 242      =1  
+ 243      =1  
+ 244      =1  // Debug/Test
+ 245      =1  // The following registers are for Cypress's internal testing purposes only.
+ 246      =1  // These registers are not documented in the datasheet or the Technical Reference
+ 247      =1  // Manual as they were not designed for end user application usage 
+ 248      =1  EXTERN xdata volatile BYTE DBUG              _AT_ 0xE6F8;  // Debug
+ 249      =1  EXTERN xdata volatile BYTE TESTCFG           _AT_ 0xE6F9;  // Test configuration
+ 250      =1  EXTERN xdata volatile BYTE USBTEST           _AT_ 0xE6FA;  // USB Test Modes
+ 251      =1  EXTERN xdata volatile BYTE CT1               _AT_ 0xE6FB;  // Chirp Test--Override
+ 252      =1  EXTERN xdata volatile BYTE CT2               _AT_ 0xE6FC;  // Chirp Test--FSM
+ 253      =1  EXTERN xdata volatile BYTE CT3               _AT_ 0xE6FD;  // Chirp Test--Control Signals
+ 254      =1  EXTERN xdata volatile BYTE CT4               _AT_ 0xE6FE;  // Chirp Test--Inputs
+ 255      =1  
+ 256      =1  // Endpoint Buffers
+ 257      =1  
+ 258      =1  EXTERN xdata volatile BYTE EP0BUF[64]        _AT_ 0xE740;  // EP0 IN-OUT buffer
+ 259      =1  EXTERN xdata volatile BYTE EP1OUTBUF[64]     _AT_ 0xE780;  // EP1-OUT buffer
+ 260      =1  EXTERN xdata volatile BYTE EP1INBUF[64]      _AT_ 0xE7C0;  // EP1-IN buffer
+ 261      =1  EXTERN xdata volatile BYTE EP2FIFOBUF[1024]  _AT_ 0xF000;  // 512/1024-byte EP2 buffer (IN or OUT)
+ 262      =1  EXTERN xdata volatile BYTE EP4FIFOBUF[1024]  _AT_ 0xF400;  // 512 byte EP4 buffer (IN or OUT)
+ 263      =1  EXTERN xdata volatile BYTE EP6FIFOBUF[1024]  _AT_ 0xF800;  // 512/1024-byte EP6 buffer (IN or OUT)
+ 264      =1  EXTERN xdata volatile BYTE EP8FIFOBUF[1024]  _AT_ 0xFC00;  // 512 byte EP8 buffer (IN or OUT)
+ 265      =1  
+ 266      =1  // Error Correction Code (ECC) Registers (FX2LP/FX1 only)
+ 267      =1  
+ 268      =1  EXTERN xdata volatile BYTE ECCCFG            _AT_ 0xE628;  // ECC Configuration
+ 269      =1  EXTERN xdata volatile BYTE ECCRESET          _AT_ 0xE629;  // ECC Reset
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 11  
+
+ 270      =1  EXTERN xdata volatile BYTE ECC1B0            _AT_ 0xE62A;  // ECC1 Byte 0
+ 271      =1  EXTERN xdata volatile BYTE ECC1B1            _AT_ 0xE62B;  // ECC1 Byte 1
+ 272      =1  EXTERN xdata volatile BYTE ECC1B2            _AT_ 0xE62C;  // ECC1 Byte 2
+ 273      =1  EXTERN xdata volatile BYTE ECC2B0            _AT_ 0xE62D;  // ECC2 Byte 0
+ 274      =1  EXTERN xdata volatile BYTE ECC2B1            _AT_ 0xE62E;  // ECC2 Byte 1
+ 275      =1  EXTERN xdata volatile BYTE ECC2B2            _AT_ 0xE62F;  // ECC2 Byte 2
+ 276      =1  
+ 277      =1  // Feature Registers  (FX2LP/FX1 only)
+ 278      =1  EXTERN xdata volatile BYTE GPCR2             _AT_ 0xE50D;  // Chip Features
+ 279      =1  
+ 280      =1  #undef EXTERN
+ 281      =1  #undef _AT_
+ 282      =1  
+ 283      =1  /*-----------------------------------------------------------------------------
+ 284      =1     Special Function Registers (SFRs)
+ 285      =1     The byte registers and bits defined in the following list are based
+ 286      =1     on the Synopsis definition of the 8051 Special Function Registers for EZ-USB. 
+ 287      =1      If you modify the register definitions below, please regenerate the file 
+ 288      =1      "ezregs.inc" which includes the same basic information for assembly inclusion.
+ 289      =1  -----------------------------------------------------------------------------*/
+ 290      =1  
+ 291      =1  sfr IOA     = 0x80;
+ 292      =1           /*  IOA  */
+ 293      =1           sbit PA0    = 0x80 + 0;
+ 294      =1           sbit PA1    = 0x80 + 1;
+ 295      =1           sbit PA2    = 0x80 + 2;
+ 296      =1           sbit PA3    = 0x80 + 3;
+ 297      =1  
+ 298      =1           sbit PA4    = 0x80 + 4;
+ 299      =1           sbit PA5    = 0x80 + 5;
+ 300      =1           sbit PA6    = 0x80 + 6;
+ 301      =1           sbit PA7    = 0x80 + 7;
+ 302      =1  sfr SP      = 0x81;
+ 303      =1  sfr DPL     = 0x82;
+ 304      =1  sfr DPH     = 0x83;
+ 305      =1  sfr DPL1    = 0x84;
+ 306      =1  sfr DPH1    = 0x85;
+ 307      =1  sfr DPS     = 0x86;
+ 308      =1           /*  DPS  */
+ 309      =1           // sbit SEL   = 0x86+0;
+ 310      =1  sfr PCON    = 0x87;
+ 311      =1           /*  PCON  */
+ 312      =1           //sbit IDLE   = 0x87+0;
+ 313      =1           //sbit STOP   = 0x87+1;
+ 314      =1           //sbit GF0    = 0x87+2;
+ 315      =1           //sbit GF1    = 0x87+3;
+ 316      =1           //sbit SMOD0  = 0x87+7;
+ 317      =1  sfr TCON    = 0x88;
+ 318      =1           /*  TCON  */
+ 319      =1           sbit IT0    = 0x88+0;
+ 320      =1           sbit IE0    = 0x88+1;
+ 321      =1           sbit IT1    = 0x88+2;
+ 322      =1           sbit IE1    = 0x88+3;
+ 323      =1           sbit TR0    = 0x88+4;
+ 324      =1           sbit TF0    = 0x88+5;
+ 325      =1           sbit TR1    = 0x88+6;
+ 326      =1           sbit TF1    = 0x88+7;
+ 327      =1  sfr TMOD    = 0x89;
+ 328      =1           /*  TMOD  */
+ 329      =1           //sbit M00    = 0x89+0;
+ 330      =1           //sbit M10    = 0x89+1;
+ 331      =1           //sbit CT0    = 0x89+2;
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 12  
+
+ 332      =1           //sbit GATE0  = 0x89+3;
+ 333      =1           //sbit M01    = 0x89+4;
+ 334      =1           //sbit M11    = 0x89+5;
+ 335      =1           //sbit CT1    = 0x89+6;
+ 336      =1           //sbit GATE1  = 0x89+7;
+ 337      =1  sfr TL0     = 0x8A;
+ 338      =1  sfr TL1     = 0x8B;
+ 339      =1  sfr TH0     = 0x8C;
+ 340      =1  sfr TH1     = 0x8D;
+ 341      =1  sfr CKCON   = 0x8E;
+ 342      =1           /*  CKCON  */
+ 343      =1           //sbit MD0    = 0x89+0;
+ 344      =1           //sbit MD1    = 0x89+1;
+ 345      =1           //sbit MD2    = 0x89+2;
+ 346      =1           //sbit T0M    = 0x89+3;
+ 347      =1           //sbit T1M    = 0x89+4;
+ 348      =1           //sbit T2M    = 0x89+5;
+ 349      =1  sfr SPC_FNC = 0x8F; // Was WRS in Reg320
+ 350      =1           /*  CKCON  */
+ 351      =1           //sbit WRS    = 0x8F+0;
+ 352      =1  sfr IOB     = 0x90;
+ 353      =1           /*  IOB  */
+ 354      =1           sbit PB0    = 0x90 + 0;
+ 355      =1           sbit PB1    = 0x90 + 1;
+ 356      =1           sbit PB2    = 0x90 + 2;
+ 357      =1           sbit PB3    = 0x90 + 3;
+ 358      =1  
+ 359      =1           sbit PB4    = 0x90 + 4;
+ 360      =1           sbit PB5    = 0x90 + 5;
+ 361      =1           sbit PB6    = 0x90 + 6;
+ 362      =1           sbit PB7    = 0x90 + 7;
+ 363      =1  sfr EXIF    = 0x91; // EXIF Bit Values differ from Reg320
+ 364      =1           /*  EXIF  */
+ 365      =1           //sbit USBINT = 0x91+4;
+ 366      =1           //sbit I2CINT = 0x91+5;
+ 367      =1           //sbit IE4    = 0x91+6;
+ 368      =1           //sbit IE5    = 0x91+7;
+ 369      =1  sfr MPAGE  = 0x92;
+ 370      =1  sfr SCON0  = 0x98;
+ 371      =1           /*  SCON0  */
+ 372      =1           sbit RI    = 0x98+0;
+ 373      =1           sbit TI    = 0x98+1;
+ 374      =1           sbit RB8   = 0x98+2;
+ 375      =1           sbit TB8   = 0x98+3;
+ 376      =1           sbit REN   = 0x98+4;
+ 377      =1           sbit SM2   = 0x98+5;
+ 378      =1           sbit SM1   = 0x98+6;
+ 379      =1           sbit SM0   = 0x98+7;
+ 380      =1  sfr SBUF0  = 0x99;
+ 381      =1  
+ 382      =1  #define AUTOPTR1H AUTOPTRH1 // for backwards compatibility with examples
+ 383      =1  #define AUTOPTR1L AUTOPTRL1 // for backwards compatibility with examples
+ 384      =1  #define APTR1H AUTOPTRH1 // for backwards compatibility with examples
+ 385      =1  #define APTR1L AUTOPTRL1 // for backwards compatibility with examples
+ 386      =1  
+ 387      =1  // this is how they are defined in the TRM
+ 388      =1  sfr AUTOPTRH1     = 0x9A; 
+ 389      =1  sfr AUTOPTRL1     = 0x9B; 
+ 390      =1  sfr AUTOPTRH2     = 0x9D;
+ 391      =1  sfr AUTOPTRL2     = 0x9E; 
+ 392      =1  
+ 393      =1  sfr IOC        = 0xA0;
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 13  
+
+ 394      =1           /*  IOC  */
+ 395      =1           sbit PC0    = 0xA0 + 0;
+ 396      =1           sbit PC1    = 0xA0 + 1;
+ 397      =1           sbit PC2    = 0xA0 + 2;
+ 398      =1           sbit PC3    = 0xA0 + 3;
+ 399      =1  
+ 400      =1           sbit PC4    = 0xA0 + 4;
+ 401      =1           sbit PC5    = 0xA0 + 5;
+ 402      =1           sbit PC6    = 0xA0 + 6;
+ 403      =1           sbit PC7    = 0xA0 + 7;
+ 404      =1  sfr INT2CLR    = 0xA1;
+ 405      =1  sfr INT4CLR    = 0xA2;
+ 406      =1  
+ 407      =1  sfr IE     = 0xA8;
+ 408      =1           /*  IE  */
+ 409      =1           sbit EX0   = 0xA8+0;
+ 410      =1           sbit ET0   = 0xA8+1;
+ 411      =1           sbit EX1   = 0xA8+2;
+ 412      =1           sbit ET1   = 0xA8+3;
+ 413      =1           sbit ES0   = 0xA8+4;
+ 414      =1           sbit ET2   = 0xA8+5;
+ 415      =1           sbit ES1   = 0xA8+6;
+ 416      =1           sbit EA    = 0xA8+7;
+ 417      =1  
+ 418      =1  sfr EP2468STAT     = 0xAA;
+ 419      =1           /* EP2468STAT */
+ 420      =1           //sbit EP2E   = 0xAA+0;
+ 421      =1           //sbit EP2F   = 0xAA+1;
+ 422      =1           //sbit EP4E   = 0xAA+2;
+ 423      =1           //sbit EP4F   = 0xAA+3;
+ 424      =1           //sbit EP6E   = 0xAA+4;
+ 425      =1           //sbit EP6F   = 0xAA+5;
+ 426      =1           //sbit EP8E   = 0xAA+6;
+ 427      =1           //sbit EP8F   = 0xAA+7;
+ 428      =1  
+ 429      =1  sfr EP24FIFOFLGS   = 0xAB;
+ 430      =1  sfr EP68FIFOFLGS   = 0xAC;
+ 431      =1  sfr AUTOPTRSETUP  = 0xAF;
+ 432      =1           /* AUTOPTRSETUP */
+ 433      =1           //   sbit EXTACC  = 0xAF+0;
+ 434      =1           //   sbit APTR1FZ = 0xAF+1;
+ 435      =1           //   sbit APTR2FZ = 0xAF+2;
+ 436      =1  
+ 437      =1  sfr IOD     = 0xB0;
+ 438      =1           /*  IOD  */
+ 439      =1           sbit PD0    = 0xB0 + 0;
+ 440      =1           sbit PD1    = 0xB0 + 1;
+ 441      =1           sbit PD2    = 0xB0 + 2;
+ 442      =1           sbit PD3    = 0xB0 + 3;
+ 443      =1  
+ 444      =1           sbit PD4    = 0xB0 + 4;
+ 445      =1           sbit PD5    = 0xB0 + 5;
+ 446      =1           sbit PD6    = 0xB0 + 6;
+ 447      =1           sbit PD7    = 0xB0 + 7;
+ 448      =1  sfr IOE     = 0xB1;
+ 449      =1  sfr OEA     = 0xB2;
+ 450      =1  sfr OEB     = 0xB3;
+ 451      =1  sfr OEC     = 0xB4;
+ 452      =1  sfr OED     = 0xB5;
+ 453      =1  sfr OEE     = 0xB6;
+ 454      =1  
+ 455      =1  sfr IP     = 0xB8;
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 14  
+
+ 456      =1           /*  IP  */
+ 457      =1           sbit PX0   = 0xB8+0;
+ 458      =1           sbit PT0   = 0xB8+1;
+ 459      =1           sbit PX1   = 0xB8+2;
+ 460      =1           sbit PT1   = 0xB8+3;
+ 461      =1           sbit PS0   = 0xB8+4;
+ 462      =1           sbit PT2   = 0xB8+5;
+ 463      =1           sbit PS1   = 0xB8+6;
+ 464      =1  
+ 465      =1  sfr EP01STAT    = 0xBA;
+ 466      =1  sfr GPIFTRIG    = 0xBB;
+ 467      =1                  
+ 468      =1  sfr GPIFSGLDATH     = 0xBD;
+ 469      =1  sfr GPIFSGLDATLX    = 0xBE;
+ 470      =1  sfr GPIFSGLDATLNOX  = 0xBF;
+ 471      =1  
+ 472      =1  sfr SCON1  = 0xC0;
+ 473      =1           /*  SCON1  */
+ 474      =1           sbit RI1   = 0xC0+0;
+ 475      =1           sbit TI1   = 0xC0+1;
+ 476      =1           sbit RB81  = 0xC0+2;
+ 477      =1           sbit TB81  = 0xC0+3;
+ 478      =1           sbit REN1  = 0xC0+4;
+ 479      =1           sbit SM21  = 0xC0+5;
+ 480      =1           sbit SM11  = 0xC0+6;
+ 481      =1           sbit SM01  = 0xC0+7;
+ 482      =1  sfr SBUF1  = 0xC1;
+ 483      =1  sfr T2CON  = 0xC8;
+ 484      =1           /*  T2CON  */
+ 485      =1           sbit CP_RL2 = 0xC8+0;
+ 486      =1           sbit C_T2  = 0xC8+1;
+ 487      =1           sbit TR2   = 0xC8+2;
+ 488      =1           sbit EXEN2 = 0xC8+3;
+ 489      =1           sbit TCLK  = 0xC8+4;
+ 490      =1           sbit RCLK  = 0xC8+5;
+ 491      =1           sbit EXF2  = 0xC8+6;
+ 492      =1           sbit TF2   = 0xC8+7;
+ 493      =1  sfr RCAP2L = 0xCA;
+ 494      =1  sfr RCAP2H = 0xCB;
+ 495      =1  sfr TL2    = 0xCC;
+ 496      =1  sfr TH2    = 0xCD;
+ 497      =1  sfr PSW    = 0xD0;
+ 498      =1           /*  PSW  */
+ 499      =1           sbit P     = 0xD0+0;
+ 500      =1           sbit FL    = 0xD0+1;
+ 501      =1           sbit OV    = 0xD0+2;
+ 502      =1           sbit RS0   = 0xD0+3;
+ 503      =1           sbit RS1   = 0xD0+4;
+ 504      =1           sbit F0    = 0xD0+5;
+ 505      =1           sbit AC    = 0xD0+6;
+ 506      =1           sbit CY    = 0xD0+7;
+ 507      =1  sfr EICON  = 0xD8; // Was WDCON in DS80C320; Bit Values differ from Reg320
+ 508      =1           /*  EICON  */
+ 509      =1           sbit INT6  = 0xD8+3;
+ 510      =1           sbit RESI  = 0xD8+4;
+ 511      =1           sbit ERESI = 0xD8+5;
+ 512      =1           sbit SMOD1 = 0xD8+7;
+ 513      =1  sfr ACC    = 0xE0;
+ 514      =1  sfr EIE    = 0xE8; // EIE Bit Values differ from Reg320
+ 515      =1           /*  EIE  */
+ 516      =1           sbit EUSB    = 0xE8+0;
+ 517      =1           sbit EI2C    = 0xE8+1;
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 15  
+
+ 518      =1           sbit EIEX4   = 0xE8+2;
+ 519      =1           sbit EIEX5   = 0xE8+3;
+ 520      =1           sbit EIEX6   = 0xE8+4;
+ 521      =1  sfr B      = 0xF0;
+ 522      =1  sfr EIP    = 0xF8; // EIP Bit Values differ from Reg320
+ 523      =1           /*  EIP  */
+ 524      =1           sbit PUSB    = 0xF8+0;
+ 525      =1           sbit PI2C    = 0xF8+1;
+ 526      =1           sbit EIPX4   = 0xF8+2;
+ 527      =1           sbit EIPX5   = 0xF8+3;
+ 528      =1           sbit EIPX6   = 0xF8+4;
+ 529      =1  
+ 530      =1  /*-----------------------------------------------------------------------------
+ 531      =1     Bit Masks
+ 532      =1  -----------------------------------------------------------------------------*/
+ 533      =1  
+ 534      =1  /* CPU Control & Status Register (CPUCS) */
+ 535      =1  #define bmPRTCSTB    bmBIT5
+ 536      =1  #define bmCLKSPD     (bmBIT4 | bmBIT3)
+ 537      =1  #define bmCLKSPD1    bmBIT4
+ 538      =1  #define bmCLKSPD0    bmBIT3
+ 539      =1  #define bmCLKINV     bmBIT2
+ 540      =1  #define bmCLKOE      bmBIT1
+ 541      =1  #define bm8051RES    bmBIT0
+ 542      =1  /* Port Alternate Configuration Registers */
+ 543      =1  /* Port A (PORTACFG) */
+ 544      =1  #define bmFLAGD      bmBIT7
+ 545      =1  #define bmINT1       bmBIT1
+ 546      =1  #define bmINT0       bmBIT0
+ 547      =1  /* Port C (PORTCCFG) */
+ 548      =1  #define bmGPIFA7     bmBIT7
+ 549      =1  #define bmGPIFA6     bmBIT6
+ 550      =1  #define bmGPIFA5     bmBIT5
+ 551      =1  #define bmGPIFA4     bmBIT4
+ 552      =1  #define bmGPIFA3     bmBIT3
+ 553      =1  #define bmGPIFA2     bmBIT2
+ 554      =1  #define bmGPIFA1     bmBIT1
+ 555      =1  #define bmGPIFA0     bmBIT0
+ 556      =1  /* Port E (PORTECFG) */
+ 557      =1  #define bmGPIFA8     bmBIT7
+ 558      =1  #define bmT2EX       bmBIT6
+ 559      =1  #define bmINT6       bmBIT5
+ 560      =1  #define bmRXD1OUT    bmBIT4
+ 561      =1  #define bmRXD0OUT    bmBIT3
+ 562      =1  #define bmT2OUT      bmBIT2
+ 563      =1  #define bmT1OUT      bmBIT1
+ 564      =1  #define bmT0OUT      bmBIT0
+ 565      =1  
+ 566      =1  /* I2C Control & Status Register (I2CS) */
+ 567      =1  #define bmSTART      bmBIT7
+ 568      =1  #define bmSTOP       bmBIT6
+ 569      =1  #define bmLASTRD     bmBIT5
+ 570      =1  #define bmID         (bmBIT4 | bmBIT3)
+ 571      =1  #define bmBERR       bmBIT2
+ 572      =1  #define bmACK        bmBIT1
+ 573      =1  #define bmDONE       bmBIT0
+ 574      =1  /* I2C Control Register (I2CTL) */
+ 575      =1  #define bmSTOPIE     bmBIT1
+ 576      =1  #define bm400KHZ     bmBIT0
+ 577      =1  /* Interrupt 2 (USB) Autovector Register (INT2IVEC) */
+ 578      =1  #define bmIV4        bmBIT6
+ 579      =1  #define bmIV3        bmBIT5
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 16  
+
+ 580      =1  #define bmIV2        bmBIT4
+ 581      =1  #define bmIV1        bmBIT3
+ 582      =1  #define bmIV0        bmBIT2
+ 583      =1  /* USB Interrupt Request & Enable Registers (USBIE/USBIRQ) */
+ 584      =1  #define bmEP0ACK     bmBIT6
+ 585      =1  #define bmHSGRANT    bmBIT5
+ 586      =1  #define bmURES       bmBIT4
+ 587      =1  #define bmSUSP       bmBIT3
+ 588      =1  #define bmSUTOK      bmBIT2
+ 589      =1  #define bmSOF        bmBIT1
+ 590      =1  #define bmSUDAV      bmBIT0
+ 591      =1  /* Breakpoint register (BREAKPT) */
+ 592      =1  #define bmBREAK      bmBIT3
+ 593      =1  #define bmBPPULSE    bmBIT2
+ 594      =1  #define bmBPEN       bmBIT1
+ 595      =1  /* Interrupt 2 & 4 Setup (INTSETUP) */
+ 596      =1  #define bmAV2EN      bmBIT3
+ 597      =1  #define INT4IN       bmBIT1
+ 598      =1  #define bmAV4EN      bmBIT0
+ 599      =1  /* USB Control & Status Register (USBCS) */
+ 600      =1  #define bmHSM        bmBIT7
+ 601      =1  #define bmDISCON     bmBIT3
+ 602      =1  #define bmNOSYNSOF   bmBIT2
+ 603      =1  #define bmRENUM      bmBIT1
+ 604      =1  #define bmSIGRESUME  bmBIT0
+ 605      =1  /* Wakeup Control and Status Register (WAKEUPCS) */
+ 606      =1  #define bmWU2        bmBIT7
+ 607      =1  #define bmWU         bmBIT6
+ 608      =1  #define bmWU2POL     bmBIT5
+ 609      =1  #define bmWUPOL      bmBIT4
+ 610      =1  #define bmDPEN       bmBIT2
+ 611      =1  #define bmWU2EN      bmBIT1
+ 612      =1  #define bmWUEN       bmBIT0
+ 613      =1  /* End Point 0 Control & Status Register (EP0CS) */
+ 614      =1  #define bmHSNAK      bmBIT7
+ 615      =1  /* End Point 0-1 Control & Status Registers (EP0CS/EP1OUTCS/EP1INCS) */
+ 616      =1  #define bmEPBUSY     bmBIT1
+ 617      =1  #define bmEPSTALL    bmBIT0
+ 618      =1  /* End Point 2-8 Control & Status Registers (EP2CS/EP4CS/EP6CS/EP8CS) */
+ 619      =1  #define bmNPAK       (bmBIT6 | bmBIT5 | bmBIT4)
+ 620      =1  #define bmEPFULL     bmBIT3
+ 621      =1  #define bmEPEMPTY    bmBIT2
+ 622      =1  /* Endpoint Status (EP2468STAT) SFR bits */
+ 623      =1  #define bmEP8FULL    bmBIT7
+ 624      =1  #define bmEP8EMPTY   bmBIT6
+ 625      =1  #define bmEP6FULL    bmBIT5
+ 626      =1  #define bmEP6EMPTY   bmBIT4
+ 627      =1  #define bmEP4FULL    bmBIT3
+ 628      =1  #define bmEP4EMPTY   bmBIT2
+ 629      =1  #define bmEP2FULL    bmBIT1
+ 630      =1  #define bmEP2EMPTY   bmBIT0
+ 631      =1  /* SETUP Data Pointer Auto Mode (SUDPTRCTL) */
+ 632      =1  #define bmSDPAUTO    bmBIT0
+ 633      =1  /* Endpoint Data Toggle Control (TOGCTL) */
+ 634      =1  #define bmQUERYTOGGLE  bmBIT7
+ 635      =1  #define bmSETTOGGLE    bmBIT6
+ 636      =1  #define bmRESETTOGGLE  bmBIT5
+ 637      =1  #define bmTOGCTLEPMASK bmBIT3 | bmBIT2 | bmBIT1 | bmBIT0
+ 638      =1  /* IBN (In Bulk Nak) enable and request bits (IBNIE/IBNIRQ) */
+ 639      =1  #define bmEP8IBN     bmBIT5
+ 640      =1  #define bmEP6IBN     bmBIT4
+ 641      =1  #define bmEP4IBN     bmBIT3
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 17  
+
+ 642      =1  #define bmEP2IBN     bmBIT2
+ 643      =1  #define bmEP1IBN     bmBIT1
+ 644      =1  #define bmEP0IBN     bmBIT0
+ 645      =1  
+ 646      =1  /* PING-NAK enable and request bits (NAKIE/NAKIRQ) */
+ 647      =1  #define bmEP8PING     bmBIT7
+ 648      =1  #define bmEP6PING     bmBIT6
+ 649      =1  #define bmEP4PING     bmBIT5
+ 650      =1  #define bmEP2PING     bmBIT4
+ 651      =1  #define bmEP1PING     bmBIT3
+ 652      =1  #define bmEP0PING     bmBIT2
+ 653      =1  #define bmIBN         bmBIT0
+ 654      =1  
+ 655      =1  /* Interface Configuration bits (IFCONFIG) */
+ 656      =1  #define bmIFCLKSRC    bmBIT7
+ 657      =1  #define bm3048MHZ     bmBIT6
+ 658      =1  #define bmIFCLKOE     bmBIT5
+ 659      =1  #define bmIFCLKPOL    bmBIT4
+ 660      =1  #define bmASYNC       bmBIT3
+ 661      =1  #define bmGSTATE      bmBIT2
+ 662      =1  #define bmIFCFG1      bmBIT1
+ 663      =1  #define bmIFCFG0      bmBIT0
+ 664      =1  #define bmIFCFGMASK   (bmIFCFG0 | bmIFCFG1)
+ 665      =1  #define bmIFGPIF      bmIFCFG1
+ 666      =1  
+ 667      =1  /* EP 2468 FIFO Configuration bits (EP2FIFOCFG,EP4FIFOCFG,EP6FIFOCFG,EP8FIFOCFG) */
+ 668      =1  #define bmINFM       bmBIT6
+ 669      =1  #define bmOEP        bmBIT5
+ 670      =1  #define bmAUTOOUT    bmBIT4
+ 671      =1  #define bmAUTOIN     bmBIT3
+ 672      =1  #define bmZEROLENIN  bmBIT2
+ 673      =1  #define bmWORDWIDE   bmBIT0
+ 674      =1  
+ 675      =1  /* Chip Revision Control Bits (REVCTL) - used to ebable/disable revision specidic
+ 676      =1     features */ 
+ 677      =1  #define bmNOAUTOARM    bmBIT1
+ 678      =1  #define bmSKIPCOMMIT   bmBIT0
+ 679      =1  
+ 680      =1  /* Fifo Reset bits (FIFORESET) */
+ 681      =1  #define bmNAKALL       bmBIT7
+ 682      =1  
+ 683      =1  /* Chip Feature Register (GPCR2) */
+ 684      =1  #define bmFULLSPEEDONLY    bmBIT4
+ 685      =1  
+ 686      =1  #endif   /* FX2REGS_H */
+  13          #include "pins_def.h"
+   1      =1  #ifndef PINS_DEF_H              //Header sentry
+   2      =1  #define PINS_DEF_H
+   3      =1  
+   4      =1  // PINS FUNCTIONS DEFINITIONS
+   5      =1  
+   6      =1  // PORT BIT DEFINITIONS : OUTPUTS
+   7      =1  //#define USB_LED_PORT_OUT              OUTB    // USB Led output pin
+   8      =1  //#define USB_LED_PIN                   bmBIT6  // USB Led
+   9      =1  #define Z8_RESET_PORT_OUT               IOE             // Reset control of Z8 board
+  10      =1  #define Z8_RESET_PIN                    bmBIT1  // Reset control of Z8 board
+  11      =1  #define OCD_EN_PORT_OUT                 IOE             // OCD Enable output port
+  12      =1  #define OCD_EN_PIN                              bmBIT0  // OCD Enable output pin
+  13      =1  #define FORCE_OCD_Z8_PORT_OUT   IOE             // Reset control of Z8 board
+  14      =1  #define FORCE_OCD_Z8_PIN                bmBIT3  // Reset control of Z8 board
+  15      =1  
+  16      =1  // PORT BIT DEFINITIONS : INPUTS
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 18  
+
+  17      =1  #define VUSB_PORT_IN                    IOE             // usb power supply monitor input port
+  18      =1  #define VUSB_PIN                                bmBIT2  // usb power supply monitor input pin
+  19      =1  
+  20      =1  
+  21      =1  // OPTIONAL PINS ACTUALLY NOT USED
+  22      =1  
+  23      =1  
+  24      =1  #endif
+  25      =1  
+  26      =1  
+  27      =1  
+  28      =1  
+  29      =1  
+  14          #include "common_def.h"
+   1      =1  #ifndef COMMON_DEF_H            //Header sentry
+   2      =1  #define COMMON_DEF_H
+   3      =1  
+   4      =1  // GLOBAL DEFINES
+   5      =1  // #define EZ_COMPIL 1
+   6      =1  
+   7      =1  //#define SIMUL 1
+   8      =1  
+   9      =1  // MIDI MERGERS BUFFERS LENGHT
+  10      =1  #define MIDI_IN_FROM_CON_BUFF_LENGHT    128     // V1.5 128
+  11      =1  #define MIDI_IN_FROM_USB_BUFF_LENGHT    128 // V1.5 128
+  12      =1  #define SERIAL_IN_FROM_Z8_BUFF_LENGHT   128 // V1.5 128 
+  13      =1  #define MIDI_IN_REALTIME_BUFF_LENGHT    8
+  14      =1  
+  15      =1  typedef struct {
+  16      =1  BYTE start_index;                                                       // start index on input buffer
+  17      =1  volatile BYTE end_index;                                        // end index on input buffer
+  18      =1  BYTE merger_state;                                                      // merger state of input buffer
+  19      =1  volatile BYTE current_index;                            // current index on input buffer
+  20      =1  volatile BYTE input_status;                                     // Status register : see bits definition below
+  21      =1  BYTE buffer[MIDI_IN_FROM_CON_BUFF_LENGHT];      // input buffer
+  22      =1  } Midi_In_Struct;
+  23      =1  
+  24      =1  
+  25      =1  // bits definition for input_status in the aove structure
+  26      =1  #define input_overflow                  (1 << 0)        // bit 0 : input overflow
+  27      =1  
+  28      =1  typedef struct {
+  29      =1  BYTE realtime[MIDI_IN_REALTIME_BUFF_LENGHT];// realtime midi input buffer
+  30      =1  BYTE realtime_start_index;                                      // current index on realtime buffer
+  31      =1  BYTE realtime_end_index;                                        // current index on realtime buffer
+  32      =1  volatile BYTE input_status;                                     // Status register : see bits definition below
+  33      =1  } Midi_In_Realtime_Struct;
+  34      =1  
+  35      =1  // bits definition for input_status in the above realtime structure
+  36      =1  #define realtime_overflow               (1 << 0)        // bit 0 : realtime input overflow
+  37      =1  
+  38      =1  // enums for the following registers updated from Z8 board
+  39      =1  // enum {CTRL_REG_0_7BITS_FROM_Z8,CTRL_REG_1_7BITS_FROM_Z8  };
+  40      =1  
+  41      =1  #endif
+  15          #include <common_z8_ez.h>
+   1      =1  #ifndef COMMON_Z8_EZ
+   2      =1  #define COMMON_Z8_EZ
+   3      =1  
+   4      =1  typedef unsigned char uchar;
+   5      =1  typedef unsigned int  uint;
+   6      =1  
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 19  
+
+   7      =1  #define Z8_FREQ 20000000ul      // 20.0 MHz
+   8      =1  
+   9      =1  #define BAUD_Z8_EZ                              31250L                  // 62.5K baud for UART0
+  10      =1  #define BAUD_OCD_Z8_EZ                  62500L                  // 62.5K baud for Z8 On Chip debugger (Must be > 39kb at 20MHz)
+  11      =1  
+  12      =1  
+  13      =1  // #define HW_V10       1 // uncoment only if hw v1.0 (usb monitor pin and cancel pins are inverted)
+  14      =1  
+  15      =1  #define FW_VERSION_INDEX                0U
+  16      =1  #define FW_SUB_VERSION_INDEX    1U
+  17      =1  #define HW_VERSION_INDEX                2U
+  18      =1  #define HW_SUB_VERSION_INDEX    3U
+  19      =1  #define MANUF_YEAR_INDEX                4U
+  20      =1  #define MANUF_MONTH_INDEX               5U
+  21      =1  #define SERIAL_4_INDEX                  6U
+  22      =1  #define SERIAL_3_INDEX                  7U
+  23      =1  #define SERIAL_2_INDEX                  8U
+  24      =1  #define SERIAL_1_INDEX                  9U
+  25      =1  #define SERIAL_0_INDEX                  10U
+  26      =1  
+  27      =1  #define IDENTITY_LENGHT                 11
+  28      =1  
+  29      =1  // Z8_STATUS_0_NVM bits definition (MUST BE LOADED From NVM AT STARTUP)
+  30      =1  // bit 7 always 0
+  31      =1  #define new_video_mode_z0nvm            (1<<6)  // 1 = inverted
+  32      =1  #define video_mode_z0nvm                        (1<<5)  // 1 = inverted
+  33      =1  #define encoder_tempo_lock_z0nvm        (1<<4)  // 1 = lock tempo encoder
+  34      =1  #define mtc_mode_on_off_z0nvm           (1<<3)  // 1 = realtime off, 0 = realtime on    DO NOT CHANGE ORDER
+  35      =1  #define mtc_mode_z0nvm                          (1<<2)  // 1 = mtc / 0 = midi clock                             DO NOT CHANGE ORDER
+  36      =1  #define hook_zjump_mode_z0nvm           (1<<1)  // 1 = jumpless
+  37      =1  #define jog_lock_z0nvm                          (1<<0)  // 1 = lock big encoder
+  38      =1  
+  39      =1  #define MTC_MODE_MASK_BIT       0x0C    // Bits 2 & 3
+  40      =1  
+  41      =1  // Z8_STATUS_1_NVM bits definition (MUST BE LOADED From NVM AT STARTUP)
+  42      =1  // bit 7 always 0
+  43      =1  #define must_autoassign_z1nvm           (1<<6)  // 1 = must auto assign
+  44      =1  #define smpte_frame_rate_1_z1nvm        (1<<2)  // 0 0 = 24 fps         0 1 = 25 fps            DO NOT CHANGE ORDER
+  45      =1  #define smpte_frame_rate_0_z1nvm        (1<<1)  // 1 0 = 30 fps nd      1 1 = 30 fps            DO NOT CHANGE ORDER
+  46      =1  
+  47      =1  #define SMPTE_FRAME_RATE_MASK_BIT       0x06    // Bits 1 & 2
+  48      =1  
+  49      =1  // Z8_STATUS_2_NVM bits definition (MUST BE LOADED From NVM AT STARTUP)
+  50      =1  // bit 7 always 0
+  51      =1  
+  52      =1  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+  53      =1  /////////////////////////// REGISTERS THAT MUST BE SENT TO EZ AT STARTUP ///////////////////////////////
+  54      =1  
+  55      =1  // CTRL_REG_0_7BITS_TO_EZ bits definition (MUST BE LOADED From NVM AT STARTUP, MUST BE SENT TO EZBOARD)
+  56      =1  // Bit 7 must be 0 since this control reg is sent to EZBOARD
+  57      =1  #define filter_state_z_ez0_bit_pos                              6       
+  58      =1  //#define                                                                               5       
+  59      =1  #define filter_type_z_ez0_bit_pos                               4
+  60      =1  #define midi_thru_ez0_bit_pos                                   3       
+  61      =1  //#define merger_src_midi_in_state_z_ez0_bit_pos        3
+  62      =1  //#define merger_src_usb_in_state_z_ez0_bit_pos 2
+  63      =1  //#define merger_dst_usb_out_state_z_ez0_bit_pos        1
+  64      =1  //#define merger_dst_out1_state_z_ez0_bit_pos           0
+  65      =1  
+  66      =1  #ifdef Z8_COMPIL
+           =1 #define filter_state_z_ez0                                      (1<<filter_state_z_ez0_bit_pos)                         // on/off
+           =1 // #define 
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 20  
+
+           =1 #define filter_type_z_ez0                                       (1<<filter_type_z_ez0_bit_pos)                          // 1=filter all, 0=filter realtime
+           =1 #define midi_thru_ez0                                           (1<<midi_thru_ez0_bit_pos)      // on/off
+           =1 //#define merger_src_midi_in_state_z_ez0        (1<<merger_src_midi_in_state_z_ez0_bit_pos)     // on/off
+           =1 //#define merger_src_usb_in_state_z_ez0         (1<<merger_src_usb_in_state_z_ez0_bit_pos)      // on/off
+           =1 //#define merger_dst_usb_out_state_z_ez0        (1<<merger_dst_usb_out_state_z_ez0_bit_pos)     // on/off
+           =1 //#define merger_dst_out1_state_z_ez0           (1<<merger_dst_out1_state_z_ez0_bit_pos)        // on/off
+           =1 #endif
+  76      =1  
+  77      =1  #ifdef EZ_COMPIL
+  78      =1  #define filter_state_z_ez0                                      (CTRL_REGS_7BITS_FROM_Z8[CTRL_REG_0_7BITS_TO_EZ_INDEX] ^ filter_state_z_ez0
+             -_bit_pos)
+  79      =1  // #define 
+  80      =1  #define filter_type_z_ez0                                       (CTRL_REGS_7BITS_FROM_Z8[CTRL_REG_0_7BITS_TO_EZ_INDEX] ^ filter_type_z_ez0_b
+             -it_pos)
+  81      =1  #define midi_thru_ez0                                           (CTRL_REGS_7BITS_FROM_Z8[CTRL_REG_0_7BITS_TO_EZ_INDEX] ^ midi_thru_ez0_bit_pos)
+  82      =1  //#define merger_src_midi_in_state_z_ez0        (CTRL_REGS_7BITS_FROM_Z8[CTRL_REG_0_7BITS_TO_EZ_INDEX] ^ merger_
+             -src_midi_in_state_z_ez0_bit_pos)
+  83      =1  //#define merger_src_usb_in_state_z_ez0         (CTRL_REGS_7BITS_FROM_Z8[CTRL_REG_0_7BITS_TO_EZ_INDEX] ^ merger_s
+             -rc_usb_in_state_z_ez0_bit_pos)
+  84      =1  //#define merger_dst_usb_out_state_z_ez0        (CTRL_REGS_7BITS_FROM_Z8[CTRL_REG_0_7BITS_TO_EZ_INDEX] ^ merger_d
+             -st_usb_out_state_z_ez0_bit_pos)
+  85      =1  //#define merger_dst_out1_state_z_ez0           (CTRL_REGS_7BITS_FROM_Z8[CTRL_REG_0_7BITS_TO_EZ_INDEX] ^ merger_dst
+             -_out1_state_z_ez0_bit_pos)
+  86      =1  #endif
+  87      =1  
+  88      =1  
+  89      =1  // CTRL_REG_1_7BITS_TO_EZ bits definition (MUST BE LOADED From NVM AT STARTUP, MUST BE SENT TO EZBOARD)
+  90      =1  // Bit 7 must be 0 since this control reg is sent to EZBOARD
+  91      =1  #define ez_fw_midi_to_z8_z_ez1_bit_pos          4       // V1.5 ; z8 indicates to EZ it must receive midi events
+  92      =1  #define realtime_source_int_z_ez1_bit_pos       1       // DO NOT CHANGE ORDER
+  93      =1  #define realtime_source_ext_z_ez1_bit_pos       0       // DO NOT CHANGE ORDER
+  94      =1  #define REALTIME_SRC_MSK        0x03                            // Midi in, Usb in, internal
+  95      =1  
+  96      =1  #ifdef Z8_COMPIL
+           =1 #define ez_fw_midi_to_z8_z_ez1                          (1<<ez_fw_midi_to_z8_z_ez1_bit_pos)             // on/off
+           =1 #define realtime_source_int_z_ez1                       (1<<realtime_source_int_z_ez1_bit_pos)  // 0=internal 0ff, 1=internal o
+             -n 
+           =1 #define realtime_source_ext_z_ez1                       (1<<realtime_source_ext_z_ez1_bit_pos)  // 0=midi in, 1=usb in (externa
+             -l sync input)
+           =1 #endif
+ 101      =1  
+ 102      =1  #ifdef EZ_COMPIL
+ 103      =1  #define ez_fw_midi_to_z8_z_ez1                          (CTRL_REGS_7BITS_FROM_Z8[CTRL_REG_1_7BITS_TO_EZ_INDEX] ^ ez_fw_midi_to_z
+             -8_z_ez1_bit_pos)
+ 104      =1  #define realtime_source_int_z_ez1                       (CTRL_REGS_7BITS_FROM_Z8[CTRL_REG_1_7BITS_TO_EZ_INDEX] ^ realtime_sour
+             -ce_int_z_ez1_bit_pos)
+ 105      =1  #define realtime_source_ext_z_ez1                       (CTRL_REGS_7BITS_FROM_Z8[CTRL_REG_1_7BITS_TO_EZ_INDEX] ^ realtime_sour
+             -ce_ext_z_ez1_bit_pos)
+ 106      =1  #endif
+ 107      =1  
+ 108      =1  // LAST_CTRL_REG_7BITS_TO_EZ_INDEX bits definition (MUST BE LOADED From NVM AT STARTUP, MUST BE SENT TO EZ
+             -BOARD)
+ 109      =1  // Bit 7 must be 0 since this control reg is sent to EZBOARD
+ 110      =1  //#define ez_board_fully_updated_ezlast         (1<<6)  // 1 when all regs dedicated to EZ have been sent
+ 111      =1  // or
+ 112      =1  #define EZ_FULLY_UPDATED        0x55U
+ 113      =1  
+ 114      =1  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+ 115      =1  // MISC REGISTERS (PARTIALY) USED BY EZ BOARD, NOT TO SEND (COMMON DEF ONLY)
+ 116      =1  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+ 117      =1  
+ 118      =1  // Z8_STATUS_8 bits definition
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 21  
+
+ 119      =1  #define onewire_rx_overflow_z8                  (1<<5)  // 0 =no overflow               DO NOT CHANGE ORDER
+ 120      =1  #define serial_in_overflow_z8                   (1<<4)  // 0 =no overflow               DO NOT CHANGE ORDER
+ 121      =1  #define midi_in_realtime_overflow_z8    (1<<3)  // 0 =no overflow               DO NOT CHANGE ORDER
+ 122      =1  #define usb_in_realtime_overflow_z8             (1<<2)  // 0 =no overflow               DO NOT CHANGE ORDER
+ 123      =1  #define midi_in_overflow_z8                             (1<<1)  // 0 =no overflow               DO NOT CHANGE ORDER
+ 124      =1  #define usb_in_overflow_z8                              (1<<0)  // 0 =no overflow               DO NOT CHANGE ORDER
+ 125      =1  
+ 126      =1  #define OVERFLOW_MSK                                    0x3FU   // mask bits 0-5
+ 127      =1  #define OVERFLOW_FROM_EZ_MSK                    0x0FU   // mask bits 0-3 (only overflows from EZ board)
+ 128      =1  #define OVERFLOW_REALTIME_MSK                   0x0CU   // mask bits 3-2
+ 129      =1  #define OVERFLOW_INPUT_MSK                              0x03U   // mask bits 1-0
+ 130      =1  #define OVERFLOW_FROM_MIDI_MSK                  0x0AU   // mask bits 1 and 3
+ 131      =1  #define OVERFLOW_FROM_USB_MSK                   0x05U   // mask bits 0 and 2
+ 132      =1  
+ 133      =1  //////////////////////////////////////////////////////////
+ 134      =1  // Z8 TO EZ (only) COMMUNICATION PROTOCOL ////////////////
+ 135      =1  //////////////////////////////////////////////////////////
+ 136      =1  #define SOF_TO_EZ                                               0xFFU
+ 137      =1  #define FRAME_FROM_Z8_TO_EZ_TYPE_MSK    0x60U   // Bits 6-5 : data type (reg/midi)
+ 138      =1  #define FRAME_TO_EZ_IS_MIDI                             0x20U
+ 139      =1  #define FRAME_TO_EZ_IS_CTRL_REG                 0x00U
+ 140      =1  #define EOF_TO_EZ                                               0xFEU
+ 141      =1  
+ 142      =1  // frame from z8 to ez status byte bits definition
+ 143      =1  // bit 7 is always 0                                    //  bit 7 : always 0
+ 144      =1  // bits 6:5                                                     // frame type 00=ctrl_reg 01=midi 
+ 145      =1  #define send_to_usb                     (1 << 4)        // bit 4        // reg address or send to usb
+ 146      =1  #define send_to_out1            (1 << 3)        // bit 3        // reg address or send to out 0
+ 147      =1  #define send_to_out2            (1 << 2)        // bit 2        // reg address or send to out 1
+ 148      =1  // bits 1:0                                                             // bits 1:0     // reg address or rfu
+ 149      =1  
+ 150      =1  #define CTRL_REG_Z8_TO_EZ_ADDR_MSK              0x1F
+ 151      =1  
+ 152      =1  //////////////////////////////////////////////////////////
+ 153      =1  // EZ TO Z8 (only) COMMUNICATION PROTOCOL ////////////////
+ 154      =1  //////////////////////////////////////////////////////////
+ 155      =1  
+ 156      =1  #define CTRL_REG_MAX_FROM_EZ_TO_Z8              1U              // Nb of registers updated to the Z8 board
+ 157      =1  
+ 158      =1  // CTRL_REG_0_7BITS_FROM_EZ bits definition : TOGGLE REGISTER
+ 159      =1  // the following bits def MUST be duplicated in main.c from EZ project file
+ 160      =1  //  bit 7 is always 0                                                   //  bit 7 : always 0
+ 161      =1  #define usb_state_from_ez0_bit_pos                                      6
+ 162      =1  #define z8_board_fully_updated_from_ez0_bit_pos         5
+ 163      =1  #define must_start_bootloader_from_ez0_bit_pos          4
+ 164      =1  #define usb_enumrated_from_ez0_bit_pos                          3
+ 165      =1  
+ 166      =1  #ifdef Z8_COMPIL
+           =1 #define usb_state_from_ez0                                      (1<<usb_state_from_ez0_bit_pos) // 0=midi in, 1=usb in
+           =1 #define z8_board_fully_updated_from_ez0         (1<<z8_board_fully_updated_from_ez0_bit_pos)    // on/off
+           =1 #define must_start_bootloader_from_ez0          (1<<must_start_bootloader_from_ez0_bit_pos)     // on/off
+           =1 #define usb_enumrated_from_ez0                          (1<<usb_enumrated_from_ez0_bit_pos)     // on/off
+           =1 #endif
+ 172      =1  
+ 173      =1  #ifdef EZ_COMPIL
+ 174      =1  #define usb_state_from_ez0                                      (CTRL_REGS_7BITS_TO_Z8[0] ^ usb_state_from_ez0_bit_pos)
+ 175      =1  #define z8_board_fully_updated_from_ez0         (CTRL_REGS_7BITS_TO_Z8[0] ^ z8_board_fully_updated_from_ez0_bit_
+             -pos)
+ 176      =1  #define must_start_bootloader_from_ez0          (CTRL_REGS_7BITS_TO_Z8[0] ^ must_start_bootloader_from_ez0_bit_pos
+             -)
+ 177      =1  #define usb_enumrated_from_ez0                          (CTRL_REGS_7BITS_TO_Z8[0] ^ usb_enumrated_from_ez0_bit_pos)
+ 178      =1  #endif
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 22  
+
+ 179      =1  
+ 180      =1  // SYSEX ID0 (BYTE 6)   
+ 181      =1  //  bit 7 is always 0                                                   //  bit 7 : always 0
+ 182      =1  #define sysex_direction_sysxid0                 (1<<6U) //  bit 6 :                                                     0=received sysex, 1=sent sysex
+ 183      =1  #define prog_upload_sysxid0                             (1<<5U) //      bit 5 : program or upload request       0=program request/answer 1=upl
+             -oad request/answer
+ 184      =1  #define prog_ez_z8_sysxid0                              (1<<5U) //      bit 5 : 0= program ez firmware 1= program z8 firmware 
+ 185      =1  #define pure_midi_from_usb_sysxid0              (1<<5U) //      bit 5 : 0= pure midi from MIDI in conn 1= pure Midi from US
+             -B in (V1.5)
+ 186      =1  #define acknoledge_sysxid0                              (1<<4U) //      bit 4 : ack request/answer                      0=no ack required/prog error  1=ack 
+             -required/prog succeeded
+ 187      =1  #define checksum_check_sysxid0                  (1<<3U) //      bit 3 : checksum check request          0=no checksum to check  1=must
+             - check embedeed checksum (calculated from SYSEX ID2 to checksum)
+ 188      =1  //#define checksum_return_sysxid0               (1<<2U) //      bit 2 : checksum return request         0=checksum return is not re
+             -quested 1:checksum return is requested 
+ 189      =1  #define fw_znext_finish_sysxid0                 (1<<2U) //      bit 2 : 0= next firmware data available / 1=finish programmin
+             -g firmware
+ 190      =1  // bits 1:0 : frame type content                                //  00=common parameter 01=lcd control assign   // DO NOT CHANGE ORDER
+ 191      =1                                                                                                  //  10=firmware or midi 11=midi control assign  // DO NOT CHANGE ORDER
+ 192      =1  #define FRAME_TO_Z8_TYPE_MSK                    0x03U   //      sysex content 
+ 193      =1                                                  
+ 194      =1  //v1.1 enum { FRAME_IS_COMMON_PARAM, FRAME_IS_LCD_CTRL_ASSIGN, FRAME_IS_FIRMWARE, FRAME_IS_MIDI_CTRL_ASSIG
+             -N, FRAME_IS_PURE_MIDI};
+ 195      =1  enum { FRAME_IS_COMMON_PARAM, FRAME_IS_LCD_CTRL_ASSIGN, FRAME_IS_FIRMWARE_OR_PURE_MIDI, FRAME_IS_MIDI_CTRL
+             -_ASSIGN};
+ 196      =1  
+ 197      =1  // Addresses of common parameters uploaded/programmed from EZ board or external sysex
+ 198      =1  enum {  // then with NVM regs dedicated to EZ board
+ 199      =1                  CTRL_REG_0_7BITS_TO_EZ_INDEX, CTRL_REG_1_7BITS_TO_EZ_INDEX, 
+ 200      =1                  LAST_CTRL_REG_7BITS_TO_EZ_INDEX,
+ 201      =1                  // continue with NVM regs dedicated to Z8 only
+ 202      =1                  Z8_STATUS_0_NVM_INDEX, Z8_STATUS_1_NVM_INDEX, CHANNEL_INDEX, GROUP_INDEX, INT_TEMPO_INDEX, 
+ 203      =1          // the following regs cannot be accessed (from EZ board only)
+ 204      =1          CTRL_REG_0_7B_FROM_EZ_INDEX, LCD_MESSAGE_TO_Z8_INDEX };
+ 205      =1  
+ 206      =1  #define IDENTITY_REQUEST_INDEX 0x7F
+ 207      =1  
+ 208      =1  // first index of NVM registers dedicated to EZ
+ 209      =1  #define CTRL_REG_TO_EZ_START_INDEX       CTRL_REG_0_7BITS_TO_EZ_INDEX   
+ 210      =1  // last index of NVM register that can be programmed by external sysex
+ 211      =1  
+ 212      =1  // last index of NVM register that can be programmed by external sysex or EZ board
+ 213      =1  #define LAST_COMMON_PARAM_INDEX      LCD_MESSAGE_TO_Z8_INDEX
+ 214      =1  // Nb of registers updated from the Z8 board
+ 215      =1  #define CTRL_REG_NB_FROM_Z8_TO_EZ        (LAST_CTRL_REG_7BITS_TO_EZ_INDEX-CTRL_REG_0_7BITS_TO_EZ_INDEX+1)               
+ 216      =1  
+ 217      =1  //SYSEX ID3 (BYTE 8)    
+ 218      =1  //  bit 7               : always 0
+ 219      =1  //      bits 6:0        : group or address      : control assign group GG
+ 220      =1   
+ 221      =1  // JLABS SYSEX header from MMA
+ 222      =1  #define JLABS_SYX_ID0                           0x00U
+ 223      =1  #define JLABS_SYX_ID1                           0x20U
+ 224      =1  #define JLABS_SYX_ID2                           0x4FU
+ 225      =1  #define JLABS_SYX_ID3                           0x00U
+ 226      =1  #define JLABS_SYX_ID4                           0x01U
+ 227      =1  
+ 228      =1  #define MIDI_PROGRAM_CHANGE                     0xC0U
+ 229      =1  #define MIDI_CONTROL_CHANGE                     0xB0U
+ 230      =1  #define MIDI_PITCH_WHEEL                        0xE0U
+ 231      =1  #define MIDI_CHANN_PRESSURE                     0xD0U
+ 232      =1  #define MIDI_NOTE_ON                            0x90U
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 23  
+
+ 233      =1  #define MIDI_NOTE_OFF                           0x80U
+ 234      =1  #define MIDI_MMC_PAUSE                          0x09U
+ 235      =1  #define MIDI_MMC_BACKWARD                       0x05U
+ 236      =1  #define MIDI_MMC_FORWARD                        0x04U
+ 237      =1  #define MIDI_MMC_PLAY                           0x02U
+ 238      =1  #define MIDI_MMC_STOP                           0x01U
+ 239      =1  #define MIDI_MMC_REC                            0x06U
+ 240      =1  #define MIDI_CLOCK                                      0xF8U
+ 241      =1  #define MIDI_TICK                                       0xF9U
+ 242      =1  #define MIDI_START                                      0xFAU
+ 243      =1  #define MIDI_CONTINUE                           0xFBU
+ 244      =1  #define MIDI_STOP                                       0xFCU
+ 245      =1  #define MIDI_SOX                                        0xF0U
+ 246      =1  #define MIDI_EOX                                        0xF7U
+ 247      =1  #define MIDI_ACTIVE_SENSE                       0xFEU   // never received, filtered by EZ board
+ 248      =1  #define MIDI_TIME_CODE                          0xF1U
+ 249      =1  #define MIDI_SONG_POSITION_POINTER      0xF2U
+ 250      =1  #define MIDI_SONG_SELECTED                      0xF3U
+ 251      =1  #define MIDI_STATUS_MASK                        0x80U
+ 252      =1  
+ 253      =1  #define JLABS_SYX_HEADER_SIZE                   6U                                                              // f0 00 20 4f 00 01 
+ 254      =1  #define JLABS_SYX_UPLOAD_HEADER_SIZE    (JLABS_SYX_HEADER_SIZE + 4U)    // f0 00 20 4f 00 01 UL LL GG NN 
+ 255      =1  
+ 256      =1  #define DATA_LENGHT_START_BOOTLOADER    0x7F
+ 257      =1  #define Z8_ERASING_TIME                                 4000
+ 258      =1  #define EE_24C64_PAGE_LENGHT                    32
+ 259      =1  #define EE24C64_SIZE                                    16384
+ 260      =1  
+ 261      =1  #define MAX_LCD_TEXT_LENGHT                     (16U + 1U)              // 16 chars + eoc
+ 262      =1  
+ 263      =1  
+ 264      =1  #define DEFAULT_INTERNAL_TEMPO          100 // 30 will be added : 130
+ 265      =1  #define MAX_REAL_TEMPO                          255
+ 266      =1  #define TEMPO_ADD_OFFSET                        30
+ 267      =1  
+ 268      =1  #endif
+  16          #include "hardware.h"
+   1      =1  #ifndef HARDWARE_H              //Header sentry
+   2      =1  #define HARDWARE_H
+   3      =1  
+   4      =1  // DEFINES
+   5      =1  #define USB_LED_PERSISTENCY             10      // in multiple of 2ms
+   6      =1  
+   7      =1  // PROTOTYPING
+   8      =1  void Init_Variables(void);
+   9      =1  void Init_IOs(void);
+  10      =1  void SyncToZ8Board(void);
+  11      =1  //void Check_InitialSwitchesState(void);
+  12      =1  
+  13      =1  #endif
+  17          #include "serial.h"
+   1      =1  #ifndef SERIAL_H                //Header sentry
+   2      =1  #define SERIAL_H
+   3      =1  
+   4      =1  #define Z8_MEM_SIZE                                     65536
+   5      =1  #define EZUSB_MEM_SIZE                          8192
+   6      =1  
+   7      =1  #define XTAL                                            48000000L       // in hertz
+   8      =1  #define MIDI_OUT_1_BAUD_RATE            31250L          // in bauds
+   9      =1  
+  10      =1  #define MIDI_OUT_1_BAUD_RELOAD                  (65536-(XTAL/(32L*MIDI_OUT_1_BAUD_RATE)))       // timer 2
+  11      =1  #define SERIAL_TO_Z8_BAUD_RELOAD                ((2*XTAL)/(32*12*BAUD_Z8_EZ))   // timer 1
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 24  
+
+  12      =1  #define SERIAL_TO_OCD_Z8_BAUD_RELOAD    ((2*XTAL)/(32*12*BAUD_OCD_Z8_EZ))       // timer 1 (ON CHIP DEBUGGER Z8)
+  13      =1  
+  14      =1  
+  15      =1  #define TIMER0_PERIOD                           2 // in milliseconds
+  16      =1  #define TIMER0_RELOAD                           (65536-(((XTAL*TIMER0_PERIOD)/(12*1000L))))
+  17      =1  
+  18      =1  #define SERIAL_TX_BUFF_LENGTH           32 // used as a buffer for MIDI outputs
+  19      =1  
+  20      =1  enum {WAIT_SOF, FRAME_STATUS_BYTE, WAIT_EOF }; // Frame state from Z8 serial
+  21      =1  enum {WAIT_FOR_CORRECT_DATA, IN_SYSEX, SYSEX_RECEIVED, NORMAL, FIFO_FULL }; // MIDI Merger State Byte
+  22      =1  enum {CN0, CN1 };        // USB MIDI CABLE NUMBER
+  23      =1  enum {SERIAL, USB }; // Bootloader source port
+  24      =1  
+  25      =1  #define CTRL_REG_Z8_FRAME_LENGHT                0x04 // FF SS VV FE FF SS VV FE
+  26      =1  
+  27      =1  // jlabs MAWZER RECOGNIZED SYSEXS (RECEIVED BY MAWZER)
+  28      =1  
+  29      =1  // jlabs MAWZER RECOGNIZED SYSEXS (SENT BY MAWZER)
+  30      =1  
+  31      =1  
+  32      =1  // FUNCTION PROTOTYPES
+  33      =1  void Init_Serial_Ports(void);
+  34      =1  void Send_To_Midi_Out_Con(BYTE data_to_send);
+  35      =1  void Check_MIDI_Buff_Send_To_Z8_Board(Midi_In_Struct *midi_struct, BYTE end_index_local);
+  36      =1  void Send_To_Serial_Z8(BYTE data_to_send);
+  37      =1  void Send_Single_Framed_byte_To_Z8(/*v1.1 BYTE SYSEX_ID0,*/ BYTE SYSEX_ID2, BYTE byte_to_send);
+  38      =1  
+  39      =1  #endif // SERIAL_H
+  18          #include "bootloader.h"
+   1      =1  #ifndef BOOTLOADER_H            //Header sentry
+   2      =1  #define BOOTLOADER_H
+   3      =1  
+   4      =1  enum { BOOTLOADER_OFF, SEND_IDENTITY_SYSEX, WAIT_EZ_FW_DATA, WAIT_Z8_FW_DATA, TERMINATE_FW_UPGRADE/*, VERI
+             -FY_Z8_CRC */};
+   5      =1  
+   6      =1  // Z8 ENCORE ON CHIP DEBUGGER DEFINITION
+   7      =1  #define OCD_FIRST_BYTE                          0x80    // used to autodetect ocd bit rate
+   8      =1  //ocd commands
+   9      =1  #define OCD_WRITE_PRG_MEM_CMD           0x0A    // 
+  10      =1  #define OCD_READ_PRG_MEM_CMD            0x0B    // V1.4
+  11      =1  #define OCD_WRITE_CTR_REG_CMD           0x04    // 
+  12      =1  #define OCD_WRITE_REG_CMD                       0x08
+  13      =1  #define OCD_READ_FLASH_CRC                      0x0E
+  14      =1  // ocd datas
+  15      =1  #define OCD_FLASH_FIRST_UNLOCK          0x73
+  16      =1  #define OCD_FLASH_SECOND_UNLOCK         0x8C
+  17      =1  #define OCD_FLASH_MASS_ERASE            0x63
+  18      =1  #define OCD_FLASH_CTR_REG_RESET         0x00
+  19      =1  #define OCD_CTR_REG_DBGMODE                     0x81
+  20      =1  // registers addresses
+  21      =1  #define OCD_OPTION_REG_ADD                      0x0000
+  22      =1  #define OCD_FLASH_CTR_REG_ADD           0x0FF8
+  23      =1  #define OCD_FLASH_FREQ_REG_HIGH_ADD     0x0FFA
+  24      =1  #define OCD_FLASH_FREQ_REG_LOW_ADD      0x0FFB
+  25      =1  #define OCD_FLASH_SELECT_PAGE           0x0FF9
+  26      =1                  
+  27      =1  #define OCD_Z8_FLASH_FREQ_REG   (Z8_FREQ / 1000)
+  28      =1  
+  29      =1  #define I2C_EE_HH_ADDR                  0x01
+  30      =1  #define SERIAL_ADDR                             0x50
+  31      =1  #define I2C_Addr                                (SERIAL_ADDR | I2C_EE_HH_ADDR)  
+  32      =1  #define FW_SYSX_DATA_START              11              // f0 00 20 4f 00 01 ss ll aa aa aa  
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 25  
+
+  33      =1  
+  34      =1  //#define fw_checksum                   sync24_clear_clock_cpt
+  35      =1  //#define fw_bl_src                             sync24_clear_cont_cpt
+  36      =1  
+  37      =1  enum { FW_BL_SRC_UNKNOWN, FW_BL_SRC_MIDI_IN, FW_BL_SRC_USB_IN };
+  38      =1  
+  39      =1  // BOOTLOADER SYSEX DEFINITION
+  40      =1  
+  41      =1  
+  42      =1  // FUNCTIONS PROTOTYPES
+  43      =1  //void SoftReset(void);
+  44      =1  void Check_Bootloader(void);
+  45      =1  void SendIdentityBootLoader(void);
+  46      =1  void SendFwAcknoledge(unsigned char result);
+  47      =1  void AssignJlabsSysexHeader(void);
+  48      =1  void SendDispatchFwSysex(void);
+  49      =1  void WaitNextBootLoaderState(unsigned char awaited_state);
+  50      =1  void DecodeFirmwareSysex(Midi_In_Struct *midi_struct);
+  51      =1  //void EEPROMWriteByte(WORD addr, BYTE value);
+  52      =1  BYTE EEPROMWriteVerify(WORD addr, BYTE length, BYTE xdata *buf); //, BYTE buffer_max_length); //TPM EEPROM
+             - Write
+  53      =1  void WriteSingleRegOCD(WORD address, BYTE value);
+  54      =1  void InitFlashFrqAndUnlock(void);
+  55      =1  
+  56      =1  #endif
+  57      =1  
+  19          #include "main.h"
+   1      =1  #ifndef MAIN_H          //Header sentry
+   2      =1  #define MAIN_H
+   3      =1  
+   4      =1  // PROTOTYPES
+   5      =1  //void TD_Poll(void);
+   6      =1  void Check_Midi_In_Buffer(Midi_In_Struct *midi_struct, bit merger_src_enable);
+   7      =1  void Check_Serial_In_From_Z8_Buffer(void);
+   8      =1  void Check_Realtime(void);
+   9      =1  void Check_Realtime_Buffers(Midi_In_Realtime_Struct *midi_struct, bit merger_src_enable);
+  10      =1  void Check_Overflow_Flags(void);
+  11      =1  void Update_Sync24(unsigned char data_received);
+  12      =1  //void Check_Realtime_From_Z8(void);
+  13      =1  
+  14      =1  #endif
+  15      =1  
+  20          #include "usb.h"
+   1      =1  #ifndef USB_H           //Header sentry
+   2      =1  #define USB_H
+   3      =1  
+   4      =1  
+   5      =1  
+   6      =1  // PROTOTYPES
+   7      =1  void Check_If_Usb_Attached(void);
+   8      =1  void Check_Usb(void);
+   9      =1  void Create_Send_USB_Frame_From_MIDI_Buffer( BYTE CN, Midi_In_Struct *midi_struct, BYTE end_index_local);
+  10      =1  void Create_Send_Realtime_USB_Frame_From_MIDI_Buffer( BYTE CN, BYTE realtime_data);
+  11      =1  void Ep2out_Function(void);
+  12      =1  #endif
+  21          
+  22          // GLOBAL VARS
+  23          extern unsigned char timeout_cpt;
+  24          
+  25          // From MAIN.C
+  26          extern xdata Midi_In_Struct     MIDI_In_From_Con, MIDI_In_From_Usb, Serial_In_From_Z8;
+  27          extern idata Midi_In_Realtime_Struct  MIDI_In_Realtime_From_Con, MIDI_In_Realtime_From_Usb, Realtime_From_
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 26  
+
+             -Z8;
+  28          extern unsigned char bdata              CTRL_REGS_7BITS_TO_Z8[CTRL_REG_MAX_FROM_EZ_TO_Z8];
+  29          extern unsigned char bdata              CTRL_REGS_7BITS_FROM_Z8[CTRL_REG_NB_FROM_Z8_TO_EZ];
+  30          extern bit z8_board_fully_updated_from_ez0_bit;
+  31          
+  32          // FROM SERIAL.C
+  33          extern unsigned char tx_to_midi_out_con_start_index;
+  34          extern unsigned char tx_to_midi_out_con_end_index;
+  35          extern bit tx_to_midi_out_con_busy;
+  36          extern bit tx_to_midi_out_con_full;
+  37          extern unsigned char tx_to_serial_z8_start_index;
+  38          extern unsigned char tx_to_serial_z8_end_index;
+  39          extern bit tx_to_serial_z8_busy;
+  40          extern bit tx_to_serial_z8_full;
+  41          
+  42          //extern bit usb_bootloader_requested;
+  43          
+  44          // FROM BOOTLOADER.C
+  45          extern volatile BYTE bootloader_state;
+  46          extern BYTE fw_bl_src;
+  47          
+  48          /* ******************************************************************** */
+  49          /* Routine: Init_Variables                                                                                              */
+  50          /* Process: Init Variables default states                                                               */
+  51          /* Inputs:      None                                                                                                            */
+  52          /* Outputs:     None                                                                                                            */
+  53          /* ******************************************************************** */
+  54          void Init_Variables(void)
+  55          {
+  56   1              bootloader_state                         = BOOTLOADER_OFF; 
+  57   1      //      usb_bootloader_requested         = FALSE;
+  58   1      
+  59   1              tx_to_midi_out_con_full          = 0;
+  60   1              tx_to_serial_z8_full             = 0;
+  61   1              tx_to_midi_out_con_busy          = 0;
+  62   1              tx_to_serial_z8_busy             = 0;
+  63   1      
+  64   1              tx_to_midi_out_con_start_index = 0;
+  65   1              tx_to_serial_z8_start_index    = 0;
+  66   1              tx_to_midi_out_con_end_index   = 0;
+  67   1              tx_to_serial_z8_end_index          = 0;
+  68   1      
+  69   1              MIDI_In_From_Con.merger_state                                   = WAIT_FOR_CORRECT_DATA;
+  70   1              MIDI_In_From_Con.current_index                                  = 0;
+  71   1              MIDI_In_From_Con.start_index                                    = 0;
+  72   1              MIDI_In_From_Con.end_index                                              = 0;    
+  73   1              MIDI_In_From_Con.input_status                                   = 0;
+  74   1              MIDI_In_Realtime_From_Con.realtime_start_index  = 0;
+  75   1              MIDI_In_Realtime_From_Con.realtime_end_index    = 0;
+  76   1              MIDI_In_Realtime_From_Con.input_status                  = 0;
+  77   1      
+  78   1              MIDI_In_From_Usb.merger_state                                   = NORMAL;
+  79   1              MIDI_In_From_Usb.current_index                                  = 0;
+  80   1              MIDI_In_From_Usb.start_index                                    = 0;
+  81   1              MIDI_In_From_Usb.end_index                                              = 0;
+  82   1              MIDI_In_From_Usb.input_status                                   = 0;
+  83   1              MIDI_In_Realtime_From_Usb.realtime_start_index  = 0;
+  84   1              MIDI_In_Realtime_From_Usb.realtime_end_index    = 0;
+  85   1              MIDI_In_Realtime_From_Usb.input_status                  = 0;
+  86   1      
+  87   1              Serial_In_From_Z8.merger_state                                  = WAIT_SOF;
+  88   1              Serial_In_From_Z8.current_index                                 = 0;
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 27  
+
+  89   1              Serial_In_From_Z8.start_index                                   = 0;
+  90   1              Serial_In_From_Z8.end_index                                             = 0;
+  91   1              Serial_In_From_Z8.input_status                                  = 0;
+  92   1              Realtime_From_Z8.realtime_start_index                   = 0;
+  93   1              Realtime_From_Z8.realtime_end_index                             = 0;
+  94   1              Realtime_From_Z8.input_status                                   = 0;
+  95   1              
+  96   1              // to ensure proper Z8 to EZ synchro, will have to wait for last reg from Z8
+  97   1              CTRL_REGS_7BITS_FROM_Z8[LAST_CTRL_REG_7BITS_TO_EZ_INDEX] = 0;
+  98   1      
+  99   1              // fw bootload source is midi or usb, unknown yet
+ 100   1              fw_bl_src = FW_BL_SRC_UNKNOWN;
+ 101   1      
+ 102   1              timeout_cpt = 0;
+ 103   1      
+ 104   1      }
+ 105          
+ 106          /* ******************************************************************** */
+ 107          /* Routine: Init_IOs                                                                                                    */
+ 108          /* Process: Init IO default states                                                                              */
+ 109          /* Inputs:      None                                                                                                            */
+ 110          /* Outputs:     None                                                                                                            */
+ 111          /* ******************************************************************** */
+ 112          void Init_IOs(void)
+ 113          {
+ 114   1              // Inititalize IOs shared functions
+ 115   1              PORTECFG = 0;           // Port E is a standard GPIO
+ 116   1      
+ 117   1              // Initialize directions for each ports
+ 118   1              OEE = 0x03;     // Port E0 and E1 are outputs, all other are inputs
+ 119   1      
+ 120   1              // Initialize output Ports default values
+ 121   1              IOE = 0x08;     // z8_reset=0, ocd_en=0, force_ocd_pin_to_zero = 1
+ 122   1      }
+ 123          
+ 124          
+ 125          /* ******************************************************************** */
+ 126          /* Routine: SyncToZ8Board                                                                                               */
+ 127          /* Process:                                                                                                                     */
+ 128          /* Inputs:      None                                                                                                            */
+ 129          /* Outputs:     None                                                                                                            */
+ 130          /* ******************************************************************** */
+ 131          void SyncToZ8Board(void)
+ 132          {
+ 133   1              // Release Z8 board reset line
+ 134   1              Z8_RESET_PORT_OUT |=  Z8_RESET_PIN;
+ 135   1      
+ 136   1              // Turn on timer 0 (2 ms timer to detect timeout)
+ 137   1              TR0 = 1;
+ 138   1      
+ 139   1              //DEBUGJDS turn on USB led
+ 140   1      //      USB_LED_PORT_OUT |= USB_LED_PIN;
+ 141   1      
+ 142   1      #ifndef SIMUL
+ 143   1              timeout_cpt = 255;
+ 144   1              // Loop until all config registers from Z8 have been received OR timout (510ms)
+ 145   1              do 
+ 146   1              { 
+ 147   2                      Check_Serial_In_From_Z8_Buffer();
+ 148   2                      Check_Usb();
+ 149   2              }
+ 150   1              while( (CTRL_REGS_7BITS_FROM_Z8[LAST_CTRL_REG_7BITS_TO_EZ_INDEX] != EZ_FULLY_UPDATED) &&
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 28  
+
+ 151   1                         //(!usb_bootloader_requested));
+ 152   1                         (timeout_cpt));              
+ 153   1      #endif
+ 154   1      
+ 155   1      #ifdef SIMUL
+                      CTRL_REGS_7BITS_FROM_Z8[0] = 0x2D;
+                      CTRL_REGS_7BITS_FROM_Z8[1] = 0x10;
+                      CTRL_REGS_7BITS_FROM_Z8[LAST_CTRL_REG_7BITS_TO_EZ_INDEX] = EZ_FULLY_UPDATED;
+              #endif
+ 160   1      
+ 161   1              // V1.5 : be sure the EZ chip is configured to accept bootloader even if Z8 chip is not answering since n
+             -ot programmed
+ 162   1              if(!timeout_cpt)
+ 163   1              {
+ 164   2                      CTRL_REGS_7BITS_FROM_Z8[0] = 0x0F;
+ 165   2                      CTRL_REGS_7BITS_FROM_Z8[1] = 0x00;
+ 166   2                      CTRL_REGS_7BITS_FROM_Z8[LAST_CTRL_REG_7BITS_TO_EZ_INDEX] = EZ_FULLY_UPDATED;
+ 167   2              }
+ 168   1      
+ 169   1              // Send registers dedicated to Z8 (CTRL_REGS_7BITS_TO_Z8)
+ 170   1              Send_Single_Framed_byte_To_Z8(CTRL_REG_0_7B_FROM_EZ_INDEX, (CTRL_REGS_7BITS_TO_Z8[0] | (1<<z8_board_fully
+             -_updated_from_ez0_bit_pos)));
+ 171   1      
+ 172   1      //      USB_LED_PORT_OUT &= ~USB_LED_PIN;
+ 173   1      
+ 174   1              // synchronize z8 board 
+ 175   1              z8_board_fully_updated_from_ez0_bit = 1;
+ 176   1      }
+ 177          
+ 178          /* ******************************************************************** */
+ 179          /* Routine: Check_InitialSwitchesState                                                                                          */
+ 180          /* Process:                                                                                                                     */
+ 181          /* Inputs:      None                                                                                                            */
+ 182          /* Outputs:     None                                                                                                            */
+ 183          /* ******************************************************************** */
+ 184          /*
+ 185          void Check_InitialSwitchesState(void)
+ 186          {
+ 187                  if(EDIT_PORT_IN & EDIT_PIN)     
+ 188                          if(OK_PORT_IN & OK_PIN)
+ 189                                  if(CANCEL_PORT_IN & CANCEL_PIN)
+ 190                                          Check_Bootloader();     
+ 191          }
+ 192          */
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 29  
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION Init_Variables (BEGIN)
+                                           ; SOURCE LINE # 54
+                                           ; SOURCE LINE # 55
+                                           ; SOURCE LINE # 56
+0000 E4                CLR     A
+0001 F500        E     MOV     bootloader_state,A
+                                           ; SOURCE LINE # 59
+0003 C200        E     CLR     tx_to_midi_out_con_full
+                                           ; SOURCE LINE # 60
+0005 C200        E     CLR     tx_to_serial_z8_full
+                                           ; SOURCE LINE # 61
+0007 C200        E     CLR     tx_to_midi_out_con_busy
+                                           ; SOURCE LINE # 62
+0009 C200        E     CLR     tx_to_serial_z8_busy
+                                           ; SOURCE LINE # 64
+000B F500        E     MOV     tx_to_midi_out_con_start_index,A
+                                           ; SOURCE LINE # 65
+000D F500        E     MOV     tx_to_serial_z8_start_index,A
+                                           ; SOURCE LINE # 66
+000F F500        E     MOV     tx_to_midi_out_con_end_index,A
+                                           ; SOURCE LINE # 67
+0011 F500        E     MOV     tx_to_serial_z8_end_index,A
+                                           ; SOURCE LINE # 69
+0013 900000      E     MOV     DPTR,#MIDI_In_From_Con+02H
+0016 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 70
+0017 A3                INC     DPTR
+0018 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 71
+0019 900000      E     MOV     DPTR,#MIDI_In_From_Con
+001C F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 72
+001D A3                INC     DPTR
+001E F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 73
+001F 900000      E     MOV     DPTR,#MIDI_In_From_Con+04H
+0022 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 74
+0023 7800        E     MOV     R0,#LOW MIDI_In_Realtime_From_Con+08H
+0025 F6                MOV     @R0,A
+                                           ; SOURCE LINE # 75
+0026 08                INC     R0
+0027 F6                MOV     @R0,A
+                                           ; SOURCE LINE # 76
+0028 08                INC     R0
+0029 F6                MOV     @R0,A
+                                           ; SOURCE LINE # 78
+002A 900000      E     MOV     DPTR,#MIDI_In_From_Usb+02H
+002D 7403              MOV     A,#03H
+002F F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 79
+0030 E4                CLR     A
+0031 A3                INC     DPTR
+0032 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 80
+0033 900000      E     MOV     DPTR,#MIDI_In_From_Usb
+0036 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 81
+0037 A3                INC     DPTR
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 30  
+
+0038 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 82
+0039 900000      E     MOV     DPTR,#MIDI_In_From_Usb+04H
+003C F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 83
+003D 7800        E     MOV     R0,#LOW MIDI_In_Realtime_From_Usb+08H
+003F F6                MOV     @R0,A
+                                           ; SOURCE LINE # 84
+0040 08                INC     R0
+0041 F6                MOV     @R0,A
+                                           ; SOURCE LINE # 85
+0042 08                INC     R0
+0043 F6                MOV     @R0,A
+                                           ; SOURCE LINE # 87
+0044 900000      E     MOV     DPTR,#Serial_In_From_Z8+02H
+0047 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 88
+0048 A3                INC     DPTR
+0049 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 89
+004A 900000      E     MOV     DPTR,#Serial_In_From_Z8
+004D F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 90
+004E A3                INC     DPTR
+004F F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 91
+0050 900000      E     MOV     DPTR,#Serial_In_From_Z8+04H
+0053 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 92
+0054 7800        E     MOV     R0,#LOW Realtime_From_Z8+08H
+0056 F6                MOV     @R0,A
+                                           ; SOURCE LINE # 93
+0057 08                INC     R0
+0058 F6                MOV     @R0,A
+                                           ; SOURCE LINE # 94
+0059 08                INC     R0
+005A F6                MOV     @R0,A
+                                           ; SOURCE LINE # 97
+005B F500        E     MOV     CTRL_REGS_7BITS_FROM_Z8+02H,A
+                                           ; SOURCE LINE # 100
+005D F500        E     MOV     fw_bl_src,A
+                                           ; SOURCE LINE # 102
+005F F500        E     MOV     timeout_cpt,A
+                                           ; SOURCE LINE # 104
+0061 22                RET     
+             ; FUNCTION Init_Variables (END)
+
+             ; FUNCTION Init_IOs (BEGIN)
+                                           ; SOURCE LINE # 112
+                                           ; SOURCE LINE # 113
+                                           ; SOURCE LINE # 115
+0000 E4                CLR     A
+0001 900000      E     MOV     DPTR,#PORTECFG
+0004 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 118
+0005 75B603            MOV     OEE,#03H
+                                           ; SOURCE LINE # 121
+0008 75B108            MOV     IOE,#08H
+                                           ; SOURCE LINE # 122
+000B 22                RET     
+             ; FUNCTION Init_IOs (END)
+
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 31  
+
+             ; FUNCTION SyncToZ8Board (BEGIN)
+                                           ; SOURCE LINE # 131
+                                           ; SOURCE LINE # 132
+                                           ; SOURCE LINE # 134
+0000 43B102            ORL     IOE,#02H
+                                           ; SOURCE LINE # 137
+0003 D28C              SETB    TR0
+                                           ; SOURCE LINE # 143
+0005 7500FF      E     MOV     timeout_cpt,#0FFH
+0008         ?C0005:
+                                           ; SOURCE LINE # 146
+                                           ; SOURCE LINE # 147
+0008 120000      E     LCALL   Check_Serial_In_From_Z8_Buffer
+                                           ; SOURCE LINE # 148
+000B 120000      E     LCALL   Check_Usb
+                                           ; SOURCE LINE # 149
+                                           ; SOURCE LINE # 150
+000E E500        E     MOV     A,CTRL_REGS_7BITS_FROM_Z8+02H
+0010 6455              XRL     A,#055H
+0012 6004              JZ      ?C0004
+0014 E500        E     MOV     A,timeout_cpt
+0016 70F0              JNZ     ?C0005
+0018         ?C0004:
+                                           ; SOURCE LINE # 162
+0018 E500        E     MOV     A,timeout_cpt
+001A 7008              JNZ     ?C0007
+                                           ; SOURCE LINE # 163
+                                           ; SOURCE LINE # 164
+001C 75000F      E     MOV     CTRL_REGS_7BITS_FROM_Z8,#0FH
+                                           ; SOURCE LINE # 165
+001F F500        E     MOV     CTRL_REGS_7BITS_FROM_Z8+01H,A
+                                           ; SOURCE LINE # 166
+0021 750055      E     MOV     CTRL_REGS_7BITS_FROM_Z8+02H,#055H
+                                           ; SOURCE LINE # 167
+0024         ?C0007:
+                                           ; SOURCE LINE # 170
+0024 E500        E     MOV     A,CTRL_REGS_7BITS_TO_Z8
+0026 4420              ORL     A,#020H
+0028 FD                MOV     R5,A
+0029 7F08              MOV     R7,#08H
+002B 120000      E     LCALL   _Send_Single_Framed_byte_To_Z8
+                                           ; SOURCE LINE # 175
+002E D200        E     SETB    z8_board_fully_updated_from_ez0_bit
+                                           ; SOURCE LINE # 176
+0030 22                RET     
+             ; FUNCTION SyncToZ8Board (END)
+
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 32  
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+WAIT_SOF . . . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+DWORD. . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_LONG   -----  4
+Init_IOs . . . . . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+Midi_In_Struct . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  133
+  start_index. . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  end_index. . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  merger_state . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+  current_index. . . . . . . . . . . .  MEMBER   -----  U_CHAR   0003H  1
+  input_status . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0004H  1
+  buffer . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0005H  128
+STRINGDSCR . . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  2
+  length . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  type . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+CTRL_REGS_7BITS_TO_Z8. . . . . . . . .  EXTERN   DATA   ARRAY    -----  1
+LCD_MESSAGE_TO_Z8_INDEX. . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+_Send_Single_Framed_byte_To_Z8 . . . .  EXTERN   CODE   PROC     -----  -----
+IN_SYSEX . . . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+Init_Variables . . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+uchar. . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_CHAR   -----  1
+DEVICEQUALDSCR . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  10
+  length . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  type . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  spec_ver_minor . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+  spec_ver_major . . . . . . . . . . .  MEMBER   -----  U_CHAR   0003H  1
+  dev_class. . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0004H  1
+  sub_class. . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0005H  1
+  protocol . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0006H  1
+  max_packet . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0007H  1
+  configs. . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0008H  1
+  reserved0. . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0009H  1
+TERMINATE_FW_UPGRADE . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+Z8_STATUS_0_NVM_INDEX. . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+Z8_STATUS_1_NVM_INDEX. . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+FW_BL_SRC_USB_IN . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+CTRL_REGS_7BITS_FROM_Z8. . . . . . . .  EXTERN   DATA   ARRAY    -----  3
+Midi_In_Realtime_Struct. . . . . . . .  TYPEDEF  -----  STRUCT   -----  11
+  realtime . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0000H  8
+  realtime_start_index . . . . . . . .  MEMBER   -----  U_CHAR   0008H  1
+  realtime_end_index . . . . . . . . .  MEMBER   -----  U_CHAR   0009H  1
+  input_status . . . . . . . . . . . .  MEMBER   -----  U_CHAR   000AH  1
+tx_to_midi_out_con_start_index . . . .  EXTERN   DATA   U_CHAR   -----  1
+Realtime_From_Z8 . . . . . . . . . . .  EXTERN   IDATA  STRUCT   -----  11
+WAIT_Z8_FW_DATA. . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+z8_board_fully_updated_from_ez0_bit. .  EXTERN   DATA   BIT      -----  1
+tx_to_midi_out_con_end_index . . . . .  EXTERN   DATA   U_CHAR   -----  1
+tx_to_midi_out_con_full. . . . . . . .  EXTERN   DATA   BIT      -----  1
+BOOTLOADER_OFF . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+DSCR . . . . . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  2
+  length . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  type . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+BOOL . . . . . . . . . . . . . . . . .  TYPEDEF  DATA   BIT      -----  1
+INT_TEMPO_INDEX. . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+FRAME_IS_MIDI_CTRL_ASSIGN. . . . . . .  E_CONST  -----  U_CHAR   -----  1
+WAIT_EZ_FW_DATA. . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+CTRL_REG_0_7BITS_TO_EZ_INDEX . . . . .  E_CONST  -----  U_CHAR   -----  1
+CTRL_REG_1_7BITS_TO_EZ_INDEX . . . . .  E_CONST  -----  U_CHAR   -----  1
+MIDI_In_From_Con . . . . . . . . . . .  EXTERN   XDATA  STRUCT   -----  133
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 33  
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+timeout_cpt. . . . . . . . . . . . . .  EXTERN   DATA   U_CHAR   -----  1
+BYTE . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_CHAR   -----  1
+LAST_CTRL_REG_7BITS_TO_EZ_INDEX. . . .  E_CONST  -----  U_CHAR   -----  1
+fw_bl_src. . . . . . . . . . . . . . .  EXTERN   DATA   U_CHAR   -----  1
+bootloader_state . . . . . . . . . . .  EXTERN   DATA   U_CHAR   -----  1
+tx_to_serial_z8_start_index. . . . . .  EXTERN   DATA   U_CHAR   -----  1
+tx_to_midi_out_con_busy. . . . . . . .  EXTERN   DATA   BIT      -----  1
+FIFO_FULL. . . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+WORD . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_INT    -----  2
+tx_to_serial_z8_end_index. . . . . . .  EXTERN   DATA   U_CHAR   -----  1
+tx_to_serial_z8_full . . . . . . . . .  EXTERN   DATA   BIT      -----  1
+MIDI_In_From_Usb . . . . . . . . . . .  EXTERN   XDATA  STRUCT   -----  133
+CN0. . . . . . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+SERIAL . . . . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+CN1. . . . . . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+uint . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_INT    -----  2
+SYSEX_RECEIVED . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+FRAME_STATUS_BYTE. . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+NORMAL . . . . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+MIDI_In_Realtime_From_Con. . . . . . .  EXTERN   IDATA  STRUCT   -----  11
+tx_to_serial_z8_busy . . . . . . . . .  EXTERN   DATA   BIT      -----  1
+CTRL_REG_0_7B_FROM_EZ_INDEX. . . . . .  E_CONST  -----  U_CHAR   -----  1
+FRAME_IS_FIRMWARE_OR_PURE_MIDI . . . .  E_CONST  -----  U_CHAR   -----  1
+FW_BL_SRC_MIDI_IN. . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+CHANNEL_INDEX. . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+TR0. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      008CH  1
+MIDI_In_Realtime_From_Usb. . . . . . .  EXTERN   IDATA  STRUCT   -----  11
+OEE. . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00B6H  1
+FRAME_IS_LCD_CTRL_ASSIGN . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+IOE. . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00B1H  1
+PORTECFG . . . . . . . . . . . . . . .  EXTERN   XDATA  U_CHAR   -----  1
+DEVICEDSCR . . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  18
+  length . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  type . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  spec_ver_minor . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+  spec_ver_major . . . . . . . . . . .  MEMBER   -----  U_CHAR   0003H  1
+  dev_class. . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0004H  1
+  sub_class. . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0005H  1
+  protocol . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0006H  1
+  max_packet . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0007H  1
+  vendor_id. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0008H  2
+  product_id . . . . . . . . . . . . .  MEMBER   -----  U_INT    000AH  2
+  version_id . . . . . . . . . . . . .  MEMBER   -----  U_INT    000CH  2
+  mfg_str. . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   000EH  1
+  prod_str . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   000FH  1
+  serialnum_str. . . . . . . . . . . .  MEMBER   -----  U_CHAR   0010H  1
+  configs. . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0011H  1
+SyncToZ8Board. . . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+Serial_In_From_Z8. . . . . . . . . . .  EXTERN   XDATA  STRUCT   -----  133
+Check_Serial_In_From_Z8_Buffer . . . .  EXTERN   CODE   PROC     -----  -----
+CONFIGDSCR . . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  9
+  length . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  type . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  config_len . . . . . . . . . . . . .  MEMBER   -----  U_INT    0002H  2
+  interfaces . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0004H  1
+  index. . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0005H  1
+  config_str . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0006H  1
+C51 COMPILER V8.02   HARDWARE                                                              02/19/2007 12:06:38 PAGE 34  
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+  attrib . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0007H  1
+  power. . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0008H  1
+FW_BL_SRC_UNKNOWN. . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+GROUP_INDEX. . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+FRAME_IS_COMMON_PARAM. . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+USB. . . . . . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+Check_Usb. . . . . . . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+WAIT_FOR_CORRECT_DATA. . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+WAIT_EOF . . . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+EPIOC. . . . . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  2
+  cntrl. . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  bytes. . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+I2CPCKT. . . . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  6
+  length . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  dat. . . . . . . . . . . . . . . . .  MEMBER   -----  PTR      0001H  3
+  count. . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0004H  1
+  status . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0005H  1
+INTRFCDSCR . . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  9
+  length . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  type . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  index. . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+  alt_setting. . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0003H  1
+  ep_cnt . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0004H  1
+  class. . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0005H  1
+  sub_class. . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0006H  1
+  protocol . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0007H  1
+  interface_str. . . . . . . . . . . .  MEMBER   -----  U_CHAR   0008H  1
+SEND_IDENTITY_SYSEX. . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+ENDPNTDSCR . . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  7
+  length . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  type . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  addr . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+  ep_type. . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0003H  1
+  mp_L . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0004H  1
+  mp_H . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0005H  1
+  interval . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0006H  1
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    159    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

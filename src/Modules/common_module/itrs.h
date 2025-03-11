@@ -1,0 +1,14 @@
+#ifndef ITRS
+#define ITRS
+
+#define TDRE	4U
+
+///////////////////////////////////////////////////////////
+// Function Prototypes
+///////////////////////////////////////////////////////////
+//void isr_timer0(void); 
+//void isr_timer1(void); 
+//void isr_rx0(void);
+void InitItrs(void);
+
+#endif

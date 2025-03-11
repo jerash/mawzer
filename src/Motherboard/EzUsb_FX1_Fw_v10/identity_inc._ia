@@ -1,0 +1,1 @@
+"..\..\Common_Ez_Z8\identity_inc.asm" INCDIR(..\..\Common_Ez_Z8) SET (SMALL) DEBUG PRINT(.\identity_inc.lst) OBJECT(.\identity_inc.obj) EP
